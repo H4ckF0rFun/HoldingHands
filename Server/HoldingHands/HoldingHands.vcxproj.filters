@@ -1,0 +1,393 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HoldingHands.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EditCommentDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UrlInputDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSelectDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatInputName.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManagerDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManagerSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileMgrSearchDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileMgrSearchSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteDesktopWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteDesktopSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="KeybdLogDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="KeybdLogSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioGrab.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioPlay.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocksProxyWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocksProxySrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocksProxyAddrDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessManagerSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessManagerWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\EventHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\IOCPSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\spinlock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocksProxyListener.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocksProxyUDPListener.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RingBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocksProxyTcp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileDownloadSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileDownloadDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTransDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTransSrv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="HoldingHands.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EditCommentDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UrlInputDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSelectDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatInputName.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManagerDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManagerSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileMgrSearchDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileMgrSearchSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteDesktopWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteDesktopSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="KernelSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="KeybdLogDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="KeybdLogSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioGrab.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioPlay.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SocksProxySrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SocksProxyAddrDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SocksProxyWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessManagerSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessManagerWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\TCPSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\UDPSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\IOCP.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\dbg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\EventHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SocksProxyListener.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SocksProxyUDPListener.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RingBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SocksProxyTcp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTransSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTransDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileDownloadSrv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FileDownloadDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HoldingHands.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\HoldingHands.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\HoldingHands.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\toolbar1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\NewFolder.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\search.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\up.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\view.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\del.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\go.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\newfolder.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\refresh.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\search.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\up.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\view.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

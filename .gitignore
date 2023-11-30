@@ -1,0 +1,11 @@
+*.obj
+Release
+Debug
+*.sdf
+*.pdb
+*.exp
+*.ipch
+ipch
+client_exe
+data
+*.db

