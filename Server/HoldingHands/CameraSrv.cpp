@@ -38,7 +38,7 @@ void CCameraSrv::OnOpen()
 void CCameraSrv::OnClose()
 {
 	CameraTerm();
-	Notify(WM_CAMERA_ERROR, (WPARAM) "Connection close....");
+	Notify(WM_CAMERA_ERROR, (WPARAM) TEXT("Connection close...."));
 }
 
 

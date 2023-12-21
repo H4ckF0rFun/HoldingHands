@@ -52,12 +52,16 @@ int main(){
 
 	WSADATA wsadata;
 
+
+	gethostbyname("");
+
 	if (WSAStartup(MAKEWORD(2, 0), &wsadata))
 	{
 		dbg_log("WSAStartup failed with error : %d", WSAGetLastError());
 		exit(1);
 	}
 
+	//
 	CIOCP * iocp = new CIOCP();
 	iocp->Create();
 

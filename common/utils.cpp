@@ -58,7 +58,8 @@ static TCHAR * MemUnits[] =
 	TEXT("TB")
 };
 
-void GetStorageSizeString(const LARGE_INTEGER & Bytes, TCHAR* strBuffer){
+void GetStorageSizeString(const LARGE_INTEGER & Bytes, TCHAR* strBuffer)
+{
 
 	double bytes = Bytes.QuadPart;
 	int MemUnitIdx = 0;

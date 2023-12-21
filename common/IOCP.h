@@ -44,8 +44,7 @@ private:
 	spinlock_t			   m_spinlock;
 	//
 
-	volatile ULONGLONG     m_ullUpload;
-	volatile ULONGLONG     m_ullDownload;
+	volatile ULONGLONG     m_ullTraffic[2];
 
 	//
 	volatile unsigned long m_BusyCount;
@@ -180,8 +179,7 @@ public:
 
 	void GetTraffic(ULONGLONG traffic[2])				//thread-safe.
 	{
-		traffic[0] = m_ullDownload;
-		traffic[1] = m_ullUpload;
+		memcpy(traffic, (void*)m_ullTraffic, sizeof(m_ullTraffic));
 	}
 
 	static unsigned int __stdcall CIOCP::Worker(thread_list * list);

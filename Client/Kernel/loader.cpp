@@ -118,11 +118,15 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 		+ sizeof(IMAGE_FILE_HEADER) + pNtHeaders->FileHeader.SizeOfOptionalHeader);
 	//
 	//展开section,空间已经分配好了,只需要把相应位置的数据copy即可
-	for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++){
-		if (pSectionHeader[i].SizeOfRawData > 0){
+	for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++)
+	{
+		if (pSectionHeader[i].SizeOfRawData > 0)
+		{
 			//SizeOfRawData == 0, bss
-			RtlCopyMemory(ImageBase + pSectionHeader[i].VirtualAddress,
-				image + pSectionHeader[i].PointerToRawData, pSectionHeader[i].SizeOfRawData);
+			RtlCopyMemory(
+				ImageBase + pSectionHeader[i].VirtualAddress,
+				image + pSectionHeader[i].PointerToRawData,
+				pSectionHeader[i].SizeOfRawData);
 		}
 	}
 	//修复IAT
@@ -130,33 +134,41 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 	pImportDescriptor = (IMAGE_IMPORT_DESCRIPTOR*)(ImageBase +
 		pNtHeaders->OptionalHeader.DataDirectory[1].VirtualAddress);
 
-	for (; pImportDescriptor->Characteristics; pImportDescriptor++){
+	for (; pImportDescriptor->Characteristics; pImportDescriptor++)
+	{
 		//Load Library;
 		char*szModuleName = (char*)ImageBase + pImportDescriptor->Name;
 		HMODULE hModule = GetModuleHandleA(szModuleName);
 
-		if (hModule == NULL){
+		if (hModule == NULL)
+		{
 			hModule = LoadLibraryA((char*)ImageBase + pImportDescriptor->Name);
 			if (hModule == NULL)
 				return -4;
 		}
+
 		//INT 用于dll 绑定 ,修复IAT即可.
 		PIMAGE_THUNK_DATA pThunkData = (PIMAGE_THUNK_DATA)(ImageBase + pImportDescriptor->FirstThunk);
-		for (; pThunkData->u1.ForwarderString; pThunkData++){
+
+		for (; pThunkData->u1.ForwarderString; pThunkData++)
+		{
 			DWORD dwFuncAddress = NULL;
 			//最高位区分序号导入还是名字导入
-			if (pThunkData->u1.Ordinal & 0x80000000){
+			if (pThunkData->u1.Ordinal & 0x80000000)
+			{
 				//序号导入.
 				dwFuncAddress = (DWORD)__GetProcAddress(hModule, (char*)(pThunkData->u1.Ordinal & 0xffff));
 			}
-			else{
+			else
+			{
 				//Import By Name
 				IMAGE_IMPORT_BY_NAME*pName = (IMAGE_IMPORT_BY_NAME*)(pThunkData->u1.ForwarderString + ImageBase);
 				//pName->Hint;							//??? Hint 
 				dwFuncAddress = (DWORD)__GetProcAddress(hModule, (char*)pName->Name);
 			}
 
-			if (dwFuncAddress == NULL){
+			if (dwFuncAddress == NULL)
+			{
 				return -5;
 			}
 			pThunkData->u1.Function = dwFuncAddress;
@@ -164,12 +176,12 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 	}
 	//重定位修复
 
-	pBaseRelocation = (IMAGE_BASE_RELOCATION*)(ImageBase +
-		pNtHeaders->OptionalHeader.DataDirectory[5].VirtualAddress);
+	pBaseRelocation = (IMAGE_BASE_RELOCATION*)(ImageBase + pNtHeaders->OptionalHeader.DataDirectory[5].VirtualAddress);
 
 	dwDelta = (DWORD)ImageBase - dwOriginalBase;
 
-	while (pBaseRelocation->VirtualAddress || pBaseRelocation->SizeOfBlock){
+	while (pBaseRelocation->VirtualAddress || pBaseRelocation->SizeOfBlock)
+	{
 		DWORD dwItems = (pBaseRelocation->SizeOfBlock - 8) / 2;
 		WORD * pAddrs = (WORD*)(8 + (DWORD)pBaseRelocation);
 		for (int i = 0; i < dwItems; i++){
@@ -192,6 +204,9 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 		pBaseRelocation = (IMAGE_BASE_RELOCATION*)(pBaseRelocation->SizeOfBlock + (DWORD)pBaseRelocation);
 	}
 	//tls......
+
+
+
 
 	//set section property
 	for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++){

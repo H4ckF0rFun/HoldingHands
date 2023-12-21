@@ -345,7 +345,7 @@ BOOL CTCPSocket::Accept(SOCKET * hClientSocket, void * lpParam, HANDLE hEvent)
 
 	_read_lock(&m_rw_spinlock);
 
-	//accept only these flags is set.
+	//accept only if these flags is set.
 	if (m_flag & (~(FLAG_CREATED | FLAG_LISTENING |FLAG_ASSOCIATED)))
 		goto __leave__;
 

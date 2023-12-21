@@ -70,9 +70,9 @@ int CClientList::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	InsertColumn(2, TEXT("Host"), LVCFMT_LEFT, 100);				//OK
 	InsertColumn(3, TEXT("User"), LVCFMT_LEFT, 100);				//OK
 	InsertColumn(4, TEXT("OS"), LVCFMT_LEFT, 110);				//OK
-	InsertColumn(5, TEXT("InstallDate"), LVCFMT_LEFT, 110);		//--
+	InsertColumn(5, TEXT("InstallDate"), LVCFMT_LEFT, 160);		//--
 	InsertColumn(6, TEXT("CPU"), LVCFMT_LEFT, 120);				//OK
-	InsertColumn(7, TEXT("Disk/RAM"), LVCFMT_LEFT, 120);			//OK
+	InsertColumn(7, TEXT("Disk/RAM"), LVCFMT_LEFT, 160);			//OK
 	InsertColumn(8, TEXT("HasCamera"), LVCFMT_LEFT, 100);		//OK
 	InsertColumn(9, TEXT("Ping"), LVCFMT_LEFT, 70);				//OK
 	InsertColumn(10, TEXT("Location"), LVCFMT_LEFT, 100);			//OK
@@ -143,17 +143,17 @@ LRESULT CClientList::OnClientLogout(WPARAM wParam, LPARAM lParam)
 	
 	if (index >= 0)
 	{
-		pHandler->Close();
-		pHandler->Put();
-
 		DeleteItem(index);
 	}
-	
+	pHandler->Close();
+	pHandler->Put();
+
 	return 0;
 }
 
 
-LRESULT CClientList::OnUpdateUploadStatu(WPARAM wParam, LPARAM lParam){
+LRESULT CClientList::OnUpdateUploadStatu(WPARAM wParam, LPARAM lParam)
+{
 	TCHAR           szModuleSize[64];
 	TCHAR           szFinishedSize[64];
 	LPVOID *       ArgList        = (LPVOID*)lParam;
@@ -175,8 +175,8 @@ LRESULT CClientList::OnUpdateUploadStatu(WPARAM wParam, LPARAM lParam){
 
 	if (index >= 0)
 	{
-		CString Statu;
-		Statu.Format(
+		CString Status;
+		Status.Format(
 			TEXT("%s : %s/%s (%.2lf%%)"), 
 			ModuleName.GetBuffer(),
 			szFinishedSize, 
@@ -184,7 +184,7 @@ LRESULT CClientList::OnUpdateUploadStatu(WPARAM wParam, LPARAM lParam){
 			100.00 * FinishedSize.LowPart / ModuleSize.LowPart
 		);
 
-		SetItemText(index, 12, Statu);
+		SetItemText(index, 12, Status);
 	}
 	return 0;
 }

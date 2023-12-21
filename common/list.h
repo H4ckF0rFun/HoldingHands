@@ -15,13 +15,15 @@ struct list_node
 		(node)->prev = (list)->prev;  \
 		(node)->next->prev = (node); \
 		(node)->prev->next = (node); \
-					}while(0);				\
+								}while(0);				\
 
 
 #define list_del_node(list,node) \
 	do{							 \
 		(node)->next->prev = (node)->prev; \
 		(node)->prev->next = (node)->next; \
+		(node)->prev = (node); \
+		(node)->next = (node); \
 				}while(0);				\
 
 
@@ -30,7 +32,6 @@ struct list_node
 		(list)->next = (list); \
 		(list)->prev = (list); \
 			} while (0);	       \
-
 
 
 #endif

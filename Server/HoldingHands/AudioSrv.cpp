@@ -99,8 +99,13 @@ void CAudioSrv::StartSendLocalVoice(){
 	if (m_AudioGrab.InitGrabber())
 	{
 		Send(AUDIO_PLAY_BEGIN, 0, 0);		//通知对方打开播放器...
-		m_hWorkThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)SendThread,
-			this, 0, 0);
+		m_hWorkThread = CreateThread(
+			0, 
+			0, 
+			(LPTHREAD_START_ROUTINE)SendThread,
+			this,
+			0, 
+			0);
 	}
 	else
 	{

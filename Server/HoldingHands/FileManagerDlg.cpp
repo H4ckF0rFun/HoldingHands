@@ -172,8 +172,6 @@ BOOL CFileManagerDlg::OnInitDialog()
 	GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 	m_FileList.EnableWindow(FALSE);
 	
-	//
-	dbg_log("GetSafeHwnd(): %08x\n", GetSafeHwnd());
 	m_pHandler->SetNotifyWindow(GetSafeHwnd());
 	
 	//root directory..
@@ -597,6 +595,7 @@ void CFileManagerDlg::OnRunfileHide()
 {
 	if (m_FileList.GetSelectedCount() == 0)
 		return;
+
 	CString Files;
 	POSITION pos = m_FileList.GetFirstSelectedItemPosition();
 
@@ -616,6 +615,7 @@ void CFileManagerDlg::OnRunfileNormal()
 {
 	if (m_FileList.GetSelectedCount() == 0)
 		return;
+
 	CString Files;
 	POSITION pos = m_FileList.GetFirstSelectedItemPosition();
 
@@ -678,7 +678,8 @@ void CFileManagerDlg::OnMenuDelete()
 	CString s;
 	POSITION pos = m_FileList.GetFirstSelectedItemPosition();
 
-	while (pos){
+	while (pos)
+	{
 		int idx = m_FileList.GetNextSelectedItem(pos);
 		s += m_FileList.GetItemText(idx, 0);
 		s += L"\n";
@@ -696,10 +697,12 @@ void CFileManagerDlg::OnMenuCopy()
 	//驱动器目录不允许复制和cut
 	if (m_FileList.GetSelectedCount() == 0 || m_Location.GetLength() == 0)
 		return;
+
 	CString s = m_Location + L"\n";
 
 	POSITION pos = m_FileList.GetFirstSelectedItemPosition();
-	while (pos){
+	while (pos)
+	{
 		int idx = m_FileList.GetNextSelectedItem(pos);
 		s += m_FileList.GetItemText(idx, 0);
 		s += "\n";

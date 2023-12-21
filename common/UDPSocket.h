@@ -2,9 +2,6 @@
 #include "IOCPSocket.h"
 
 
-#define IO_READ    0
-#define IO_WRITE   1
-
 struct UDP_READ_OVERLAPPED : SOCKET_OVERLAPPED
 {
 	UINT8 *	    m_lpData;

@@ -38,8 +38,14 @@ void CKeybdLogSrv::OnGetPlug(){
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	DWORD dwRead = 0;
 
-	hFile = CreateFile(FileName, GENERIC_READ, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hFile = CreateFile(
+		FileName, 
+		GENERIC_READ, 
+		FILE_SHARE_READ, 
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL, 
+		NULL);
 
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
@@ -53,7 +59,12 @@ void CKeybdLogSrv::OnGetPlug(){
 	}
 
 	dwFileSizeLow = GetFileSize(hFile, NULL);
-	lpBuffer = VirtualAlloc(NULL, dwFileSizeLow, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	lpBuffer = VirtualAlloc(
+		NULL, 
+		dwFileSizeLow,
+		MEM_COMMIT | MEM_RESERVE,
+		PAGE_READWRITE);
+
 	if (lpBuffer && ReadFile(hFile, lpBuffer, dwFileSizeLow, &dwRead, NULL) &&
 		dwRead == dwFileSizeLow)
 	{

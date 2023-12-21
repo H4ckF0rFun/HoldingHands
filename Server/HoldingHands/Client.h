@@ -62,12 +62,6 @@ private:
 
 public:
 	
-	void CClient::OnRecv2(
-		BYTE * lpData,
-		UINT32 nTransferredBytes,
-		void * lpParam,
-		DWORD Error);
-
 	virtual void OnRecv(BYTE * lpData, UINT32 nTransferredBytes, void * lpParam, DWORD Error);
 	virtual void OnSend(BYTE * lpData, UINT32 nTransferredBytes, void * lpParam, DWORD Error);
 

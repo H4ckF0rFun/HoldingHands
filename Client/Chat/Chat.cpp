@@ -84,7 +84,7 @@ LRESULT CALLBACK CChat::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 void CChat::ThreadProc(CChat*pChat)
 {
-	HINSTANCE hInstance = GetModuleHandleW(NULL);
+	HINSTANCE hInstance = GetModuleHandle(NULL);
 	static int HasRegister = 0;
 
 	if(!HasRegister)

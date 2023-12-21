@@ -9,9 +9,12 @@
 class CIOCP;
 
 #define IO_READ    0
+
 #define IO_WRITE   1
-#define IO_CONNECT 2
-#define IO_ACCEPT  3
+#define IO_ACCEPT  2
+
+#define IO_CONNECT 3
+
 
 #define MAX_ADDR_LEN  128
 

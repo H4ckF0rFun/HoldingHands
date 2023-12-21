@@ -199,7 +199,6 @@
     <ClCompile Include="KernelSrv.cpp" />
     <ClCompile Include="KeybdLogDlg.cpp" />
     <ClCompile Include="KeybdLogSrv.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="FileDownloadDlg.cpp" />
     <ClCompile Include="FileDownloadSrv.cpp" />

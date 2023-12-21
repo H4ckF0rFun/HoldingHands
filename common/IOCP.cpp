@@ -64,8 +64,8 @@ CIOCP::CIOCP(UINT MaxThreadCount, typeInit init, typeFini fini,void *lpParam)
 	_rw_spinlock_init(&m_rw_spinlock);
 
 	//traffic
-	m_ullUpload = 0;
-	m_ullDownload = 0;
+	m_ullTraffic[0] = 0;
+	m_ullTraffic[1] = 0;
 
 	//ref
 	m_RefCount = 1;
@@ -480,6 +480,7 @@ BOOL CIOCP::PostConnect(
 		goto __failed__;
 	}
 
+
 	InterlockedIncrement(&m_IoReqCount);
 	retval = TRUE;
 
@@ -558,10 +559,12 @@ unsigned int CIOCP::Worker(thread_list * list)
 		{
 			InterlockedDecrement(&Iocp->m_WorkingCount);
 		}
-		else {
+		else
+		{
 			Iocp->Get();
 			InterlockedIncrement(&Iocp->m_ThreadCount);
-			if (!Iocp->AddWorker()){
+			if (!Iocp->AddWorker())
+			{
 				InterlockedDecrement(&Iocp->m_WorkingCount);
 				InterlockedIncrement(&Iocp->m_ThreadCount);
 				Iocp->Put();
@@ -569,19 +572,15 @@ unsigned int CIOCP::Worker(thread_list * list)
 		}
 		
 		/***********Update the total amount of data uploaded and downloaded ***********/
-		if (nTransferredBytes)
-		{
-			switch (lpOverlappedplus->m_IOtype)
-			{
-			case IO_READ:
-				InterlockedExchangeAdd(&Iocp->m_ullDownload, nTransferredBytes);
-				break;
+		/*
+			&1 ==0 : read,accept.
+			&1 ==1 : write ,connect
+		*/
 
-			case IO_WRITE:
-				InterlockedExchangeAdd(&Iocp->m_ullUpload, nTransferredBytes);
-				break;
-			}
-		}
+		InterlockedExchangeAdd(
+			&Iocp->m_ullTraffic[lpOverlappedplus->m_IOtype & 0x1],
+			nTransferredBytes);
+
 		/*******************************************************/
 		
 		sock->callback(lpOverlappedplus, nTransferredBytes, Error);
@@ -614,7 +613,8 @@ unsigned int CIOCP::Worker(thread_list * list)
 		{	
 			loop = FALSE;
 		}
-		else{
+		else
+		{
 			InterlockedIncrement(&Iocp->m_WorkingCount);
 		}
 	}
@@ -622,7 +622,7 @@ unsigned int CIOCP::Worker(thread_list * list)
 	//remove current thread from worker list.
 	Iocp->RemoveWorker(list);
 
-	//it is closing ? 
+	//is it closing ? 
 	_write_lock(&Iocp->m_rw_spinlock);
 	if (!InterlockedDecrement(&Iocp->m_ThreadCount)
 		&& Iocp->m_state & IOCP_CLOSING)
@@ -694,7 +694,8 @@ BOOL CIOCP::Create()
 		InterlockedIncrement(&m_ThreadCount);
 		Get();
 
-		if (!AddWorker()){
+		if (!AddWorker())
+		{
 			InterlockedDecrement(&m_ThreadCount);
 			Put();
 		}
@@ -809,6 +810,7 @@ __CancelIO:
 		5. 所有线程都在忙,队列中还有.
 	*/
 
+	//wake up a thread.
 	PostQueuedCompletionStatus(
 		m_hCompletionPort, 
 		0, 

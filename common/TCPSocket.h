@@ -3,12 +3,6 @@
 #include "spinlock.h"
 
 
-
-#define IO_READ    0
-#define IO_WRITE   1
-#define IO_CONNECT 2
-#define IO_ACCEPT  3
-
 struct TCP_READ_OVERLAPPED : SOCKET_OVERLAPPED
 {
 	HANDLE		m_hEvent;

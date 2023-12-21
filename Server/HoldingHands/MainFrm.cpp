@@ -472,7 +472,8 @@ void CMainFrame::OnClose()
 }
 
 
-LRESULT CMainFrame::OnClientLogin(WPARAM wParam, LPARAM module){
+LRESULT CMainFrame::OnClientLogin(WPARAM wParam, LPARAM module)
+{
 	CEventHandler*pHandler = (CEventHandler*)wParam;
 	CWnd * pWnd = NULL;
 

@@ -41,31 +41,48 @@ BOOL CAudioGrab::InitGrabber()
 	int i = 0;
 	CloseGrabber();
 	
-	m_hWorkThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)WorkThread, this, 0, &m_dwThreadID);
+	m_hWorkThread = CreateThread(
+		0,
+		0, 
+		(LPTHREAD_START_ROUTINE)WorkThread, 
+		this,
+		0,
+		&m_dwThreadID);
+	
 	if (!m_hWorkThread){
 		goto Failed;
 	}
 		
-	mmResult = waveInOpen(&m_hWaveIn, WAVE_MAPPER, &m_Wavefmt, 
-		(DWORD_PTR)m_dwThreadID, (DWORD_PTR)this, CALLBACK_THREAD);
+	mmResult = waveInOpen(
+		&m_hWaveIn, 
+		WAVE_MAPPER, 
+		&m_Wavefmt, 
+		(DWORD_PTR)m_dwThreadID,
+		(DWORD_PTR)this,
+		CALLBACK_THREAD);
 	//
-	if (mmResult != MMSYSERR_NOERROR){
+	if (mmResult != MMSYSERR_NOERROR)
+	{
 		goto Failed;
 	}
 
-	for (i = 0; i < BUFF_COUNT; i++){
+	for (i = 0; i < BUFF_COUNT; i++)
+	{
 
 		m_hdrs[i].dwBufferLength = LEN_PER_BUFF;
 		m_hdrs[i].lpData = m_Buffers[i];
 		memset(m_Buffers, 0, LEN_PER_BUFF);
 
 		mmResult = waveInPrepareHeader(m_hWaveIn, &m_hdrs[i], sizeof(WAVEHDR));
-		if (mmResult != MMSYSERR_NOERROR){
+		
+		if (mmResult != MMSYSERR_NOERROR)
+		{
 			goto Failed;
 		}
 			
 		mmResult = waveInAddBuffer(m_hWaveIn, &m_hdrs[i], sizeof(WAVEHDR));
-		if (mmResult != MMSYSERR_NOERROR){
+		if (mmResult != MMSYSERR_NOERROR)
+		{
 			goto Failed;
 		}
 	}
@@ -88,7 +105,8 @@ void CAudioGrab::CloseGrabber()
 		waveInStop(m_hWaveIn);
 
 	//等待线程退出
-	if (m_hWorkThread && m_dwThreadID){
+	if (m_hWorkThread && m_dwThreadID)
+	{
 		PostThreadMessage(m_dwThreadID, WM_QUIT, 0, 0);
 		WaitForSingleObject(m_hWorkThread, INFINITE);
 		CloseHandle(m_hWorkThread);
@@ -98,23 +116,28 @@ void CAudioGrab::CloseGrabber()
 	m_dwThreadID = 0;
 	
 	//关闭设备
-	if (m_hWaveIn){
+	if (m_hWaveIn)
+	{
 		waveInClose(m_hWaveIn);
 		m_hWaveIn = NULL;
 	}
 	//
-	if (m_hEvent){
+	if (m_hEvent)
+	{
 		CloseHandle(m_hEvent);
 		m_hEvent = NULL;
 	}
-	if (m_hMutex){
+	if (m_hMutex)
+	{
 		CloseHandle(m_hMutex);
 		m_hMutex = NULL;
 	}
 	//清理缓存
-	while (!m_buffer_list.empty()){
+	while (!m_buffer_list.empty())
+	{
 		auto & buff = m_buffer_list.front();
-		if (buff.first){
+		if (buff.first)
+		{
 			delete[]buff.first;
 		}
 		m_buffer_list.pop_front();
@@ -132,9 +155,11 @@ BOOL CAudioGrab::GetBuffer(void**ppBuffer, DWORD*pBufLen)
 	char*Buffer = NULL;
 	DWORD dwLen = NULL;
 	RemoveHead(&Buffer, &dwLen);
+
 	if (Buffer == NULL){
 		return FALSE;
 	}
+	
 	*ppBuffer = Buffer;
 	*pBufLen = dwLen;
 	return TRUE;
@@ -146,6 +171,7 @@ void __stdcall CAudioGrab::WorkThread(CAudioGrab*pThis)
 	MSG msg;
 	WAVEHDR*pHdr = 0;
 	MMRESULT mmResult = 0;
+
 	while (GetMessage(&msg, 0, 0, 0))
 	{
 		switch (msg.message)

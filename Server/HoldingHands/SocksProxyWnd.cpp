@@ -213,15 +213,15 @@ void CSocksProxyWnd::OnSize(UINT nType, int cx, int cy)
 void CSocksProxyWnd::OnVerSocks4()
 {
 	
-		m_pHandler->SetSocksVersion(0x4);
+	m_pHandler->SetSocksVersion(0x4);
 
-		GetMenu()->GetSubMenu(1)->
-			CheckMenuRadioItem(
-			ID_VER_SOCKS5,
-			ID_VER_SOCKS4,
-			ID_VER_SOCKS4,
-			MF_BYCOMMAND
-		);
+	GetMenu()->GetSubMenu(1)->
+		CheckMenuRadioItem(
+		ID_VER_SOCKS5,
+		ID_VER_SOCKS4,
+		ID_VER_SOCKS4,
+		MF_BYCOMMAND
+	);
 	
 }
 
@@ -229,15 +229,15 @@ void CSocksProxyWnd::OnVerSocks4()
 void CSocksProxyWnd::OnVerSocks5()
 {
 	
-		m_pHandler->SetSocksVersion(0x5);
+	m_pHandler->SetSocksVersion(0x5);
 
-		GetMenu()->GetSubMenu(1)->
-			CheckMenuRadioItem(
-			ID_VER_SOCKS5, 
-			ID_VER_SOCKS4,
-			ID_VER_SOCKS5, 
-			MF_BYCOMMAND
-		);
+	GetMenu()->GetSubMenu(1)->
+		CheckMenuRadioItem(
+		ID_VER_SOCKS5, 
+		ID_VER_SOCKS4,
+		ID_VER_SOCKS5, 
+		MF_BYCOMMAND
+	);
 	
 }
 
@@ -284,24 +284,24 @@ void CSocksProxyWnd::OnMainStop()
 {
 	if (m_IsRunning)
 	{
-			m_pHandler->StopProxyServer();
+		m_pHandler->StopProxyServer();
 			
-			MessageBox(
-				TEXT("Proxy server has been stopped!"),
-				TEXT("Tips"),
-				MB_OK | MB_ICONINFORMATION
-			);
+		MessageBox(
+			TEXT("Proxy server has been stopped!"),
+			TEXT("Tips"),
+			MB_OK | MB_ICONINFORMATION
+		);
 
-			CString Text;
-			char	szIP[0x100];
+		CString Text;
+		char	szIP[0x100];
 
-			m_pHandler->GetPeerAddress(szIP);
-			Text.Format(TEXT("[%s] SocksProxy"), CString(szIP));
+		m_pHandler->GetPeerAddress(szIP);
+		Text.Format(TEXT("[%s] SocksProxy"), CString(szIP));
 			
-			SetWindowText(Text);
+		SetWindowText(Text);
 
-			m_IsRunning = FALSE;
-			KillTimer(10086);
+		m_IsRunning = FALSE;
+		KillTimer(10086);
 	}
 }
 

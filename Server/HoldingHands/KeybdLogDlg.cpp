@@ -18,10 +18,12 @@ CKeybdLogDlg::CKeybdLogDlg(CKeybdLogSrv*pHandler, CWnd* pParent /*=NULL*/)
 	m_pHandler(pHandler),
 	m_dwTimerId(0)
 {
+	m_pHandler->Get();
 }
 
 CKeybdLogDlg::~CKeybdLogDlg()
 {
+	m_pHandler->Put();
 }
 
 void CKeybdLogDlg::DoDataExchange(CDataExchange* pDX)
@@ -208,7 +210,6 @@ LRESULT CKeybdLogDlg::OnLogInit(WPARAM wParam, LPARAM lParam)
 
 void CKeybdLogDlg::OnBnClickedCheck1()
 {
-	//
 	m_pHandler->SetOfflineRecord(m_OfflineRecord.GetCheck());
 }
 

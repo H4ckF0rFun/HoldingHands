@@ -115,7 +115,10 @@ CString CFileTransDlg::GetProgressString(ULONGLONG ullFinished, ULONGLONG ullTot
 		liTotalSize.QuadPart = 1;
 	}
 	CString Text;
-	Text.Format(TEXT("%s / %s (%llu%%)"), szFinishedSize, szTotalSize,
+	Text.Format(
+		TEXT("%s / %s (%llu%%)"), 
+		szFinishedSize, 
+		szTotalSize,
 		100 * liFinishedSize.QuadPart / liTotalSize.QuadPart);
 
 	return Text;
@@ -158,8 +161,12 @@ LRESULT CFileTransDlg::OnTransFileBegin(WPARAM wParam, LPARAM lParam)
 	m_TransLog.ReplaceSel(Text);
 
 	//设置当前文件
-	Text.Format(TEXT("%s (%d/%d)"), pFile->RelativeFilePath,
-		m_dwFinishedCount + 1, m_dwTotalCount);
+	Text.Format(
+		TEXT("%s (%d/%d)"), 
+		pFile->RelativeFilePath,
+		m_dwFinishedCount + 1,
+		m_dwTotalCount);
+	
 	GetDlgItem(IDC_CURRENT_FILE)->SetWindowText(Text);
 
 	//当前文件进度.
@@ -190,7 +197,6 @@ LRESULT CFileTransDlg::OnTransFileFinished(WPARAM wParam, LPARAM lParam)
 		Text = "    -Failed\r\n";
 	}
 
-
 	//记录结果.
 	m_TransLog.SetSel(length, length);
 	m_TransLog.ReplaceSel(Text);
@@ -214,7 +220,7 @@ LRESULT CFileTransDlg::OnTransFileDC(WPARAM wParam, LPARAM lParam)
 	GetDlgItem(IDC_TOTAL_PROGRESS)->SetWindowText(Text);
 
 	//更新进度条;
-	m_Progress.SetPos(m_ullFinishedSize * 100 / m_ullTotalSize);
+	m_Progress.SetPos(m_ullFinishedSize * 100ull / m_ullTotalSize);
 	return 0;
 }
 

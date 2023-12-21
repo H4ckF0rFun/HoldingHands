@@ -134,6 +134,7 @@ void CFileTransSrv::OnGetFileDataChunkRpl(DWORD Read, char*Buffer)
 	BOOL bFailed = (pRpl->dwChunkSize == 0 ||
 		(!WriteFile(m_hCurFile, pRpl->FileDataChunk, pRpl->dwChunkSize, &dwWrite, NULL)) || 
 		(dwWrite == 0));
+
 	if (!bFailed)
 	{
 		//写入成功
@@ -151,6 +152,7 @@ void CFileTransSrv::OnGetFileDataChunkRpl(DWORD Read, char*Buffer)
 		Notify(WM_MNFT_FILE_DC_TRANSFERRED, dwWrite, 0);
 		/*****************************************************************************/
 	}
+	
 	//如果失败了,或者接收完了.那么就接终止当前的传输,请求下一个文件.
 	if (bFailed || !m_ullLeftFileLength)
 	{
@@ -215,8 +217,15 @@ void CFileTransSrv::OnGetFileInfoRpl(DWORD Read, char*Buffer)
 		if (m_ullLeftFileLength != 0)
 		{
 			//CreateFile.
-			m_hCurFile = CreateFile(FullPath, GENERIC_WRITE, 0, NULL, 
-				CREATE_ALWAYS, m_dwCurFileAttribute, NULL);
+			m_hCurFile = CreateFile(
+				FullPath, 
+				GENERIC_WRITE,
+				0,
+				NULL, 
+				CREATE_ALWAYS, 
+				m_dwCurFileAttribute,
+				NULL);
+			
 			//GetFileChunk.
 			if (m_hCurFile != INVALID_HANDLE_VALUE)
 			{
@@ -231,9 +240,11 @@ void CFileTransSrv::OnGetFileInfoRpl(DWORD Read, char*Buffer)
 	{
 		CreateDirectory(FullPath, NULL);		//MakesureDirectoryExist
 	}
+
 	//文件长度为0,或者当前句柄打开失败,那么就请求下一个文件.
-	if (pFileInfo->Attribute&FILE_ATTRIBUTE_DIRECTORY || 
-		m_ullLeftFileLength == 0 || m_hCurFile == INVALID_HANDLE_VALUE)
+	if (pFileInfo->Attribute & FILE_ATTRIBUTE_DIRECTORY || 
+		m_ullLeftFileLength == 0 ||
+		m_hCurFile == INVALID_HANDLE_VALUE)
 	{
 		
 		//结束当前文件的传输.
@@ -241,6 +252,7 @@ void CFileTransSrv::OnGetFileInfoRpl(DWORD Read, char*Buffer)
 		ftf.dwFileIdentity = m_dwCurFileIdentity;
 		ftf.dwStatu = (pFileInfo->Attribute&FILE_ATTRIBUTE_DIRECTORY 
 			|| m_ullLeftFileLength == 0) ? MNFT_STATU_SUCCESS : MNFT_STATU_FAILED;
+
 		Send(MNFT_FILE_TRANS_FINISHED, (char*)&ftf, sizeof(ftf));
 		//
 		/*****************************************************************************/
@@ -254,7 +266,7 @@ void CFileTransSrv::OnGetFileInfoRpl(DWORD Read, char*Buffer)
 		MNFT_File_Info_Get fig;
 		m_dwCurFileIdentity = GetTickCount();
 		fig.dwFileIdentity = m_dwCurFileIdentity;
-		Send(MNFT_FILE_INFO_GET, (char*)&fig, sizeof(fig));
+		Send(MNFT_FILE_INFO_GET, &fig, sizeof(fig));
 	}
 	free(FullPath);
 }
@@ -272,7 +284,7 @@ void CFileTransSrv::OnGetTransInfoRpl(DWORD Read, char*Buffer)
 	MNFT_File_Info_Get fig;
 	m_dwCurFileIdentity = GetTickCount();
 	fig.dwFileIdentity = m_dwCurFileIdentity;
-	Send(MNFT_FILE_INFO_GET, (char*)&fig, sizeof(fig));
+	Send(MNFT_FILE_INFO_GET, &fig, sizeof(fig));
 }
 
 
@@ -281,12 +293,15 @@ void CFileTransSrv::OnGetTransInfoRpl(DWORD Read, char*Buffer)
 void CFileTransSrv::OnFileTransFinished(DWORD Read, char*Buffer)
 {
 	MNFT_File_Trans_Finished*pftf = (MNFT_File_Trans_Finished*)Buffer;
-	if (pftf->dwFileIdentity != m_dwCurFileIdentity){
+	
+	if (pftf->dwFileIdentity != m_dwCurFileIdentity)
+	{
 		Close();
 		return;
 	}
 	
-	if (m_hCurFile != INVALID_HANDLE_VALUE){
+	if (m_hCurFile != INVALID_HANDLE_VALUE)
+	{
 		CloseHandle(m_hCurFile);
 		m_hCurFile = INVALID_HANDLE_VALUE;
 	}
@@ -296,6 +311,7 @@ void CFileTransSrv::OnFileTransFinished(DWORD Read, char*Buffer)
 	m_dwCurFileAttribute = 0;
 	//free memory;
 	FileInfo*pFile = m_JobList.RemoveHead();
+	
 	if (pFile)
 	{
 		free(pFile);

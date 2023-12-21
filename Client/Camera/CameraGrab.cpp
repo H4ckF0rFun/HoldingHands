@@ -224,21 +224,33 @@ void CCameraGrab::GetDeviceList(const string& query_name, IBaseFilter**ppBaseFil
 	BOOL	bLoop = TRUE;
 	int i = 0;
 
-	hr = CoCreateInstance((REFCLSID)CLSID_CaptureGraphBuilder2,
-		NULL, CLSCTX_INPROC, (REFIID)IID_ICaptureGraphBuilder2,
+	hr = CoCreateInstance(
+		(REFCLSID)CLSID_CaptureGraphBuilder2,
+		NULL, 
+		CLSCTX_INPROC, 
+		(REFIID)IID_ICaptureGraphBuilder2,
 		(void **)&pBuilder);
 
 	if (FAILED(hr)){
 		goto Failed;
 	}
 
-	hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
-		IID_ICreateDevEnum, (void **)&pDevEnum);
+	hr = CoCreateInstance(
+		CLSID_SystemDeviceEnum, 
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_ICreateDevEnum, 
+		(void **)&pDevEnum);
+	
 	if (FAILED(hr) || !pDevEnum){	
 		goto Failed;
 	}
 
-	hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnumMoniker, 0);
+	hr = pDevEnum->CreateClassEnumerator(
+		CLSID_VideoInputDeviceCategory,
+		&pEnumMoniker,
+		0);
+	
 	if (FAILED(hr) || !pEnumMoniker){	
 		goto Failed;
 	}
@@ -266,7 +278,9 @@ void CCameraGrab::GetDeviceList(const string& query_name, IBaseFilter**ppBaseFil
 		WCHAR * w_name = varTemp.bstrVal;
 		//wide byte to g2312....
 		int len = WideCharToMultiByte(CP_ACP, 0, w_name, lstrlenW(w_name), nullptr, 0, nullptr, nullptr);
+		
 		device_name.resize(len,0);
+		
 		WideCharToMultiByte(CP_ACP, 0, w_name, lstrlenW(w_name), 
 			(char*)device_name.c_str(), len, nullptr, nullptr);
 
@@ -400,12 +414,14 @@ int CCameraGrab::GrabberInit(const string&device_name, DWORD dwWidth, DWORD dwHe
 	//
 	hr = CoCreateInstance(CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER,
 		IID_IBaseFilter, (LPVOID*)&m_pSampleGrabberFilter);
+
 	if (FAILED(hr)){
 		wsprintfA(szError, ("CoCreateInstance3 Failed"));
 		goto Failed;
 	}
 	//
 	hr = m_pSampleGrabberFilter->QueryInterface(IID_ISampleGrabber, (void**)&m_pSamplerGrabber);
+	
 	if (FAILED(hr)){
 		wsprintfA(szError, ("m_pSampleGrabberFilter->QueryInterface Failed"));
 		goto Failed;
@@ -424,8 +440,13 @@ int CCameraGrab::GrabberInit(const string&device_name, DWORD dwWidth, DWORD dwHe
 	m_pSamplerGrabber->SetCallback(m_pCallback, 1);
 	//
 
-	hr = CoCreateInstance(CLSID_NullRenderer, NULL, CLSCTX_INPROC_SERVER,
-		IID_IBaseFilter, (LPVOID*)&m_pNullRenderer);
+	hr = CoCreateInstance(
+		CLSID_NullRenderer,
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_IBaseFilter, 
+		(LPVOID*)&m_pNullRenderer);
+	
 	if (FAILED(hr)){
 		wsprintfA(szError, ("CoCreateInstance 4 Failed"));
 		goto Failed;
@@ -483,8 +504,13 @@ int CCameraGrab::GrabberInit(const string&device_name, DWORD dwWidth, DWORD dwHe
 	}
 
 	//
-	hr = m_pBuild->RenderStream(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pCaptureFilter, 
-		m_pSampleGrabberFilter, m_pNullRenderer);
+	hr = m_pBuild->RenderStream(
+		&PIN_CATEGORY_CAPTURE, 
+		&MEDIATYPE_Video,
+		m_pCaptureFilter, 
+		m_pSampleGrabberFilter,
+		m_pNullRenderer);
+	
 	if (FAILED(hr)){
 		wsprintfA(szError, ("m_pBuild->RenderStream Failed"));
 		goto Failed;

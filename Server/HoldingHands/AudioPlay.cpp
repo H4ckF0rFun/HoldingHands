@@ -18,7 +18,6 @@ CAudioPlay::CAudioPlay():
 	m_WaveFmt.nBlockAlign = 2;
 	m_WaveFmt.wBitsPerSample = 16;
 	m_WaveFmt.cbSize = 0;
-
 }
 
 

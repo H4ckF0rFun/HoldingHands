@@ -224,15 +224,15 @@ void CRemoteDesktopWnd::OnCaptureMouse()
 {
 	m_dwCaptureFlags = (m_dwCaptureFlags & (~CAPTURE_MOUSE)) | (CAPTURE_MOUSE & (~(m_dwCaptureFlags & CAPTURE_MOUSE)));
 
-	m_pHandler->SetCaptureFlag(REMOTEDESKTOP_FLAG_CAPTURE_MOUSE | 
-		((m_dwCaptureFlags&CAPTURE_MOUSE)? 0x80000000 : 0));
+	m_pHandler->SetCaptureFlag(
+		REMOTEDESKTOP_FLAG_CAPTURE_MOUSE | ((m_dwCaptureFlags&CAPTURE_MOUSE)? 0x80000000 : 0));
 }
 
 void CRemoteDesktopWnd::OnCaptureTransparentwindow()
 {
 	m_dwCaptureFlags = (m_dwCaptureFlags & (~CAPTURE_TRANSPARENT)) | (CAPTURE_TRANSPARENT & (~(m_dwCaptureFlags & CAPTURE_TRANSPARENT)));
-	m_pHandler->SetCaptureFlag(REMOTEDESKTOP_FLAG_CAPTURE_TRANSPARENT |
-		((m_dwCaptureFlags&CAPTURE_TRANSPARENT) ? 0x80000000 : 0));
+	m_pHandler->SetCaptureFlag(
+		REMOTEDESKTOP_FLAG_CAPTURE_TRANSPARENT | ((m_dwCaptureFlags&CAPTURE_TRANSPARENT) ? 0x80000000 : 0));
 
 }
 
@@ -287,7 +287,6 @@ LRESULT CRemoteDesktopWnd::OnError(WPARAM wParam, LPARAM lParam)
 
 		这里直接改为 Page 为客户区大小,Max为远程桌面大小,
 		这样滚动条的Pos 的范围就是 0 - （远程桌面大小 - 客户区大小);
-		
 */
 
 
@@ -607,10 +606,14 @@ void CRemoteDesktopWnd::OnSetFocus(CWnd* pOldWnd)
 void CRemoteDesktopWnd::OnMaxfps10()
 {
 	m_dwMaxpFps = 10;
-		GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
-			CheckMenuRadioItem(ID_MAXFPS_10, ID_MAXFPS_NOLIMIT, ID_MAXFPS_10, MF_BYCOMMAND);
+	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+		CheckMenuRadioItem(
+		ID_MAXFPS_10, 
+		ID_MAXFPS_NOLIMIT, 
+		ID_MAXFPS_10, 
+		MF_BYCOMMAND);
 
-		m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 		
 }
 
@@ -618,10 +621,14 @@ void CRemoteDesktopWnd::OnMaxfps10()
 void CRemoteDesktopWnd::OnMaxfps20()
 {
 	m_dwMaxpFps = 20;
-		GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
-			CheckMenuRadioItem(ID_MAXFPS_10, ID_MAXFPS_NOLIMIT, ID_MAXFPS_20, MF_BYCOMMAND);
+	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+		CheckMenuRadioItem(
+		ID_MAXFPS_10,
+		ID_MAXFPS_NOLIMIT, 
+		ID_MAXFPS_20,
+		MF_BYCOMMAND);
 
-		m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 	
 		
 }
@@ -629,23 +636,30 @@ void CRemoteDesktopWnd::OnMaxfps20()
 
 void CRemoteDesktopWnd::OnMaxfps30()
 {
-		m_dwMaxpFps = 30;
-		GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
-			CheckMenuRadioItem(ID_MAXFPS_10, ID_MAXFPS_NOLIMIT, ID_MAXFPS_30, MF_BYCOMMAND);
+	m_dwMaxpFps = 30;
+	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+		CheckMenuRadioItem(
+		ID_MAXFPS_10, 
+		ID_MAXFPS_NOLIMIT, 
+		ID_MAXFPS_30,
+		MF_BYCOMMAND);
 
-		m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 
-	
 }
 
 
 void CRemoteDesktopWnd::OnMaxfpsNolimit()
 {
-		m_dwMaxpFps = 60;
-		GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
-			CheckMenuRadioItem(ID_MAXFPS_10, ID_MAXFPS_NOLIMIT, ID_MAXFPS_NOLIMIT, MF_BYCOMMAND);
+	m_dwMaxpFps = 60;
+	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+		CheckMenuRadioItem(
+		ID_MAXFPS_10, 
+		ID_MAXFPS_NOLIMIT, 
+		ID_MAXFPS_NOLIMIT, 
+		MF_BYCOMMAND);
 
-		m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 	
 }
 
@@ -831,7 +845,8 @@ LRESULT CRemoteDesktopWnd::OnScreenShot(WPARAM wParam,LPARAM lParam){
 	return 0;
 }
 
-void CRemoteDesktopWnd::OnOtherScreenshot(){
+void CRemoteDesktopWnd::OnOtherScreenshot()
+{
 	m_pHandler->ScreenShot();
 }
 
@@ -925,11 +940,15 @@ BOOL CRemoteDesktopWnd::PreTranslateMessage(MSG* pMsg)
 void CRemoteDesktopWnd::OnQualityLow()
 {
 	m_dwQuality = QUALITY_LOW;
-		GetMenu()->GetSubMenu(0)->GetSubMenu(3)->
-			CheckMenuRadioItem(ID_QUALITY_LOW, ID_QUALITY_HIGH, ID_QUALITY_LOW, MF_BYCOMMAND);
+	GetMenu()->GetSubMenu(0)->GetSubMenu(3)->
+		CheckMenuRadioItem(
+		ID_QUALITY_LOW, 
+		ID_QUALITY_HIGH, 
+		ID_QUALITY_LOW,
+		MF_BYCOMMAND);
 
 
-		m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 	
 }
 
@@ -937,9 +956,13 @@ void CRemoteDesktopWnd::OnQualityLow()
 void CRemoteDesktopWnd::OnQualityHigh()
 {
 	m_dwQuality = QUALITY_HIGH;
-		GetMenu()->GetSubMenu(0)->GetSubMenu(3)->
-			CheckMenuRadioItem(ID_QUALITY_LOW, ID_QUALITY_HIGH, ID_QUALITY_HIGH, MF_BYCOMMAND);
+	GetMenu()->GetSubMenu(0)->GetSubMenu(3)->
+		CheckMenuRadioItem(
+		ID_QUALITY_LOW, 
+		ID_QUALITY_HIGH,
+		ID_QUALITY_HIGH,
+		MF_BYCOMMAND);
 
-		m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 	
 }

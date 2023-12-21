@@ -376,12 +376,12 @@ void CClient::Send(vec * Bufs, int nBuf)
 
 
 LRESULT CClient::Notify(DWORD Msg, WPARAM wParam, LPARAM lParam, BOOL Sync)
-{
+{	
 	if (!m_hNotifyWindow)
 		return 0;
 
 	if (Sync)
-		return SendMessageA(m_hNotifyWindow, Msg, wParam, lParam);
+		return SendMessage(m_hNotifyWindow, Msg, wParam, lParam);
 	else
-		return PostMessageA(m_hNotifyWindow, Msg, wParam, lParam);
+		return PostMessage(m_hNotifyWindow, Msg, wParam, lParam);
 }
