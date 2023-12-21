@@ -6,6 +6,9 @@
 class CClientList :
 	public CListCtrl
 {
+private:
+	int m_sortCol;
+	int m_ascending = 1;
 public:
 	CClientList();
 	~CClientList();
@@ -44,5 +47,10 @@ public:
 	afx_msg void OnSessionExit();
 	afx_msg void OnUtilsOpenwebpage();
 	afx_msg void OnOperationProcessmanager();
+	afx_msg void OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult);
+
+
+	static int CALLBACK CompareByString(LPARAM, LPARAM, LPARAM);
+
 };
 

@@ -232,6 +232,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME),TRUE);
 	SetIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME), TRUE);
 
+	CenterWindow(CWnd::GetDesktopWindow());
+
 	/*
 	LPVOID * Args = new LPVOID [2];
 

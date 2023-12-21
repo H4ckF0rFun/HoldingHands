@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(CClientList, CListCtrl)
 	ON_COMMAND(ID_SESSION_EXIT, &CClientList::OnSessionExit)
 	ON_COMMAND(ID_UTILS_OPENWEBPAGE, &CClientList::OnUtilsOpenwebpage)
 	ON_COMMAND(ID_OPERATION_PROCESSMANAGER, &CClientList::OnOperationProcessmanager)
+	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CClientList::OnLvnColumnclick)
 END_MESSAGE_MAP()
 
 
@@ -487,4 +488,25 @@ LRESULT CClientList::OnGetModulePath(WPARAM wParam, LPARAM lParam)
 	CString ModulePath = pMainFrame->Config().GetConfig(TEXT("server"), TEXT("modules"));
 	lstrcpy(Path, ModulePath);
 	return 0;
+}
+
+int CALLBACK CClientList::CompareByString(LPARAM item1, LPARAM item2, LPARAM obj)
+{
+	CClientList * l = (CClientList*)obj;
+	CString s1 = l->GetItemText(item1, l->m_sortCol);
+	CString s2 = l->GetItemText(item2, l->m_sortCol);
+
+	return l->m_ascending * (s1 - s2 );
+}
+
+void CClientList::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	// TODO:  在此添加控件通知处理程序代码
+	*pResult = 0;
+
+	m_ascending *= -1;
+	m_sortCol = pNMLV->iSubItem;
+	SortItemsEx(CompareByString,(DWORD_PTR)this);
+	return;
 }

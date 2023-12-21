@@ -52,9 +52,6 @@ int main(){
 
 	WSADATA wsadata;
 
-
-	gethostbyname("");
-
 	if (WSAStartup(MAKEWORD(2, 0), &wsadata))
 	{
 		dbg_log("WSAStartup failed with error : %d", WSAGetLastError());

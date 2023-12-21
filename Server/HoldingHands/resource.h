@@ -72,6 +72,7 @@
 #define IDC_PROGRESS                    1024
 #define IDC_IPADDRESS1                  1024
 #define IDC_IPADDRESS2                  1025
+#define IDC_TAB1                        1026
 #define ID_MAIN                         32771
 #define ID_MAIN_STARTSERVER             32772
 #define ID_MAIN_SETTINGS                32773
@@ -178,7 +179,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        351
 #define _APS_NEXT_COMMAND_VALUE         32871
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
