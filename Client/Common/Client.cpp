@@ -186,7 +186,6 @@ void CClient::OnSend(
 	void * lpParam, 
 	DWORD Error)
 {
-	SetEvent(m_hEvent);
 }
 
 void CClient::OnRecvCompletePacket(BYTE * lpData, UINT32 Size)
@@ -258,7 +257,7 @@ void CClient::Send(BYTE *lpData, UINT32 Size)
 
 	memcpy(pkt + 1, lpData, Size - sizeof(pkt_head));
 
-	CTCPSocket::Send(m_lpWriteBuf, Size, NULL);
+	CTCPSocket::Send(m_lpWriteBuf, Size, NULL,NULL,m_hEvent);
 }
 
 void CClient::Send(vec * Bufs, int nBuf)
@@ -293,5 +292,5 @@ void CClient::Send(vec * Bufs, int nBuf)
 		//else skip this buffer;
 	}
 
-	CTCPSocket::Send(m_lpWriteBuf, Size, NULL);
+	CTCPSocket::Send(m_lpWriteBuf, Size, NULL, NULL,m_hEvent);
 }

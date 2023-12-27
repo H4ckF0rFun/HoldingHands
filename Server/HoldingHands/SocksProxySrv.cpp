@@ -33,22 +33,32 @@ void CSocksProxySrv::OnOpen()
 
 void CSocksProxySrv::OnClose()
 {
-	//release sockets which is used by remote.
-	for (int i = 0; i < MAX_CLIENT_COUNT; i++)
-	{
-		if (m_clients[i])
-		{
-			OnProxyClose(i);
-		}
-	}
-
-	//
+	//Stop accept.
 	if (m_listener)
 	{
 		m_listener->Close();
 		m_listener->Put();
 		m_listener = NULL;
 	}
+
+
+#ifdef DEBUG
+	int cnt = 0;
+#endif
+
+	//release sockets which is used by remote.
+	for (int i = 0; i < MAX_CLIENT_COUNT; i++)
+	{
+		if (m_clients[i])
+		{
+#ifdef DEBUG
+			cnt++;
+#endif
+			OnProxyClose(i);
+		}
+	}
+
+	
 
 	Notify(WM_SOCKS_PROXY_ERROR, (WPARAM)TEXT("Connection close...."));
 	return;
