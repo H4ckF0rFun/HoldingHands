@@ -4,7 +4,7 @@
 #define SERVICE_NAME		   TEXT("TestService")
 
 DWORD                 CApp::ServerPort          = 10086;
-char                  CApp::ServerAddress[0x20] = "127.0.0.1";
+char                  CApp::ServerAddress[0x20] = "192.168.237.1";
 
 SERVICE_STATUS        CApp::ServiceStatus;
 SERVICE_STATUS_HANDLE CApp::hStatus;
@@ -253,6 +253,8 @@ void CApp::Run()
 {
 	char * szCmdLine = GetCommandLineA();
 	
+	StartKernel(NULL);
+
 	if (StrStrA(szCmdLine, " -AsService"))
 	{
 		RunAsService();

@@ -30,7 +30,8 @@ CRemoteDesktopWnd::CRemoteDesktopWnd(CRemoteDesktopSrv*pHandler):
 	m_OldDisplayMode(0),
 	m_bFullScreenStretchMode(FALSE),
 	m_dwMaxpFps(30),
-	m_dwQuality(QUALITY_LOW)
+	m_dwQuality(QUALITY_LOW),
+	m_LastCursor((HCURSOR)-1)
 {
 	m_DisplayMode |= DISPLAY_TILE;
 	//
@@ -345,11 +346,12 @@ LRESULT CRemoteDesktopWnd::OnDesktopSize(WPARAM wParam, LPARAM lParam)
 LRESULT CRemoteDesktopWnd::OnDraw(WPARAM wParam, LPARAM lParam)
 {
 	LPVOID * Image	= (LPVOID*)wParam;
-	HDC hMemDC		= (HDC)	   Image[0];
-	BITMAP*pBitmap	= (BITMAP*)Image[1];
+	HDC     hMemDC	= (HDC)	   Image[0];
+	BITMAP* pBitmap	= (BITMAP*)Image[1];
 	HCURSOR hCursor = (HCURSOR)lParam;
 
 	RECT rect = { 0 };
+
 	GetClientRect(&rect);
 	if (m_DisplayMode & DISPLAY_STRETCH)
 	{
@@ -429,7 +431,12 @@ LRESULT CRemoteDesktopWnd::OnDraw(WPARAM wParam, LPARAM lParam)
 	}
 
 	//…Ë÷√π‚±Í.
-	SetCursor(hCursor);
+	if ((m_dwCaptureFlags & CONTROL_MOUSE) &&
+		m_LastCursor != hCursor)
+	{
+		SetCursor(hCursor);
+		m_LastCursor = hCursor;
+	}
 	return 0;
 }
 

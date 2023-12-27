@@ -32,6 +32,8 @@
 
 //
 #define WM_PROCESS_MANAGER_APPEND_ICON				(WM_USER + 0x106)
+#define WM_PROCESS_MANAGER_ERROR			        (WM_USER + 0x107)
+
 
 #define MODIFY_UPDATE_NAME				0x1
 #define MODIFY_UPDATE_PATH				0x2

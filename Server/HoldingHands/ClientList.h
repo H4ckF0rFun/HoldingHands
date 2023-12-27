@@ -8,7 +8,9 @@ class CClientList :
 {
 private:
 	int m_sortCol;
-	int m_ascending = 1;
+	int m_ascending;
+	int m_LastSortColum;
+
 public:
 	CClientList();
 	~CClientList();

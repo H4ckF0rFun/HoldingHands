@@ -15,8 +15,6 @@
 #define WM_CMD_RESULT	(WM_USER + 126)
 #define WM_CMD_ERROR	(WM_USER + 127)
 
-
-class CCmdWnd;
 class CCmdSrv :
 	public CEventHandler
 {

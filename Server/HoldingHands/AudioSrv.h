@@ -17,7 +17,6 @@
 //notify 
 #define WM_AUDIO_ERROR (WM_USER + 137)
 
-class CAudioDlg;
 class CAudioSrv :
 	public CEventHandler
 {

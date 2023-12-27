@@ -227,7 +227,8 @@ void CSearchFile::MasterThread(CSearchFile*pThis)
 			//------------------------------------------------------------------------------------------------
 			//如果执行到这里post的目标线程已经执行完毕,栈空且WorkingThreadCount==0,但是当前工作线程又向主线程发送了一个WM_End_Travel,最后EndThreadCount会大1）
 			//如果在上一段和这一段之间其他线程调用了Stop,那么EndThreadCount也会多加一次
-			if ((pThis->m_bStopSearching || (pThis->m_StackSize == 0 && pThis->m_lWorkingThreadCount == 0))
+			if ((pThis->m_bStopSearching || 
+				(pThis->m_StackSize == 0 && pThis->m_lWorkingThreadCount == 0))
 				&& !bPost/*一定要保证前面没有PostMessage*/)
 			{
 				++EndThreadCount;

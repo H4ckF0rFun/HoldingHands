@@ -23,8 +23,6 @@
 #define WM_MNDD_ERROR				(WM_USER + 703)
 
 
-class CFileDownloadDlg;
-
 class CFileDownloadSrv :
 	public CEventHandler
 {

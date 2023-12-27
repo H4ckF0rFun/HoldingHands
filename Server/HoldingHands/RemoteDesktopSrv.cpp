@@ -239,8 +239,7 @@ void CRemoteDesktopSrv::OnFrame(DWORD dwRead, BYTE *Buffer)
 				(uint8_t*)m_Buffer, 
 				m_Bmp.bmWidthBytes,
 				m_Bmp.bmWidth, 
-				m_Bmp.bmHeight
-			);
+				m_Bmp.bmHeight);
 			
 			//显示到窗口上
 			Image[0] = m_hMemDC;

@@ -43,8 +43,6 @@
 #define WM_MNFT_TRANS_FINISHED				(WM_USER + 504)
 #define WM_MNFT_ERROR						(WM_USER + 505)
 
-class CFileTransDlg;
-
 class CFileTransSrv :
 	public CEventHandler
 {

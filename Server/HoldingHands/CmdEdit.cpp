@@ -169,12 +169,12 @@ void CCmdEdit::OnCmdBegin()
 
 void CCmdEdit::OnCmdResult(const CString &strResult)
 {
-
-	SetSel(m_ReadOnlyLength, -1);			//把输入的那部分也替换掉.
 	const TCHAR *p = strResult;
 	const TCHAR * start = p;
 
 	CString strFinalResult;
+
+	SetSel(m_ReadOnlyLength, -1);			//把输入的那部分也替换掉.
 
 	while (*p)
 	{
@@ -203,32 +203,38 @@ LRESULT CCmdEdit::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	// TODO:  在此添加专用代码和/或调用基类
 	int start, end, left;
-	if (message == EM_REPLACESEL){
+	if (message == EM_REPLACESEL)
+	{
 		GetSel(start, end);
 		left = min(start, end);
-		if (left <m_ReadOnlyLength){
+		if (left <m_ReadOnlyLength)
+		{
 			return 0;
 		}
 	}
-	else if (message == WM_CHAR){
+	else if (message == WM_CHAR)
+	{
 		GetSel(start, end);
 		left = min(start, end);
 
-		if (left < m_ReadOnlyLength){
+		if (left < m_ReadOnlyLength)
+		{
 			return 0;
 		}
 	}
-	else if (message == WM_PASTE || message == WM_CUT){
-
+	else if (message == WM_PASTE || message == WM_CUT)
+	{
 		GetSel(start, end);
 		left = min(start, end);
 
-		if (left < m_ReadOnlyLength){
+		if (left < m_ReadOnlyLength)
+		{
 			return 0;
 		}
 	}
 	return CEdit::WindowProc(message, wParam, lParam);
 }
+
 BEGIN_MESSAGE_MAP(CCmdEdit, CEdit)
 	ON_WM_CREATE()
 END_MESSAGE_MAP()
@@ -242,10 +248,21 @@ int CCmdEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CDC *pDC = GetDC();
 
 	// TODO:  在此添加您专用的创建代码
-	m_Font.CreateFont(20, 10, 0, 0, FW_REGULAR, FALSE, FALSE,
-		0, DEFAULT_CHARSET, DEFAULT_CHARSET,
-		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_SCRIPT, TEXT("JetBrains Mono"));
+	m_Font.CreateFont(
+		20,
+		10,
+		0,
+		0, 
+		FW_REGULAR, 
+		FALSE, 
+		FALSE,
+		0, 
+		DEFAULT_CHARSET,
+		DEFAULT_CHARSET,
+		CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_SCRIPT,
+		TEXT("JetBrains Mono"));
 
 	SetFont(&m_Font);
 	SetLimitText(-1);

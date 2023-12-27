@@ -288,6 +288,7 @@ void CRemoteDesktop::ClipdListenProc(CRemoteDesktop*pThis)
 	free(pMyData);
 	pMyData = NULL;
 }
+
 void CRemoteDesktop::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
 {
 	switch (e)
@@ -335,7 +336,8 @@ void CRemoteDesktop::SetClipbdText(TCHAR*szText)
 		sizeof(TCHAR) * (lstrlen(szText) + 1));
 }
 
-void CRemoteDesktop::OnSetFlag(DWORD dwFlag){
+void CRemoteDesktop::OnSetFlag(DWORD dwFlag)
+{
 	if (dwFlag & 0x80000000)
 	{
 		//Set Flag
@@ -434,7 +436,7 @@ void CALLBACK CRemoteDesktop::DesktopGrabThread(CRemoteDesktop*pThis){
 			pThis->Send(REMOTEDESKTOP_BMP_FILE, buffer, dwSize);
 			delete[]buffer;
 		}
-		else
+		else 
 		{
 			if (!pThis->m_grab.GetFrame(
 				&pThis->m_FrameBuffer,

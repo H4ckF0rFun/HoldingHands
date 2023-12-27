@@ -239,7 +239,7 @@ int CSocksProxySrv::AllocClientID(CSocksProxyTcp * client)
 	{
 		InterlockedDecrement(&m_free);
 		//dbg_log("Alloc Client[%d]", ID);
-		client->Get();
+		client->Get();						//远程客户对client的引用.
 		m_clients[ID] = client;
 	}
 	else

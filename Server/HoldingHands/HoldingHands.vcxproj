@@ -117,6 +117,8 @@
     <ClInclude Include="..\..\common\IOCPSocket.h" />
     <ClInclude Include="..\..\common\list.h" />
     <ClInclude Include="..\..\common\spinlock.h" />
+    <ClInclude Include="..\..\common\TCPSocket.h" />
+    <ClInclude Include="..\..\common\UDPSocket.h" />
     <ClInclude Include="AudioDlg.h" />
     <ClInclude Include="AudioGrab.h" />
     <ClInclude Include="AudioPlay.h" />

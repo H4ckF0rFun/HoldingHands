@@ -31,10 +31,12 @@ public:
 	afx_msg LRESULT OnAppendProcessInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnRemoveProcessInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnUpdateProcessInfo(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnError(WPARAM wParam, LPARAM lParam); 
+
 
 	afx_msg LRESULT OnGrowImageList(WPARAM wParam, LPARAM lParam);
 
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg int  OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnClose();
 	afx_msg void OnPopMenu(NMHDR*pNMHDR, LRESULT * pResult);

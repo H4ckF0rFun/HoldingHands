@@ -42,6 +42,8 @@ public:
 	POINT	m_OrgPt;			//¹ö¶¯ÌõÎ»ÖÃ.
 
 	DWORD	m_dwCaptureFlags;
+	HCURSOR m_LastCursor;
+
 	// CONTROL
 	BOOL m_ControlFlags;		//
 

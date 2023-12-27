@@ -150,7 +150,7 @@ void CFileMgrSearchDlg::OnBnClickedOk()
 		m_pHandler->Search((m_StartLocation + TEXT("\n") + m_TargetName).GetBuffer());
 
 		//¿ªÊ¼²éÕÒ
-		Text.Format(TEXT("[%s] Searching..."), szIP);
+		Text.Format(TEXT("[%s] Searching..."), CString(szIP));
 		SetWindowText(Text);
 
 		pButton->SetWindowText(TEXT("Stop"));

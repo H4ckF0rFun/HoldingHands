@@ -78,24 +78,29 @@ int CCameraWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #define IDM_CAMERA_BEGIN	0x0030
 
 
-LRESULT CCameraWnd::OnDeviceList(WPARAM wParam, LPARAM lParam){
+LRESULT CCameraWnd::OnDeviceList(WPARAM wParam, LPARAM lParam)
+{
 	string json_res = (char*)wParam;
 	Json::Reader reader;
 	Json::Value root;
-	if (!reader.parse(json_res, root)){
+
+	if (!reader.parse(json_res, root))
+	{
 		MessageBox(TEXT("Parse Json Failed!"));
 		return 0;
 	}
 
 	CMenu *pMenu = GetSystemMenu(FALSE);
 	//解析数据..
-	if (pMenu){
+	if (pMenu)
+	{
 		pMenu->AppendMenu(MF_STRING, IDM_SCREENSHOT, TEXT("Screenshot"));
 		pMenu->AppendMenu(MF_STRING, IDM_RECORD, TEXT("Record"));
 		pMenu->AppendMenu(MF_SEPARATOR);
 
 		Json::Value::Members members = root.getMemberNames();
-		for (auto it = members.begin(); it != members.end(); it++){
+		for (auto it = members.begin(); it != members.end(); it++)
+		{
 			string device_name = *it;
 			m_deviceName.Add(CString(device_name.c_str()));
 			//Insert device name.
@@ -104,7 +109,8 @@ LRESULT CCameraWnd::OnDeviceList(WPARAM wParam, LPARAM lParam){
 
 			int iSize = root[device_name].size();
 			
-			for (int i = 0; i < iSize;i++){
+			for (int i = 0; i < iSize;i++)
+			{
 				Json::Value Size = root[device_name][i];
 				CString strSize;
 				int width = Size["width"].asInt();
@@ -117,8 +123,11 @@ LRESULT CCameraWnd::OnDeviceList(WPARAM wParam, LPARAM lParam){
 				m_SizeCount++;
 			}
 			//插到最后的位置
-			pMenu->InsertMenu(-1, MF_STRING | MF_POPUP | MF_BYPOSITION,
-				(UINT)VideoSizeMenu.Detach(), CString(device_name.c_str()));
+			pMenu->InsertMenu(
+				-1,
+				MF_STRING | MF_POPUP | MF_BYPOSITION,
+				(UINT)VideoSizeMenu.Detach(), 
+				CString(device_name.c_str()));
 
 			m_DeviceCount++;
 		}
@@ -170,7 +179,8 @@ void CCameraWnd::OnSysCommand(UINT nID, LPARAM lParam)
 	default:
 		if (nID >= IDM_CAMERA_BEGIN && nID < (IDM_CAMERA_BEGIN + m_SizeCount)){
 			
-			if (nID != m_CurrentSizeID){
+			if (nID != m_CurrentSizeID)
+			{
 				int device_id = m_sizeToDevice[nID - IDM_CAMERA_BEGIN];
 				CStringA deviceName(m_deviceName[device_id]);
 				CString strSize;
@@ -187,7 +197,8 @@ void CCameraWnd::OnSysCommand(UINT nID, LPARAM lParam)
 				int iDeviceBegin = iDeviceEnd - m_DeviceCount;
 				//清除所有状态
 
-				for (int i = iDeviceBegin; i < iDeviceEnd; i++){
+				for (int i = iDeviceBegin; i < iDeviceEnd; i++)
+				{
 					CString MenuString;
 					CStringA aMenuString;
 					pSysMenu->GetMenuString(i, MenuString, MF_BYPOSITION);
@@ -195,17 +206,21 @@ void CCameraWnd::OnSysCommand(UINT nID, LPARAM lParam)
 					pSysMenu->CheckMenuItem(i, MF_UNCHECKED | MF_BYPOSITION);
 
 					//select device name.
-					if (aMenuString == deviceName){
+					if (aMenuString == deviceName)
+					{
 						pSysMenu->CheckMenuItem(i, MF_CHECKED | MF_BYPOSITION);
 					}
+
 					CMenu*pMenu = pSysMenu->GetSubMenu(i);
 					if (!pMenu)
 						continue;
 
-					for (int j = 0; j < pMenu->GetMenuItemCount(); j++){
+					for (int j = 0; j < pMenu->GetMenuItemCount(); j++)
+					{
 						pMenu->CheckMenuItem(j, MF_UNCHECKED | MF_BYPOSITION);
 
-						if (pMenu->GetMenuItemID(j) == nID){
+						if (pMenu->GetMenuItemID(j) == nID)
+						{
 							pMenu->CheckMenuItem(j, MF_CHECKED | MF_BYPOSITION);
 						}
 					}
@@ -213,7 +228,8 @@ void CCameraWnd::OnSysCommand(UINT nID, LPARAM lParam)
 				m_CurrentSizeID = nID;
 			}
 		}
-		else{
+		else
+		{
 			CFrameWnd::OnSysCommand(nID, lParam);
 		}
 		break;
@@ -307,7 +323,8 @@ LRESULT CCameraWnd::OnFrame(WPARAM wParam, LPARAM lParam)
 	//
 	
 	if (m_VideoHeight < m_dwHeight ||
-		m_VideoWidth < m_dwWidth){
+		m_VideoWidth < m_dwWidth)
+	{
 		
 		CRect rect;
 		rect.left = rect.top = 0;
@@ -321,11 +338,16 @@ LRESULT CCameraWnd::OnFrame(WPARAM wParam, LPARAM lParam)
 	BitBlt(m_hdc, m_Org.x, m_Org.y, m_VideoWidth, m_VideoHeight, hMdc, 0, 0, SRCCOPY);
 	m_dwFps++;
 
-	if ((GetTickCount() - m_dwLastTime) >= 1000){
+	if ((GetTickCount() - m_dwLastTime) >= 1000)
+	{
 		//更新FPS
 		CString csNewTitle;
-		csNewTitle.Format(TEXT("%s - [Fps: %d] (%d x %d)"), m_Title.GetBuffer(),
-			m_dwFps, m_VideoWidth, m_VideoHeight);
+		csNewTitle.Format(
+			TEXT("%s - [Fps: %d] (%d x %d)"), 
+			m_Title.GetBuffer(),
+			m_dwFps,
+			m_VideoWidth, 
+			m_VideoHeight);
 
 		SetWindowText(csNewTitle);
 		m_dwLastTime = GetTickCount();

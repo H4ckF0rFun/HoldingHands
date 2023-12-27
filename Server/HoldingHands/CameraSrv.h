@@ -38,9 +38,6 @@ extern"C"
 #define WM_CAMERA_GET_DRAW_WND	(WM_USER + 358)
 
 
-
-class CCameraWnd;
-
 class CCameraSrv :
 	public CEventHandler
 {

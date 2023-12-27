@@ -18,9 +18,6 @@
 #define WM_SOCKS_PROXY_ERROR	(WM_USER + 122)
 #define WM_SOCKS_PROXY_LOG		(WM_USER + 123)
 
-class CIOCPProxyServer;
-class ClientCtx;
-
 class CSocksProxyTcp;
 class CSocksProxyListener;
 class CIOCP;

@@ -379,7 +379,10 @@ void CKernelSrv::OnGetModuleInfo(const TCHAR*ModuleName){
 
 		if (m_hModuleFile == INVALID_HANDLE_VALUE)
 		{
-			dbg_log("Open %s failed with error: %d\n", m_szModulePath, GetLastError());
+			dbg_log("Open %s failed with error: %d\n", 
+				m_szModulePath, 
+				GetLastError());
+			
 			Send(KNEL_MODULE_INFO, &zero, sizeof(zero));
 			return;
 		}

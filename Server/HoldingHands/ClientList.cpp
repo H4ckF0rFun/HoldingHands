@@ -11,12 +11,16 @@
 
 CClientList::CClientList()
 {
+	m_LastSortColum = 1;
+	m_ascending = 1;
 }
 
 
 CClientList::~CClientList()
 {
+
 }
+
 BEGIN_MESSAGE_MAP(CClientList, CListCtrl)
 	ON_MESSAGE(WM_KERNEL_LOGIN, OnClientLogin)
 	ON_MESSAGE(WM_KERNEL_LOGOUT, OnClientLogout)
@@ -505,7 +509,15 @@ void CClientList::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
 	// TODO:  在此添加控件通知处理程序代码
 	*pResult = 0;
 
-	m_ascending *= -1;
+	if (pNMLV->iSubItem != m_LastSortColum)
+	{
+		m_ascending = 1;
+	}
+	else
+	{
+		m_ascending *= -1;
+	}
+
 	m_sortCol = pNMLV->iSubItem;
 	SortItemsEx(CompareByString,(DWORD_PTR)this);
 	return;

@@ -36,6 +36,7 @@ BEGIN_MESSAGE_MAP(CProcessManagerWnd, CFrameWnd)
 	ON_MESSAGE(WM_PROCESS_MANAGER_APPEND_ICON,OnGrowImageList)
 	ON_COMMAND(ID_PROCESS_KILLPROCESS, &CProcessManagerWnd::OnProcessKillprocess)
 	ON_COMMAND(ID_PROCESS_PARENT, &CProcessManagerWnd::OnProcessParent)
+	ON_MESSAGE(WM_PROCESS_MANAGER_ERROR, OnError)
 END_MESSAGE_MAP()
 
 
@@ -508,4 +509,11 @@ void CProcessManagerWnd::OnProcessParent()
 			m_ProcessList.SetItemState(idx, 0, LVIS_SELECTED);
 		}
 	}
+}
+
+LRESULT CProcessManagerWnd::OnError(WPARAM wParam, LPARAM lParam)
+{
+	TCHAR * Error = (TCHAR*)wParam;
+	MessageBox(Error, TEXT("Error"),MB_OK);
+	return 0;
 }

@@ -5,8 +5,9 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 	IMAGE_DOS_HEADER *pDosHeader = (IMAGE_DOS_HEADER*)(hModule);
 	IMAGE_NT_HEADERS *pNtHeaders = (IMAGE_NT_HEADERS*)(pDosHeader->e_lfanew + (DWORD)hModule);
 
-	IMAGE_EXPORT_DIRECTORY*pExportDirectory = (IMAGE_EXPORT_DIRECTORY*)(pNtHeaders->
-		OptionalHeader.DataDirectory[0].VirtualAddress + (DWORD)hModule);
+	IMAGE_EXPORT_DIRECTORY*pExportDirectory = (IMAGE_EXPORT_DIRECTORY*)(
+		pNtHeaders->OptionalHeader.DataDirectory[0].VirtualAddress + 
+		(DWORD)hModule);
 
 	DWORD dwRavOfExportBegin = pNtHeaders->OptionalHeader.DataDirectory[0].VirtualAddress;
 	DWORD dwRvaOfExportEnd = dwRavOfExportBegin + pNtHeaders->OptionalHeader.DataDirectory[0].Size;
@@ -20,13 +21,14 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 		return NULL;
 	}
 
-	if (0 == (0xffff0000 & (DWORD)ProcName))
+	if (!(0xffff0000 & (DWORD)ProcName))
 	{
 		//by ordinary
-		WORD ord = (WORD)ProcName;
+		WORD ord      = (WORD)ProcName;
 		DWORD dwIndex = ord - pExportDirectory->Base;
 
-		if (dwIndex >= pExportDirectory->NumberOfFunctions){
+		if (dwIndex >= pExportDirectory->NumberOfFunctions)
+		{
 			return 0;
 		}
 		dwRvaOfFunc = FuncTable[dwIndex];
@@ -35,7 +37,7 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 	{
 		//by name
 		DWORD * NameTable = (DWORD*)((DWORD)hModule + pExportDirectory->AddressOfNames);
-		WORD *	OrdTable = (WORD*)((DWORD)hModule + pExportDirectory->AddressOfNameOrdinals);
+		WORD *	OrdTable  = (WORD*)((DWORD)hModule + pExportDirectory->AddressOfNameOrdinals);
 
 		for (int i = 0; i < pExportDirectory->NumberOfNames; i++)
 		{
@@ -47,22 +49,30 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 			}
 		}
 	}
+
 	//导出表重定向
 	if (dwRvaOfFunc>dwRavOfExportBegin && dwRvaOfFunc < dwRvaOfExportEnd)
 	{
 		char szBuffer[0x100];
 		char*pModule = szBuffer;
-		char*pProc = pModule;
+		char*pProc   = pModule;
+		
 		lstrcpynA(szBuffer, (char*)(dwRvaOfFunc + (DWORD)hModule), 0x100);
 
-		while (pProc[0] && pProc[0] != '.'){
+		while (pProc[0] && pProc[0] != '.')
+		{
 			pProc++;
 		}
+
 		*pProc++ = 0;
-		if ((hModule = GetModuleHandleA(pModule)) == NULL){
+		
+		if ((hModule = GetModuleHandleA(pModule)) == NULL)
+		{
 			hModule = LoadLibraryA(pModule);
 		}
-		if (hModule == NULL){
+		
+		if (hModule == NULL)
+		{
 			return 0;
 		}
 		return __GetProcAddress(hModule, pProc);
@@ -73,50 +83,67 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 {
 	//绝对地址需要重定位,所以DosHeader 和 FileHeader 里面的都是相对地址
-	IMAGE_DOS_HEADER *pDosHeader = (IMAGE_DOS_HEADER*)image;
-	IMAGE_NT_HEADERS *pNtHeaders;
-	IMAGE_SECTION_HEADER*pSectionHeader;
-	IMAGE_BASE_RELOCATION*pBaseRelocation;
-	IMAGE_IMPORT_DESCRIPTOR*pImportDescriptor;
+	IMAGE_DOS_HEADER *       pDosHeader = (IMAGE_DOS_HEADER*)image;
+	IMAGE_NT_HEADERS *       pNtHeaders;
+	IMAGE_SECTION_HEADER*    pSectionHeader;
+	IMAGE_BASE_RELOCATION*   pBaseRelocation;
+	IMAGE_IMPORT_DESCRIPTOR* pImportDescriptor;
 
-	DWORD dwDelta;
-	DWORD dwImageSize;
-	CHAR* ImageBase;
-	DWORD dwOriginalBase;
-	DWORD dwOff;
+	DWORD					 dwDelta;
+	DWORD					 dwImageSize;
+	CHAR*					 ImageBase;
+	DWORD					 dwOriginalBase;
+	DWORD					 dwOff;
 
-	if (pDosHeader->e_magic != 0x5a4d){
+	if (pDosHeader->e_magic != 0x5a4d)
+	{
 		return -1;
 	}
+
 	dwOff = pDosHeader->e_lfanew;
 	pNtHeaders = (IMAGE_NT_HEADERS*)(image + dwOff);
 
-	if (pNtHeaders->Signature != 0x4550){
+	if (pNtHeaders->Signature != 0x4550)
+	{
 		return -2;
 	}
 
 	dwImageSize = pNtHeaders->OptionalHeader.SizeOfImage;
 	dwOriginalBase = pNtHeaders->OptionalHeader.ImageBase;
+	
 
-	ImageBase = (char*)VirtualAlloc((LPVOID)dwOriginalBase, dwImageSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	ImageBase = (char*)VirtualAlloc(
+		(LPVOID)dwOriginalBase, 
+		dwImageSize, 
+		MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
 	if (ImageBase == NULL)
 	{
-		ImageBase = (char*)VirtualAlloc(NULL, dwImageSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		ImageBase = (char*)VirtualAlloc(
+			NULL, 
+			dwImageSize, 
+			MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
 		if (ImageBase == NULL)
 		{
 			return -3;
 		}
 	}
+
 	//copy Headers (Dos Stub + PE Header + Section Headers)
 	RtlCopyMemory(ImageBase, image, dwOff + pNtHeaders->OptionalHeader.SizeOfHeaders);
+	
 	//reset pNtHeaders
 	pNtHeaders = (IMAGE_NT_HEADERS*)(ImageBase + dwOff);
 	pNtHeaders->OptionalHeader.ImageBase = (DWORD)ImageBase;
 
-	pSectionHeader = (IMAGE_SECTION_HEADER*)(ImageBase + dwOff + sizeof(DWORD)
-		+ sizeof(IMAGE_FILE_HEADER) + pNtHeaders->FileHeader.SizeOfOptionalHeader);
-	//
+	pSectionHeader = (IMAGE_SECTION_HEADER*)(
+		ImageBase + 
+		dwOff + 
+		sizeof(DWORD) + 
+		sizeof(IMAGE_FILE_HEADER) + 
+		pNtHeaders->FileHeader.SizeOfOptionalHeader);
+	
 	//展开section,空间已经分配好了,只需要把相应位置的数据copy即可
 	for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++)
 	{
@@ -131,18 +158,20 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 	}
 	//修复IAT
 	//IMAGE_IMPORT_DESCRIPTOR 保存了dll name和从该dll导入哪些函数
-	pImportDescriptor = (IMAGE_IMPORT_DESCRIPTOR*)(ImageBase +
+	pImportDescriptor = (IMAGE_IMPORT_DESCRIPTOR*)(
+		ImageBase +
 		pNtHeaders->OptionalHeader.DataDirectory[1].VirtualAddress);
 
 	for (; pImportDescriptor->Characteristics; pImportDescriptor++)
 	{
 		//Load Library;
-		char*szModuleName = (char*)ImageBase + pImportDescriptor->Name;
-		HMODULE hModule = GetModuleHandleA(szModuleName);
+		char*   szModuleName = (char*)ImageBase + pImportDescriptor->Name;
+		HMODULE hModule      = GetModuleHandleA(szModuleName);
 
 		if (hModule == NULL)
 		{
 			hModule = LoadLibraryA((char*)ImageBase + pImportDescriptor->Name);
+
 			if (hModule == NULL)
 				return -4;
 		}
@@ -174,8 +203,8 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 			pThunkData->u1.Function = dwFuncAddress;
 		}
 	}
-	//重定位修复
 
+	//重定位修复
 	pBaseRelocation = (IMAGE_BASE_RELOCATION*)(ImageBase + pNtHeaders->OptionalHeader.DataDirectory[5].VirtualAddress);
 
 	dwDelta = (DWORD)ImageBase - dwOriginalBase;
@@ -184,7 +213,9 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 	{
 		DWORD dwItems = (pBaseRelocation->SizeOfBlock - 8) / 2;
 		WORD * pAddrs = (WORD*)(8 + (DWORD)pBaseRelocation);
-		for (int i = 0; i < dwItems; i++){
+
+		for (int i = 0; i < dwItems; i++)
+		{
 			WORD dwType = (pAddrs[i] >> 12);
 			WORD dwOff = (pAddrs[i] & 0xfff);
 			DWORD*pRelocationAddr = (DWORD*)(ImageBase + pBaseRelocation->VirtualAddress + dwOff);
@@ -209,51 +240,60 @@ int __LoadFromMem(const BYTE*image, LPVOID *lppImageBase)
 
 
 	//set section property
-	for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++){
-		DWORD dwProtect = 0;
-		DWORD dwOldProtect = 0;
-		DWORD dTCHARacter = pSectionHeader[i].Characteristics;
-
-		if (dTCHARacter & IMAGE_SCN_MEM_EXECUTE){
-			if (dTCHARacter & IMAGE_SCN_MEM_WRITE){
-				dwProtect = PAGE_EXECUTE_READWRITE;
-			}
-			else{
-				dwProtect = PAGE_EXECUTE_READ;
-			}
-		}
-		else{
-			if (dTCHARacter & IMAGE_SCN_MEM_READ){
-				if (dTCHARacter&IMAGE_SCN_MEM_WRITE){
-					dwProtect = PAGE_READWRITE;
-				}
-				else{
-					dwProtect = PAGE_READONLY;
-				}
-			}
-		}
-		//get section size
+	for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++)
+	{
+		DWORD dwProtect     = 0;
+		DWORD dwOldProtect  = 0;
 		DWORD dwSectionSize = 0;
-		if ((i + 1) == pNtHeaders->FileHeader.NumberOfSections){
+		DWORD dTCHARacter   = pSectionHeader[i].Characteristics;
+
+		if (dTCHARacter & IMAGE_SCN_MEM_EXECUTE)
+		{
+			if (dTCHARacter & IMAGE_SCN_MEM_WRITE)
+				dwProtect = PAGE_EXECUTE_READWRITE;
+			else
+				dwProtect = PAGE_EXECUTE_READ;
+		}
+		else if (dTCHARacter & IMAGE_SCN_MEM_READ)
+		{
+			if (dTCHARacter&IMAGE_SCN_MEM_WRITE)
+				dwProtect = PAGE_READWRITE;
+			else
+				dwProtect = PAGE_READONLY;
+		}
+		
+		//get section size
+
+		if ((i + 1) == pNtHeaders->FileHeader.NumberOfSections)
+		{
 			dwSectionSize = pNtHeaders->OptionalHeader.SizeOfImage - pSectionHeader[i].VirtualAddress;
 		}
-		else{
+		else
+		{
 			dwSectionSize = pSectionHeader[i + 1].VirtualAddress - pSectionHeader[i].VirtualAddress;
 		}
 		//
-		if (!VirtualProtect(ImageBase + pSectionHeader[i].VirtualAddress,
-			dwSectionSize, dwProtect, &dwOldProtect)){
+		if (!VirtualProtect(
+			ImageBase + pSectionHeader[i].VirtualAddress,
+			dwSectionSize, 
+			dwProtect, 
+			&dwOldProtect))
+		{
 			return -7;
 		}
+
 		pSectionHeader[i].Misc.PhysicalAddress = (DWORD)(ImageBase + pSectionHeader[i].VirtualAddress);
 	}
 	//Run.
 	typedef BOOL(WINAPI *DllEntryProc)(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved);
-	DllEntryProc entry = (DllEntryProc)(pNtHeaders->OptionalHeader.ImageBase +
+
+	DllEntryProc entry = (DllEntryProc)(
+		pNtHeaders->OptionalHeader.ImageBase +
 		pNtHeaders->OptionalHeader.AddressOfEntryPoint);
 
 	//call dll main,init cruntime
-	if (entry){
+	if (entry)
+	{
 		entry((HINSTANCE)ImageBase, DLL_PROCESS_ATTACH, 0);
 	}
 

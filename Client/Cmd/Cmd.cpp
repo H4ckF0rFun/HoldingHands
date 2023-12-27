@@ -20,6 +20,10 @@ CCmd::~CCmd()
 /*
 	@ Date:		2022 07 11
 	@ Modify:	优化解决cmd 行缓冲太慢的问题
+	
+	
+	@ Date: 	2023 11 25
+	@ Modify:  优化缓冲问题.
 */
 
 #define PIPE_BUF_SIZE 0x100000

@@ -689,7 +689,7 @@ BOOL CIOCP::Create()
 		goto __failed__;
 	}
 
-	for (int i = 0; i < m_MaxThreadCount; i++)
+	for (unsigned long i = 0; i < m_MaxThreadCount; i++)
 	{
 		InterlockedIncrement(&m_ThreadCount);
 		Get();
@@ -702,10 +702,14 @@ BOOL CIOCP::Create()
 	}
 		
 	bRet = TRUE;
+	
+	_write_lock(&m_rw_spinlock);
 	m_state = IOCP_CREATED;
+	_write_unlock(&m_rw_spinlock);
+	
 
-	//
 __failed__:
+
 	if (!bRet)			//creating ,but create failed;
 	{
 		if (m_hCompletionPort)
@@ -713,13 +717,24 @@ __failed__:
 			CloseHandle(m_hCompletionPort);
 			m_hCompletionPort = NULL;
 		}
+		
+		_write_lock(&m_rw_spinlock);
+		m_state = IOCP_CLOSED;
+		_write_unlock(&m_rw_spinlock);
+
 	}
+
 	return bRet;
 }
 
 /*
-	一旦 Post 成功,那么就一定要处理掉sock的 IO请求。因为要释放
-	Overlapped以及其他的数据.
+	一旦 Post 成功,那么就一定要处理掉sock的 IO请求。
+	因为要释放Overlapped对象.
+
+	即使iocp被关闭,也不能直接关闭完成端口,这样未处理的IO所相关的overlapped对象无法被释放
+	而造成内存泄露。
+
+	所以必须遍历关联链表,将所有sock投递的IO请求取消并处理之后，才正真的关闭完成端口.
 */
 
 void CIOCP::Close()

@@ -20,7 +20,7 @@ void CProcessManagerSrv::OnOpen()
 }
 void CProcessManagerSrv::OnClose()
 {
-	
+	Notify(WM_PROCESS_MANAGER_ERROR,(WPARAM)TEXT("Connection close"),0);
 }
 
 void CProcessManagerSrv::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)

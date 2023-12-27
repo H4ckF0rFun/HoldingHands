@@ -177,7 +177,8 @@ LRESULT CSocksProxyWnd::OnProxyClosed(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-LRESULT CSocksProxyWnd::OnError(WPARAM wParam, LPARAM lParam){
+LRESULT CSocksProxyWnd::OnError(WPARAM wParam, LPARAM lParam)
+{
 	TCHAR* szError = (TCHAR*)wParam;
 	MessageBox(szError, TEXT("Tips"), MB_OK | MB_ICONINFORMATION);
 	return 0;
@@ -190,12 +191,10 @@ void CSocksProxyWnd::OnClose()
 	DestroyWindow();
 }
 
-
-void CSocksProxyWnd::PostNcDestroy()
-{
-	delete this;
-}
-
+//void CSocksProxyWnd::PostNcDestroy()
+//{
+//	delete this;
+//}
 
 void CSocksProxyWnd::OnSize(UINT nType, int cx, int cy)
 {
@@ -222,7 +221,6 @@ void CSocksProxyWnd::OnVerSocks4()
 		ID_VER_SOCKS4,
 		MF_BYCOMMAND
 	);
-	
 }
 
 
