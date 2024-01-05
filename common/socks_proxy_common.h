@@ -1,6 +1,9 @@
 #ifndef _SOCKS_COMMON_H
 #define _SOCKS_COMMON_H
 
+
+
+
 #define MAX_CLIENT_COUNT	4096
 
 #define UDP_MAX_BUFF		0x10000
@@ -36,7 +39,15 @@
 #define ADDRTYPE_DOMAIN			0x3
 #define ADDRTYPE_IPV6			0x4
 
+//
+#define SOCKS_PROXY			(('S') | (('K') << 8) | (('P') << 16) | (('X') << 24))
 
-
+enum SOCKS_PROXY_EVENT
+{
+	SOCK_PROXY_REQUEST,
+	SOCK_PROXY_REQUEST_RESULT,
+	SOCK_PROXY_DATA,
+	SOCK_PROXY_CLOSE
+};
 
 #endif

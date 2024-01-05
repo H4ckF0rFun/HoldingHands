@@ -4,17 +4,22 @@
 
 volatile unsigned int CAudio::nInstance = 0;
 
-CAudio::CAudio(CClient *pClient) :
+CAudio::CAudio(CClient *pClient, Module * owner) :
 CEventHandler(pClient, AUDIO)
 {
 	m_hWorkThread = NULL;			// grab thread.
 	m_IsWorking = FALSE;			// 
+	m_owner = owner;
+
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
 CAudio::~CAudio()
 {
-
+	if (m_owner)
+		put_module(m_owner);
 }
 
 void CAudio::OnOpen()

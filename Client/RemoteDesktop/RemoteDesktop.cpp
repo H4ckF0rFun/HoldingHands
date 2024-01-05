@@ -1,4 +1,5 @@
 #include "RemoteDesktop.h"
+#include "dbg.h"
 #include <stdint.h>
 #include <stdio.h>
 #include"x264.h"
@@ -38,39 +39,45 @@ TCHAR*	CursorResArray[MAX_CURSOR_TYPE] =
 };
 
 
-CRemoteDesktop::CRemoteDesktop(CClient *pClient) :
+CRemoteDesktop::CRemoteDesktop(CClient *pClient,Module * owner) :
 CEventHandler(pClient, REMOTEDESKTOP)
-{
-	//m_dwLastTime = 0;
-	
-	m_dwFrameSize = 0;
-	m_FrameBuffer = 0;
-	
-	m_dwMaxFps = 30;
-	m_Quality = QUALITY_LOW;
-
-
+{	
 	m_hClipbdListenWnd = NULL;
 	m_ClipbdListenerThread = NULL;
-	
-	m_dwCaptureFlags &= 0;
+		
+	m_flags = 0;
 
-	m_hWorkThread = NULL;
-	m_dwWorkThreadId = 0;
+	m_FrameReqCnt = 0;
+
+	m_hTimerQueue = NULL;
+	m_hTimer = NULL;
+
+	m_owner = owner;
+	
+	m_TimerMutex = 0;
+
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
 CRemoteDesktop::~CRemoteDesktop()
 {
+	if (m_owner)
+		put_module(m_owner);
 }
 
 
 void CRemoteDesktop::OnOpen()
 {
-	if (InterlockedExchange(&nInstance, 1))
-	{
+	int   err = 0;
+	int   nMonitor;
+	RECT  Monitors[16] = { 0 };
+	TCHAR szError[0x100];
+
+	if (InterlockedExchange(&nInstance, 1)){
 		//已经有一个实例了.
-		TCHAR szError[] = TEXT("One instance is already running");
+		wsprintf(szError, TEXT("One instance is already running"));
 		Send(REMOTEDESKTOP_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
 		Send(-1, NULL, 0);
 		Close();
@@ -87,26 +94,44 @@ void CRemoteDesktop::OnOpen()
 		0
 	);
 
+	//send monitors info.
+	err = m_dxgiCapture.InitD3D11Device();
+	if (err){
+		wsprintf(szError, TEXT("InitD3D11Device failed with error : %d"),err);
+		Send(REMOTEDESKTOP_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+		return;
+	}
+
+	//
+	nMonitor = m_dxgiCapture.GetAllMonitor(Monitors);
+	if (nMonitor < 0){
+		wsprintf(szError, TEXT("GetAllMonitor failed with error : %d"), nMonitor);
+		Send(REMOTEDESKTOP_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+		return;
+	}
+
+	//send monitor info to server.
+	Send(REMOTEDESKTOP_MONITORS, Monitors, nMonitor * sizeof(Monitors[0]));
+
+	m_dxgiCapture.Cleanup();
 }
 
 void CRemoteDesktop::OnClose()
 {
 	//关闭监听剪切板.
-	if (m_hClipbdListenWnd)
-	{
+	if (m_hClipbdListenWnd){
 		PostMessage(m_hClipbdListenWnd, WM_CLOSE, 0, 0);
 		m_hClipbdListenWnd = NULL;
 	}
 
 	//等待线程退出
-	if (m_ClipbdListenerThread)
-	{
+	if (m_ClipbdListenerThread){
 		WaitForSingleObject(m_ClipbdListenerThread, INFINITE);
 		CloseHandle(m_ClipbdListenerThread);
 		m_ClipbdListenerThread = NULL;
 	}
 
-	TermRD();
+	StopCapture();
 
 	InterlockedExchange(&nInstance, 0);
 }
@@ -224,12 +249,12 @@ LRESULT CALLBACK CRemoteDesktop::WndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARA
 void CRemoteDesktop::ClipdListenProc(CRemoteDesktop*pThis)
 {
 	static int      HasRegistered = 0;
-	MSG             msg = {0};
-	HINSTANCE		hInstance = GetModuleHandle(0);
-	HWND			hWnd = NULL;
-	char			szError[256] = { 0 };
+	MSG             msg           = {0};
+	HINSTANCE		hInstance     = GetModuleHandle(0);
+	HWND			hWnd          = NULL;
+	char			szError[256]  = { 0 };
 
-	MyData*			pMyData = (MyData*)malloc(sizeof(MyData));
+	MyData*			pMyData  = (MyData*)malloc(sizeof(MyData));
 	pMyData->m_pThis         = pThis;
 	pMyData->m_hNextViewer   = NULL;
 	pMyData->m_SetClipbdText = NULL;
@@ -237,12 +262,12 @@ void CRemoteDesktop::ClipdListenProc(CRemoteDesktop*pThis)
 	//注册窗口类
 	if(HasRegistered == 0)
 	{
-		WNDCLASSA wndclass = {0};
+		WNDCLASS wndclass = {0};
 		wndclass.hInstance = hInstance;
-		wndclass.lpszClassName = "ClipbdListener";
+		wndclass.lpszClassName = TEXT("ClipbdListener");
 		wndclass.lpfnWndProc = WndProc;
 		wndclass.style = CS_HREDRAW|CS_VREDRAW;
-		HasRegistered = (0 != RegisterClassA(&wndclass));
+		HasRegistered = (0 != RegisterClass(&wndclass));
 	}
 
 	if(HasRegistered == 0)
@@ -251,9 +276,9 @@ void CRemoteDesktop::ClipdListenProc(CRemoteDesktop*pThis)
 		return;
 	}
 
-	hWnd = CreateWindowA(
-		"ClipbdListener",
-		"",
+	hWnd = CreateWindow(
+		TEXT("ClipbdListener"),
+		TEXT(""),
 		WS_OVERLAPPEDWINDOW,
 		0,
 		0,
@@ -296,8 +321,8 @@ void CRemoteDesktop::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
 	case REMOTEDESKTOP_NEXT_FRAME:
 		OnNextFrame();
 		break;
-	case REMOTEDESKTOP_INIT_RDP:
-		OnInitRD(((DWORD*)lpData)[0], ((DWORD*)lpData)[1]);
+	case REMOTEDESKTOP_START_CAPTURE:
+		OnStartCapture(((UINT32*)lpData)[0], ((UINT32*)lpData)[1], ((UINT32*)lpData)[2]);
 		break;
 	case REMOTEDESKTOP_CTRL:
 		OnControl((CtrlParam*)lpData);
@@ -307,9 +332,6 @@ void CRemoteDesktop::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
 		break;
 	case REMOTEDESKTOP_SETFLAG:
 		OnSetFlag(*(DWORD*)lpData);
-		break;
-	case REMOTEDESKTOP_GET_BMP_FILE:
-		OnScreenShot();
 		break;
 	default:
 		break;
@@ -338,67 +360,223 @@ void CRemoteDesktop::SetClipbdText(TCHAR*szText)
 
 void CRemoteDesktop::OnSetFlag(DWORD dwFlag)
 {
-	if (dwFlag & 0x80000000)
+	if (dwFlag & 0x80000000){
+		m_flags |= (dwFlag & 0x7fffffff);		//set
+	}
+	else{
+		m_flags &= (~dwFlag);					//clear
+	}
+}
+
+
+void CRemoteDesktop::StopCapture()
+{
+	//Stop capture.
+	if (m_hTimer && m_hTimerQueue){
+		DeleteTimerQueueTimer(m_hTimerQueue, m_hTimer, NULL);
+		m_hTimer = NULL;
+	}
+
+	if (m_hTimerQueue){
+		DeleteTimerQueue(m_hTimerQueue);
+		m_hTimerQueue = NULL;
+	}
+
+	while (m_TimerMutex) Sleep(1);
+
+	//close encoder.
+	m_encoder.close();
+
+	//release dxgicapture.
+	m_dxgiCapture.Cleanup();
+}
+
+
+
+void __stdcall CRemoteDesktop::TimerCallback(PVOID lpParam, BOOLEAN TimerOrWaitFired)
+{
+	CRemoteDesktop * pThis = (CRemoteDesktop*)lpParam;
+	TCHAR	szError[0x100];
+	int  err = 0;
+
+	//
+	int width, height;
+	uint8_t * lpRGB;
+	uint32_t stride;
+	uint32_t size;
+	uint8_t * encoded_data;
+	uint32_t  encoded_size;
+	RECT	  rect;
+
+	//send data...
+	CURSORINFO ci = { 0 };
+	POINT CursorPos = { 0 };
+	vec bufs[3];
+	BYTE cursorIdx = 0;
+	
+
+	//Skip this frame.
+	if (InterlockedExchange(&pThis->m_TimerMutex, 1)){
+		dbg_log("skip frame");
+		return;
+	}
+
+	if (pThis->m_FrameReqCnt <= 0){
+		InterlockedExchange(&pThis->m_TimerMutex, 0);
+		return;
+	}
+
+	//get desktop frame.
+	err = pThis->m_dxgiCapture.GetDesktopFrame(&lpRGB, &stride, &size);
+
+	if (err){
+		wsprintf(szError, TEXT("GetDesktopFrame failed with error : %d"), err);
+		pThis->Send(
+			REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		goto done;
+	}
+
+	//encode.
+	pThis->m_dxgiCapture.GetCurrentMonitorSize(&width, &height);
+
+	err = pThis->m_encoder.encode(lpRGB, 32, stride, width, height, &encoded_data, &encoded_size,-1);
+	if (err){
+		wsprintf(szError, TEXT("encode failed with error : %d"), err);
+		pThis->Send(
+			REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		goto done;
+	}
+
+	//send frame.
+	ci.cbSize = sizeof(ci);
+	GetCursorInfo(&ci);
+	GetCursorPos(&CursorPos);
+
+	pThis->m_dxgiCapture.GetCurrentMonitorRect(&rect);
+
+	if (CursorPos.x > rect.left &&
+		CursorPos.x < rect.right &&
+		CursorPos.y > rect.top &&
+		CursorPos.y < rect.bottom
+		)
 	{
-		//Set Flag
-		m_dwCaptureFlags |= (dwFlag & 0x7fffffff);
+		cursorIdx = pThis->getCurCursorIdx(ci.hCursor);
+		CursorPos.x -= rect.left;
+		CursorPos.y -= rect.top;
 	}
 	else
 	{
-		//Cancel Flag
-		m_dwCaptureFlags &= (~dwFlag);
+		cursorIdx = 0xff;
 	}
+	
+	bufs[0].lpData = &cursorIdx;
+	bufs[0].Size   = sizeof(cursorIdx);
+
+	bufs[1].lpData = &CursorPos;
+	bufs[1].Size   = sizeof(CursorPos);
+
+	bufs[2].lpData = encoded_data;
+	bufs[2].Size   = encoded_size;
+
+	pThis->Send(REMOTEDESKTOP_FRAME, bufs, 3);
+
+done:
+	InterlockedDecrement(&pThis->m_FrameReqCnt);
+	InterlockedExchange(&pThis->m_TimerMutex, 0);
 }
 
-void CRemoteDesktop::TermRD(){
-	////线程 Desktop Grab,虽然能提高fps,但是延迟太难受了
-	if (m_hWorkThread)
-	{
-		while (!PostThreadMessage(m_dwWorkThreadId, WM_QUIT, 0, 0))
-		{
-			Sleep(1);
-		}
-		WaitForSingleObject(m_hWorkThread, INFINITE);
-		CloseHandle(m_hWorkThread);
-		m_hWorkThread = NULL;
-		m_dwWorkThreadId = 0;
-	}
-	//必须先等待线程退出.,因为有GetFrame...
-	m_grab.GrabTerm();
-}
 
-void CRemoteDesktop::OnInitRD(DWORD dwFps, DWORD dwQuality)
+
+void CRemoteDesktop::OnStartCapture(int monitor, UINT fps, UINT quality)
 {
-	char szError[] = "desktop grab init failed!";
-	DWORD buff[2];
-	m_dwMaxFps = dwFps;
-	m_Quality = dwQuality;
+	TCHAR szError[0x100];
+	int   MonitorSize[2];
+	int err;
+	int bitrate = 0;
 
-	TermRD();
+	StopCapture();
 
-	if (!m_grab.GrabInit(m_dwMaxFps,m_Quality))
-	{
-		Send(REMOTEDESKTOP_ERROR, (char*)szError, (sizeof(char) * (lstrlenA(szError) + 1)));
-		Close();
+
+	//Init dxgi capture.
+	err = m_dxgiCapture.InitD3D11Device();
+	if (err){
+		wsprintf(szError, TEXT("InitD3D11Device failed with error : %d"), err);
+		Send(REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
 		return;
 	}
-	//Send Video Size
-	m_grab.GetDesktopSize(buff, buff + 1);
-	Send(REMOTEDESKTOP_DESKSIZE, (char*)buff, sizeof(DWORD) * 2);
 
-	m_hWorkThread = CreateThread(0, 0,
-		(LPTHREAD_START_ROUTINE)DesktopGrabThread, this,
-		0, &m_dwWorkThreadId);
+	err = m_dxgiCapture.InitDuplication(monitor);
+	if (err){
+		wsprintf(szError, TEXT("InitDuplication failed with error : %d"), err);
+		Send(REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		return;
+	}
 
-	for (int i = 0; i < FRAME_QUEUE_SIZE; i++)
+	err = m_dxgiCapture.InitTexture();
+	if (err){
+		wsprintf(szError, TEXT("InitTexture failed with error : %d"), err);
+		Send(REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		return;
+	}
+
+	m_dxgiCapture.GetCurrentMonitorSize(&MonitorSize[0], &MonitorSize[1]);
+	Send(REMOTEDESKTOP_DESKSIZE, MonitorSize, sizeof(MonitorSize));
+	
+	//Init x264 encoder.
+	if (quality == QUALITY_LOW){
+		bitrate = MonitorSize[0] * MonitorSize[1] / 1266;
+	}
+
+	if (!m_encoder.open(MonitorSize[0], MonitorSize[1], fps, bitrate)){
+		wsprintf(szError, TEXT("open x264encoder failed"));
+		Send(REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		return;
+	}
+
+	//发送窗口大小.
+	m_FrameReqCnt = 2;
+
+	//Create timer..
+	m_TimerPerFrame = 1000 / fps;
+	m_hTimerQueue = CreateTimerQueue();
+
+	if (!m_hTimerQueue)
 	{
-		while (!PostThreadMessage(m_dwWorkThreadId, THREAD_MSG_NEXT_FRAME, 0, 0));
+		wsprintf(szError, TEXT("CreateTimerQueue failed with error : %d"), GetLastError());
+		Send(REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		return;
+	}
+
+	if (!CreateTimerQueueTimer(
+		&m_hTimer, 
+		m_hTimerQueue, 
+		TimerCallback, 
+		this, 
+		m_TimerPerFrame, 
+		m_TimerPerFrame, 
+		0))
+	{
+		wsprintf(szError, TEXT("CreateTimerQueueTimer failed with error : %d"), GetLastError());
+		Send(REMOTEDESKTOP_ERROR,
+			szError,
+			(sizeof(TCHAR) * (lstrlen(szError) + 1)));
+		return;
 	}
 }
-
-
-extern void dbg_log(const char * format, ...);
-
 
 int CRemoteDesktop::getCurCursorIdx(HCURSOR hCursor)
 {
@@ -412,100 +590,15 @@ int CRemoteDesktop::getCurCursorIdx(HCURSOR hCursor)
 	return 1; //IDC_ARROW;
 }
 
-void CALLBACK CRemoteDesktop::DesktopGrabThread(CRemoteDesktop*pThis){
-	//成功,发送视频大小.
-	TCHAR	szError[] = TEXT("desktop grab failed!");
-	double	Elapse = 0.0;
-	double	ElaspePerFrame = 0.0;
-	MSG		msg		  = { 0 };
-	LARGE_INTEGER liFrequency,liLastSendTime;
-	LARGE_INTEGER liCurTime;
-
-	QueryPerformanceFrequency(&liFrequency);
-	QueryPerformanceCounter(&liLastSendTime);
-
-	//
-	while (GetMessage(&msg, 0, 0, 0))
-	{
-		if (msg.message == THREAD_MSG_GET_BMP_FILE)
-		{
-			BYTE *buffer = 0;
-			DWORD dwSize = 0;
-
-			pThis->m_grab.GetBmpFile(&buffer, &dwSize);
-			pThis->Send(REMOTEDESKTOP_BMP_FILE, buffer, dwSize);
-			delete[]buffer;
-		}
-		else 
-		{
-			if (!pThis->m_grab.GetFrame(
-				&pThis->m_FrameBuffer,
-				&pThis->m_dwFrameSize,
-				pThis->m_dwCaptureFlags))
-			{
-
-				pThis->Send(
-					REMOTEDESKTOP_ERROR,
-					szError,
-					(sizeof(TCHAR) * (lstrlen(szError) + 1)));
-
-				pThis->Close();
-			}
-			else
-			{
-				do
-				{
-					QueryPerformanceCounter(&liCurTime);
-					if (liCurTime.QuadPart < liLastSendTime.QuadPart)
-					{
-						break;
-					}
-					
-					Elapse = 1.0 * (liCurTime.QuadPart - liLastSendTime.QuadPart) / liFrequency.QuadPart
-						* 1000.0;
-					
-					ElaspePerFrame = 1000.0 / pThis->m_dwMaxFps;			//毫秒.
-					__asm
-					{
-						pause;
-						pause;
-						pause;
-					}
-				} while (Elapse < ElaspePerFrame + 1);
-				QueryPerformanceCounter(&liLastSendTime);
-				
-				//Send Frame, 不要阻塞....
-
-				CURSORINFO ci = { 0 };
-				vec bufs[2];
-				BYTE cursorIdx = 0;
-
-				ci.cbSize = sizeof(ci);
-				GetCursorInfo(&ci);
-
-				bufs[0].lpData = &cursorIdx;
-				bufs[0].Size = sizeof(cursorIdx);
-
-				bufs[1].lpData = pThis->m_FrameBuffer;
-				bufs[1].Size = pThis->m_dwFrameSize;
-
-				cursorIdx = pThis->getCurCursorIdx(ci.hCursor);
-
-				pThis->Send(REMOTEDESKTOP_FRAME, bufs, 2);
-			}
-		}
-	}
-}
-
 void CRemoteDesktop::OnNextFrame()
 {
-	PostThreadMessage(m_dwWorkThreadId, THREAD_MSG_NEXT_FRAME, 0, 0);
+	InterlockedIncrement(&m_FrameReqCnt);
 }
 
-void CRemoteDesktop::OnScreenShot()
-{
-	PostThreadMessage(m_dwWorkThreadId, THREAD_MSG_GET_BMP_FILE, 0, 0);
-}
+//void CRemoteDesktop::OnScreenShot()
+//{
+//	//PostThreadMessage(m_dwWorkThreadId, THREAD_MSG_GET_BMP_FILE, 0, 0);
+//}
 
 void CRemoteDesktop::OnControl(CtrlParam*pParam)
 {

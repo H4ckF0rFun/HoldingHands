@@ -4,20 +4,27 @@
 #define ID_INPUT                        1001
 
 
-CChat::CChat(CClient *pClient) :
+CChat::CChat(CClient *pClient, Module  * owner) :
 CEventHandler(pClient, CHAT)
 {
 	m_hInit = NULL;
 	m_hDlg = NULL;
 	m_hWndThread = NULL;
 	m_dwThreadId = 0;
+	m_owner = owner;
+
 	memset(m_szPeerName, 0, sizeof(m_szPeerName));
+
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
 CChat::~CChat()
 {
 	dbg_log("CChat::~CChat()");
+	if (m_owner)
+		put_module(m_owner);
 }
 
 //假设对话框不可能由client关闭,只能由客户端断开.;

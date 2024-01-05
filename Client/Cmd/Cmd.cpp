@@ -3,18 +3,25 @@
 
 using std::iostream;
 
-CCmd::CCmd(CClient *pClient) :
+CCmd::CCmd(CClient *pClient, Module * owner) :
 CEventHandler(pClient,CMD)
 {
 	m_hReadPipe = NULL;
 	m_hWritePipe = NULL;
 	m_hReadThread = NULL;
 	memset(&m_pi, 0, sizeof(m_pi));
+
+	m_owner = owner;
+
+	if (m_owner)
+		get_module(m_owner);
 }
 
 CCmd::~CCmd()
 {
 	dbg_log("CCmd::~CCmd()");
+	if (m_owner)
+		put_module(m_owner);
 }
 
 /*
@@ -28,7 +35,7 @@ CCmd::~CCmd()
 
 #define PIPE_BUF_SIZE 0x100000
 
-void __stdcall ReadThread(CCmd*pCmd)
+void __stdcall CCmd::ReadThread(CCmd*pCmd)
 {
 	CHAR *  lpData = new CHAR[PIPE_BUF_SIZE];
 	TCHAR* szOutput = new TCHAR[PIPE_BUF_SIZE];

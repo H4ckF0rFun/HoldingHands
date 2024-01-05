@@ -98,6 +98,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\audio_common.h" />
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="AudioPlay.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

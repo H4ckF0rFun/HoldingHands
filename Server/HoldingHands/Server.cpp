@@ -29,7 +29,9 @@ void CServer::OnAccept(
 	}
 
 	//create a new client socket.
-	//hold the lock before we use the m_Iocp pointer,because it may be modified by Iocp object.
+	//hold the lock before we use the m_Iocp pointer,
+	//because it may be modified by Iocp object.
+	//unless you are sure that m_Iocp will not be change by others.
 
 	client = new CClient(hClientSocket);
 	client->SetNotifyWindow(m_hNotifyWindow);

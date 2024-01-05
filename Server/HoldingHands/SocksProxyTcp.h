@@ -1,6 +1,6 @@
 #pragma once
 #include "TCPSocket.h"
-#include "SocksProxyCommon.h"
+#include "socks_proxy_common.h"
 
 /*
 	如果 AB 双方都是在析构函数内才put,那么就会造成死锁,无法释放资源
@@ -13,8 +13,6 @@
 #define SOCKS_PROXY_HANDSHAKE		0
 #define SOCKS_PROXY_REQUEST			1
 #define SOCKS_PROXY_FORWARD			2
-
-
 
 
 class CSocksProxyUDPListener;

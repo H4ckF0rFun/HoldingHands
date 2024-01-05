@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\FileManager\FileDownloader.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -39,5 +36,16 @@
     <ClCompile Include="..\..\common\utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="FileDownloader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\filedownloader_common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileDownloader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

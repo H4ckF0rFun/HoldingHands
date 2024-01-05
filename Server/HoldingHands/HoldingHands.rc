@@ -94,7 +94,11 @@ BEGIN
     POPUP "Operation"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "RemoteDesktop",               ID_OPERATION_REMOTEDESKTOP
+        POPUP "RemoteDesktop"
+        BEGIN
+            MENUITEM "Gdi Capture",                 ID_REMOTEDESKTOP_GDI
+            MENUITEM "Dxgi Capture",                ID_REMOTEDESKTOP_DXGI
+        END
         MENUITEM "Keyboard",                    ID_OPERATION_KEYBOARD
         MENUITEM "Camera",                      ID_OPERATION_CAMERA
         MENUITEM "Microphone",                  ID_OPERATION_MICROPHONE
@@ -176,6 +180,10 @@ END
 
 IDR_RD_MENU MENU
 BEGIN
+    POPUP "Monitors"
+    BEGIN
+        MENUITEM SEPARATOR
+    END
     POPUP "Display"
     BEGIN
         MENUITEM "Stretch",                     ID_DISPLAY_STRETCH

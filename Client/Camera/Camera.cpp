@@ -13,15 +13,21 @@
 
 volatile unsigned int CCamera::nInstance = 0;
 
-CCamera::CCamera(CClient *pClient) :
+CCamera::CCamera(CClient *pClient, Module * owner) :
 CEventHandler(pClient, CAMERA){
 	m_bStop = FALSE;
 	m_hWorkThread = NULL;
+
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
-CCamera::~CCamera(){
-	
+CCamera::~CCamera()
+{
+	if (m_owner)
+		put_module(m_owner);
 }
 
 void CCamera::OnOpen()

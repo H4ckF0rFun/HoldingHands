@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DesktopGrab.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="RemoteDesktop.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -42,5 +39,22 @@
     <ClCompile Include="..\Common\Client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DxgiCapture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\X264Encoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DxgiCapture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteDesktop.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\rd_common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

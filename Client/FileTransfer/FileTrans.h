@@ -2,35 +2,9 @@
 #ifndef _MINI_FILE_TRANS_SVR
 #define _MINI_FILE_TRANS_SVR
 
+#include "file_transfer_common.h"
 #include "EventHandler.h"
-
-#define MINIFILETRANS	('M'|('N'<<8)|('F')<<16|('T')<<24)
-
-
-#define MNFT_DUTY_SENDER			(0xabcdef11)
-#define MNFT_DUTY_RECEIVER			(~MNFT_DUTY_SENDER)
-
-#define MNFT_INIT					(0xab00)
-
-#define MNFT_TRANS_INFO_GET			(0xab01)
-#define MNFT_TRANS_INFO_RPL			(0xab02)
-
-#define MNFT_FILE_INFO_GET			(0xab03)
-#define MNFT_FILE_INFO_RPL			(0xab04)
-
-#define MNFT_FILE_DATA_CHUNK_GET	(0xab05)
-#define MNFT_FILE_DATA_CHUNK_RPL	(0xab06)
-
-//recv----->send
-#define MNFT_FILE_TRANS_FINISHED	(0xab07)
-
-//send ---> recv
-#define MNFT_TRANS_FINISHED			(0xab08)
-
-
-#define MNFT_STATU_SUCCESS			(0x01010101)
-#define MNFT_STATU_FAILED			(0x02020202)
-
+#include "module.h"
 /************************************************************************************/
 
 
@@ -40,6 +14,7 @@ class CFileTrans :
 	public CEventHandler
 {
 private:
+
 	//some structures will be used when we thansfer files;
 	struct FileInfo
 	{
@@ -179,7 +154,9 @@ private:
 
 
 private:
-	
+	Module *        m_owner;
+
+
 	//common
 	DWORD			m_dwCurFileIdentity;
 	HANDLE			m_hCurFile;
@@ -226,7 +203,7 @@ private:
 	void OnGetFileDataChunkRpl(DWORD Read, char*Buffer);
 
 public:
-	CFileTrans(CClient*pClient, UINT32 Duty, const TCHAR * SrcDir, const TCHAR* DestDir, const TCHAR * FileList);
+	CFileTrans(CClient*pClient,Module * owner ,UINT32 Duty, const TCHAR * SrcDir, const TCHAR* DestDir, const TCHAR * FileList);
 	~CFileTrans();
 };
 

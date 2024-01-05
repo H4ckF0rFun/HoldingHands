@@ -1,15 +1,9 @@
 #pragma once
+
+#include "file_search_common.h"
 #include "EventHandler.h"
 
-#define FILEMGR_SEARCH			('S'|('R'<<8)|('C'<<16)|('H'<<24))
 
-#define FILE_MGR_SEARCH_SEARCH		(0xaca1)
-
-#define FILE_MGR_SEARCH_STOP		(0xaca2)
-
-#define FILE_MGR_SEARCH_FOUND		(0xaca3)
-
-#define FILE_MGR_SEARCH_OVER		(0xaca4)
 
 
 //Notify Message

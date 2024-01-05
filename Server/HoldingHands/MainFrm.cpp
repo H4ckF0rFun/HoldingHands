@@ -91,6 +91,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_UTILS_OPENWEBPAGE, &CMainFrame::OnUtilsOpenwebpage)
 	ON_WM_SIZE()
 	ON_COMMAND(ID_OPERATION_PROCESSMANAGER, &CMainFrame::OnOperationProcessmanager)
+	ON_COMMAND(ID_REMOTEDESKTOP_DXGI, &CMainFrame::OnRemotedesktopDxgi)
+	ON_COMMAND(ID_REMOTEDESKTOP_GDI, &CMainFrame::OnRemotedesktopGdi)
 END_MESSAGE_MAP()
 
 TCHAR * szSrvStatu[] =
@@ -295,9 +297,11 @@ void CMainFrame::OnUpdateStatuBar()
 	//更新时间
 	CString PaneText;
 	CTime time = CTime::GetTickCount();
-	LARGE_INTEGER traffic[2];
+	ULONG traffic[2];
+	static ULONG last_traffic[2] = { 0 };
+
 	LARGE_INTEGER tmp[2];
-	static LARGE_INTEGER last_traffic[2] = { 0 };
+	
 
 	TCHAR szReadSpeed[128], szWriteSpeed[128];
 
@@ -305,18 +309,18 @@ void CMainFrame::OnUpdateStatuBar()
 	m_wndStatusBar.SetPaneText(5, PaneText);
 	//更新上传,下载速度.
 
-	m_Iocp->GetTraffic((ULONGLONG*)traffic);
-	memcpy(tmp, traffic, sizeof(traffic));
-	
-	//
-	traffic[0].QuadPart -= last_traffic[0].QuadPart;
-	traffic[1].QuadPart -= last_traffic[1].QuadPart;
+	m_Iocp->GetTraffic(traffic);
+
+	tmp[0].QuadPart = traffic[0] - last_traffic[0];
+	tmp[1].QuadPart = traffic[1] - last_traffic[1];
 
 	//update traffic.
-	memcpy(last_traffic, tmp, sizeof(tmp));
+	last_traffic[0] = traffic[0];
+	last_traffic[1] = traffic[1];
 
-	GetStorageSizeString(traffic[0], szReadSpeed);
-	GetStorageSizeString(traffic[1], szWriteSpeed);
+	
+	GetStorageSizeString(tmp[0], szReadSpeed);
+	GetStorageSizeString(tmp[1], szWriteSpeed);
 
 	PaneText.Format(TEXT("Upload: %s/S"), szWriteSpeed);
 	m_wndStatusBar.SetPaneText(3, PaneText);
@@ -722,4 +726,16 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 void CMainFrame::OnOperationProcessmanager()
 {
 	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_PROCESSMANAGER);
+}
+
+
+void CMainFrame::OnRemotedesktopDxgi()
+{
+	m_ClientList.SendMessage(WM_COMMAND, ID_REMOTEDESKTOP_DXGI);
+}
+
+
+void CMainFrame::OnRemotedesktopGdi()
+{
+	m_ClientList.SendMessage(WM_COMMAND, ID_REMOTEDESKTOP_GDI);
 }

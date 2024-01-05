@@ -1,12 +1,6 @@
 #pragma once
+#include "chat_common.h"
 #include "EventHandler.h"
-
-#define CHAT		('C'|('H'<<8)|('A'<<16)|('T'<<24))
-
-//handler message..
-#define CHAT_INIT			(0xaa00)			//client---svr
-#define CHAT_BEGIN			(0xaa01)			//svr---client
-#define CHAT_MSG			(0xaa02)			//p2p
 
 //notify message
 #define WM_CHAT_ERROR			(WM_USER + 101)

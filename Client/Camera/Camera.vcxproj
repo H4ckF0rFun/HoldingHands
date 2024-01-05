@@ -98,6 +98,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MySampleGrabberCB.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\camera_common.h" />
+    <ClInclude Include="Camera.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

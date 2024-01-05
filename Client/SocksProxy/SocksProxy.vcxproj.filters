@@ -56,7 +56,7 @@
     <ClInclude Include="SocksProxyUDP.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\common\SocksProxyCommon.h">
+    <ClInclude Include="..\..\common\socks_proxy_common.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

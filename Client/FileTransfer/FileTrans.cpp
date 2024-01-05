@@ -4,7 +4,12 @@
 BOOL MakesureDirExist(const TCHAR* Path,BOOL bIncludeFileName = FALSE);
 
 
-CFileTrans::CFileTrans(CClient*pClient, UINT32 Duty, const TCHAR * SrcDir, const TCHAR* DestDir, const TCHAR * FileList) :
+CFileTrans::CFileTrans(CClient*pClient, 
+	Module * owner,
+	UINT32 Duty, 
+	const TCHAR * SrcDir, 
+	const TCHAR* DestDir,
+	const TCHAR * FileList) :
 CEventHandler(pClient, MINIFILETRANS)
 {
 	m_dwCurFileIdentity = 0;
@@ -22,6 +27,11 @@ CEventHandler(pClient, MINIFILETRANS)
 
 	m_FileList = (TCHAR*)malloc(sizeof(TCHAR) * (lstrlen(FileList) + 1));
 	lstrcpy(m_FileList, FileList);
+
+	m_owner = owner;
+
+	if (m_owner)
+		get_module(m_owner);
 
 }
 
@@ -45,6 +55,9 @@ CFileTrans::~CFileTrans()
 		free(m_FileList);
 		m_FileList = NULL;
 	}
+
+	if (m_owner)
+		put_module(m_owner);
 }
 
 void CFileTrans::OnClose()

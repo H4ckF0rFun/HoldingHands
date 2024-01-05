@@ -180,7 +180,7 @@ LRESULT CSocksProxyWnd::OnProxyClosed(WPARAM wParam, LPARAM lParam)
 LRESULT CSocksProxyWnd::OnError(WPARAM wParam, LPARAM lParam)
 {
 	TCHAR* szError = (TCHAR*)wParam;
-	MessageBox(szError, TEXT("Tips"), MB_OK | MB_ICONINFORMATION);
+	MessageBox(szError, TEXT("Error"), MB_OK | MB_ICONERROR);
 	return 0;
 }
 

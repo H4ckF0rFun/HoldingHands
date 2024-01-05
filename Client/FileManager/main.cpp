@@ -4,47 +4,55 @@
 
 
 extern "C" __declspec(dllexport)
-void  ModuleEntry(
-CIOCP * iocp,
-char* szServerAddr,
+int ModuleEntry(
+CIOCP * Iocp,
+Module * owner,
+const char* szServerAddr,
 unsigned short uPort,
-void *lpParam)
-
+LPVOID Args[],
+LPVOID  Kernel,
+typeRun run_module)
 {
+	int err = 0;
+
 	CClient * client = new CClient;
-	CFileManager * fm = new CFileManager(client);
+	CFileManager * fm = new CFileManager(client,owner,run_module,Kernel);
 
 	if (!client->Create())
 	{
 		dbg_log("client->Create() failed");
+		err = -1;
 		goto __failed__;
 	}
 
 	if (!client->Bind(0))
 	{
 		dbg_log("client->Bind() failed");
+		err = -2;
 		goto __failed__;
 	}
 
-	if (!iocp->AssociateSock(client))
+	if (!Iocp->AssociateSock(client))
 	{
 		dbg_log("iocp->AssociateSock(client) failed");
+		err = -3;
 		goto __failed__;
 	}
 
 	if (!client->Connect(szServerAddr, uPort, NULL, NULL))
 	{
 		dbg_log("client->Connect() failed");
+		err = -4;
 		goto __failed__;
 	}
 
 	client->Put();
-	return;
+	return 0;
 
 __failed__:
 	client->Close();
 	client->Put();
-	return;
+	return err;
 }
 
 #ifdef _DEBUG
@@ -62,7 +70,7 @@ int main(){
 	iocp->Create();
 
 	//
-	ModuleEntry(iocp, "192.168.237.1", 10086, NULL);
+	ModuleEntry(iocp, "192.168.237.1", 10086, NULL,NULL,NULL);
 
 	Sleep(INFINITE);
 }

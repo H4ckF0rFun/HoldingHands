@@ -2,34 +2,9 @@
 #ifndef _FILE_TRANS_SVR
 #define _FILE_TRANS_SVR
 
+#include "file_transfer_common.h"
 #include "EventHandler.h"
 
-#define MINIFILETRANS	('M'|('N'<<8)|('F')<<16|('T')<<24)
-
-
-#define MNFT_DUTY_SendER			(0xabcdef11)
-#define MNFT_DUTY_RECEIVER			(~MNFT_DUTY_SendER)
-
-#define MNFT_INIT					(0xab00)
-
-#define MNFT_TRANS_INFO_GET			(0xab01)
-#define MNFT_TRANS_INFO_RPL			(0xab02)
-
-#define MNFT_FILE_INFO_GET			(0xab03)
-#define MNFT_FILE_INFO_RPL			(0xab04)
-
-#define MNFT_FILE_DATA_CHUNK_GET	(0xab05)
-#define MNFT_FILE_DATA_CHUNK_RPL	(0xab06)
-
-//recv----->Send
-#define MNFT_FILE_TRANS_FINISHED	(0xab07)
-
-//Send ---> recv
-#define MNFT_TRANS_FINISHED			(0xab08)
-
-
-#define MNFT_STATU_SUCCESS			(0x01010101)
-#define MNFT_STATU_FAILED			(0x02020202)
 
 
 //Notify Message 

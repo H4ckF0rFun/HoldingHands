@@ -1,18 +1,17 @@
 #pragma once
+
+
+
 #include "EventHandler.h"
-
-#define CMD				('C'|('M')<<8|('D')<<16)
-
-//0³É¹¦,-1Ê§°Ü
-#define CMD_BEGIN		(0xcad0)
-
-#define CMD_COMMAND		(0xcad1)
-#define CMD_RESULT		(0xcad2)
+#include "cmd_common.h"
+#include "module.h"
 
 class CCmd :
 	public CEventHandler
 {
-public:
+
+private:
+	Module *    m_owner;
 	HANDLE		m_hReadThread;		
 
 	HANDLE		m_hReadPipe;
@@ -21,16 +20,18 @@ public:
 	HANDLE		m_hCmdProcess;
 
 	PROCESS_INFORMATION m_pi;
+
+public:
 	void OnClose();		
 	void OnOpen();
 
 	void OnEvent(UINT32 e, BYTE *lpData, UINT32 Size);
-
-
 	int CmdBegin();
 
+	static void __stdcall CCmd::ReadThread(CCmd*pCmd);
+
 	void OnCommand(TCHAR*szCmd);
-	CCmd(CClient *pClient);
+	CCmd(CClient *pClient,Module * owner);
 	~CCmd();
 };
 

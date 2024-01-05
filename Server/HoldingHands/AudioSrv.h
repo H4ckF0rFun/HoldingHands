@@ -2,17 +2,8 @@
 #include "EventHandler.h"
 #include "AudioGrab.h"
 #include "AudioPlay.h"
+#include "audio_common.h"
 
-#define AUDIO		('A'|'U'<<8|'D'<<16|'O'<<24)
-
-#define AUDIO_ERROR (0x0000)
-
-#define AUDIO_BEGIN (0xaaa0)
-#define AUDIO_STOP  (0xaaa2)
-
-#define AUDIO_PLAY_BEGIN	(0xaaa5)
-#define AUDIO_PLAY_DATA		(0xaaa6)
-#define AUDIO_PLAY_STOP		(0xaaa7)
 
 //notify 
 #define WM_AUDIO_ERROR (WM_USER + 137)

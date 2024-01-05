@@ -14,8 +14,10 @@ HHOOK			hKbHook = NULL;
 extern"C"__declspec(dllimport)	HWND	hTopWindow;						//顶层窗口
 extern"C"__declspec(dllimport) LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);	//钩子函数
 
+#define FIRST_MONITOR_ID 0x40
+#define MAX_MONITOR_ID (FIRST_MONITOR_ID + 0x10)
+
 CRemoteDesktopWnd::CRemoteDesktopWnd(CRemoteDesktopSrv*pHandler):
-	m_dwCaptureFlags(0),
 	m_ControlFlags(0),
 	m_pHandler(pHandler),
 	m_dwDeskWidth(0),
@@ -31,7 +33,9 @@ CRemoteDesktopWnd::CRemoteDesktopWnd(CRemoteDesktopSrv*pHandler):
 	m_bFullScreenStretchMode(FALSE),
 	m_dwMaxpFps(30),
 	m_dwQuality(QUALITY_LOW),
-	m_LastCursor((HCURSOR)-1)
+	m_LastCursor((HCURSOR)-1),
+	m_nMonitors(0),
+	m_CurrentMonitor(-1)
 {
 	m_DisplayMode |= DISPLAY_TILE;
 	//
@@ -95,7 +99,11 @@ BEGIN_MESSAGE_MAP(CRemoteDesktopWnd, CFrameWnd)
 	ON_COMMAND(ID_OTHER_SCREENSHOT, &CRemoteDesktopWnd::OnOtherScreenshot)
 	ON_COMMAND(ID_QUALITY_LOW, &CRemoteDesktopWnd::OnQualityLow)
 	ON_COMMAND(ID_QUALITY_HIGH, &CRemoteDesktopWnd::OnQualityHigh)
-	ON_MESSAGE(WM_REMOTE_DESKTOP_SCREENSHOT, OnScreenShot)
+	ON_MESSAGE(WM_REMOTE_DESKTOP_MONITORS,OnMonitorsInfo)
+	ON_MESSAGE(WM_REMOTE_DESKTOP_GET_SCREENSHOT_SAVE_PATH,OnGetScreenshotSavePath)
+	ON_COMMAND_RANGE(FIRST_MONITOR_ID, MAX_MONITOR_ID, SwitchMonitor)
+	//ON_MESSAGE(WM_REMOTE_DESKTOP_SCREENSHOT, OnScreenShot)
+	ON_WM_SYSCOMMAND()
 END_MESSAGE_MAP()
 
 
@@ -140,7 +148,7 @@ int CRemoteDesktopWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetMenu(&m_Menu);
 
 	//默认是平铺.
-	CMenu*pMenu = m_Menu.GetSubMenu(0);
+	CMenu*pMenu = m_Menu.GetSubMenu(1);
 	pMenu->CheckMenuRadioItem(ID_DISPLAY_STRETCH, ID_DISPLAY_TILE, ID_DISPLAY_TILE, MF_BYCOMMAND);
 	
 	//Set Window Text.
@@ -164,7 +172,7 @@ int CRemoteDesktopWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	//
 	m_pHandler->SetNotifyWindow(GetSafeHwnd());
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	//m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
 	return 0;
 }
 
@@ -178,7 +186,7 @@ void CRemoteDesktopWnd::OnDisplayStretch()
 	// TODO:  在此添加命令处理程序代码
 
 	m_DisplayMode = DISPLAY_STRETCH;
-	CMenu*pMenu = m_Menu.GetSubMenu(0);
+	CMenu*pMenu = m_Menu.GetSubMenu(1);
 	EnableScrollBarCtrl(SB_VERT, 0);
 	EnableScrollBarCtrl(SB_HORZ, 0);
 	pMenu->CheckMenuRadioItem(ID_DISPLAY_STRETCH, ID_DISPLAY_TILE, ID_DISPLAY_STRETCH, MF_BYCOMMAND);
@@ -190,7 +198,7 @@ void CRemoteDesktopWnd::OnDisplayTile()
 	// TODO:  在此添加命令处理程序代码
 	m_DisplayMode = DISPLAY_TILE;
 
-	CMenu*pMenu = m_Menu.GetSubMenu(0);
+	CMenu*pMenu = m_Menu.GetSubMenu(1);
 	EnableScrollBarCtrl(SB_VERT, 1);
 	EnableScrollBarCtrl(SB_HORZ, 1);
 	//
@@ -223,18 +231,26 @@ void CRemoteDesktopWnd::OnDisplayTile()
 
 void CRemoteDesktopWnd::OnCaptureMouse()
 {
-	m_dwCaptureFlags = (m_dwCaptureFlags & (~CAPTURE_MOUSE)) | (CAPTURE_MOUSE & (~(m_dwCaptureFlags & CAPTURE_MOUSE)));
+	DWORD flag = m_pHandler->GetFlag();
 
-	m_pHandler->SetCaptureFlag(
-		REMOTEDESKTOP_FLAG_CAPTURE_MOUSE | ((m_dwCaptureFlags&CAPTURE_MOUSE)? 0x80000000 : 0));
+	if (flag & FLAG_DRAW_MOUSE){
+		m_pHandler->SetFlag(FLAG_DRAW_MOUSE);
+	}
+	else{
+		m_pHandler->SetFlag(0x80000000 | FLAG_DRAW_MOUSE);
+	}
 }
 
 void CRemoteDesktopWnd::OnCaptureTransparentwindow()
 {
-	m_dwCaptureFlags = (m_dwCaptureFlags & (~CAPTURE_TRANSPARENT)) | (CAPTURE_TRANSPARENT & (~(m_dwCaptureFlags & CAPTURE_TRANSPARENT)));
-	m_pHandler->SetCaptureFlag(
-		REMOTEDESKTOP_FLAG_CAPTURE_TRANSPARENT | ((m_dwCaptureFlags&CAPTURE_TRANSPARENT) ? 0x80000000 : 0));
+	DWORD flag = m_pHandler->GetFlag();
 
+	if (flag & FLAG_CAPTURE_TRANSPARENTWND){
+			m_pHandler->SetFlag(FLAG_CAPTURE_TRANSPARENTWND);
+	}
+	else{
+		m_pHandler->SetFlag(0x80000000 | FLAG_CAPTURE_TRANSPARENTWND);
+	}
 }
 
 void CRemoteDesktopWnd::OnControlKeyboard()
@@ -261,13 +277,13 @@ void CRemoteDesktopWnd::OnUpdateControlKeyboard(CCmdUI *pCmdUI)
 
 void CRemoteDesktopWnd::OnUpdateCaptureMouse(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(m_dwCaptureFlags & CAPTURE_MOUSE);
+	pCmdUI->SetCheck(m_pHandler->GetFlag() & FLAG_DRAW_MOUSE);
 }
 
 
 void CRemoteDesktopWnd::OnUpdateCaptureTransparentwindow(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(m_dwCaptureFlags & CAPTURE_TRANSPARENT);
+	pCmdUI->SetCheck(m_pHandler->GetFlag() & FLAG_CAPTURE_TRANSPARENTWND);
 }
 
 LRESULT CRemoteDesktopWnd::OnError(WPARAM wParam, LPARAM lParam)
@@ -346,10 +362,14 @@ LRESULT CRemoteDesktopWnd::OnDesktopSize(WPARAM wParam, LPARAM lParam)
 LRESULT CRemoteDesktopWnd::OnDraw(WPARAM wParam, LPARAM lParam)
 {
 	LPVOID * Image	= (LPVOID*)wParam;
+	LPVOID * CursorInfo = (LPVOID *)lParam;
+
 	HDC     hMemDC	= (HDC)	   Image[0];
 	BITMAP* pBitmap	= (BITMAP*)Image[1];
-	HCURSOR hCursor = (HCURSOR)lParam;
 
+	HCURSOR hCursor = (HCURSOR)CursorInfo[0];
+	LPPOINT lpCursorPos = (LPPOINT)CursorInfo[1];
+ 
 	RECT rect = { 0 };
 
 	GetClientRect(&rect);
@@ -431,7 +451,7 @@ LRESULT CRemoteDesktopWnd::OnDraw(WPARAM wParam, LPARAM lParam)
 	}
 
 	//设置光标.
-	if ((m_dwCaptureFlags & CONTROL_MOUSE) &&
+	if ((m_ControlFlags & CONTROL_MOUSE) &&
 		m_LastCursor != hCursor)
 	{
 		SetCursor(hCursor);
@@ -613,61 +633,57 @@ void CRemoteDesktopWnd::OnSetFocus(CWnd* pOldWnd)
 void CRemoteDesktopWnd::OnMaxfps10()
 {
 	m_dwMaxpFps = 10;
-	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+	GetMenu()->GetSubMenu(1)->GetSubMenu(2)->
 		CheckMenuRadioItem(
-		ID_MAXFPS_10, 
-		ID_MAXFPS_NOLIMIT, 
-		ID_MAXFPS_10, 
+		ID_MAXFPS_10,
+		ID_MAXFPS_NOLIMIT,
+		ID_MAXFPS_10,
 		MF_BYCOMMAND);
 
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
-		
+	m_pHandler->StartCapture(m_CurrentMonitor, m_dwMaxpFps, m_dwQuality);
+
 }
 
 
 void CRemoteDesktopWnd::OnMaxfps20()
 {
 	m_dwMaxpFps = 20;
-	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+	GetMenu()->GetSubMenu(1)->GetSubMenu(2)->
 		CheckMenuRadioItem(
 		ID_MAXFPS_10,
 		ID_MAXFPS_NOLIMIT, 
 		ID_MAXFPS_20,
 		MF_BYCOMMAND);
 
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
-	
-		
+	m_pHandler->StartCapture(m_CurrentMonitor, m_dwMaxpFps, m_dwQuality);
 }
 
 
 void CRemoteDesktopWnd::OnMaxfps30()
 {
 	m_dwMaxpFps = 30;
-	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+	GetMenu()->GetSubMenu(1)->GetSubMenu(2)->
 		CheckMenuRadioItem(
 		ID_MAXFPS_10, 
 		ID_MAXFPS_NOLIMIT, 
 		ID_MAXFPS_30,
 		MF_BYCOMMAND);
 
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
-
+	m_pHandler->StartCapture(m_CurrentMonitor, m_dwMaxpFps, m_dwQuality);
 }
 
 
 void CRemoteDesktopWnd::OnMaxfpsNolimit()
 {
 	m_dwMaxpFps = 60;
-	GetMenu()->GetSubMenu(0)->GetSubMenu(2)->
+	GetMenu()->GetSubMenu(1)->GetSubMenu(2)->
 		CheckMenuRadioItem(
 		ID_MAXFPS_10, 
 		ID_MAXFPS_NOLIMIT, 
 		ID_MAXFPS_NOLIMIT, 
 		MF_BYCOMMAND);
 
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
-	
+	m_pHandler->StartCapture(m_CurrentMonitor, m_dwMaxpFps, m_dwQuality);
 }
 
 
@@ -795,22 +811,56 @@ void CRemoteDesktopWnd::OnDisplayFullscreen()
 }
 
 
-LRESULT CRemoteDesktopWnd::OnScreenShot(WPARAM wParam,LPARAM lParam){
-	char * Buffer = (char*)wParam;
-	DWORD dwSize = lParam;
+//LRESULT CRemoteDesktopWnd::OnScreenShot(WPARAM wParam,LPARAM lParam)
+//{
+//	//char * Buffer = (char*)wParam;
+//	//DWORD  dwSize = lParam;
+//
+//	//if (Buffer == NULL)
+//	//{
+//	//	return 0;
+//	//}
+//
+//	//CString FileName;
+//	//CTime Time = CTime::GetTickCount();
+//	//FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
+//
+//	//CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
+//	//CString value    = pMainWnd->Config().GetConfig(TEXT("remote_desktop"), TEXT("screenshot_save_path"));
+//	//CString SavePath;
+//
+//	//SavePath += value;
+//	//SavePath += FileName;
+//
+//	//if (SavePath[1] != ':')
+//	//{
+//	//	CString csCurrentDir;
+//	//	csCurrentDir.Preallocate(MAX_PATH);
+//	//	GetCurrentDirectory(MAX_PATH, csCurrentDir.GetBuffer());
+//	//	SavePath = csCurrentDir + "\\" + SavePath;
+//	//}
+//
+//	//MakesureDirExist(SavePath, TRUE);
+//
+//	return 0;
+//}
 
-	if (Buffer == NULL)
-	{
-		return 0;
-	}
+void CRemoteDesktopWnd::OnOtherScreenshot()
+{
+	m_pHandler->ScreenShot();
+}
 
+
+
+LRESULT CRemoteDesktopWnd::OnGetScreenshotSavePath(WPARAM wParam, LPARAM lParamm)
+{
 	CString FileName;
 	CTime Time = CTime::GetTickCount();
-	FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
-
 	CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
-	CString value    = pMainWnd->Config().GetConfig(TEXT("remote_desktop"), TEXT("screenshot_save_path"));
+	CString value = pMainWnd->Config().GetConfig(TEXT("remote_desktop"), TEXT("screenshot_save_path"));
 	CString SavePath;
+
+	FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
 
 	SavePath += value;
 	SavePath += FileName;
@@ -824,37 +874,8 @@ LRESULT CRemoteDesktopWnd::OnScreenShot(WPARAM wParam,LPARAM lParam){
 	}
 
 	MakesureDirExist(SavePath, TRUE);
-
-	HANDLE hFile = CreateFile(
-		SavePath, 
-		GENERIC_WRITE,
-		NULL,
-		NULL, 
-		CREATE_ALWAYS, 
-		FILE_ATTRIBUTE_NORMAL,
-		NULL);
-	CString err;
-
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		err.Format(TEXT("CreateFile failed with error: %d"), GetLastError());
-	}
-
-	if (hFile != INVALID_HANDLE_VALUE)
-	{
-		DWORD dwWrite = 0;
-		WriteFile(hFile, Buffer, dwSize, &dwWrite, NULL);
-		CloseHandle(hFile);
-
-		err.Format(TEXT("Image has been save to %s"), SavePath);
-	}
-	MessageBox(err, TEXT("Tips"), MB_OK | MB_ICONINFORMATION);
+	lstrcpy((TCHAR*)wParam, SavePath);
 	return 0;
-}
-
-void CRemoteDesktopWnd::OnOtherScreenshot()
-{
-	m_pHandler->ScreenShot();
 }
 
 
@@ -947,7 +968,7 @@ BOOL CRemoteDesktopWnd::PreTranslateMessage(MSG* pMsg)
 void CRemoteDesktopWnd::OnQualityLow()
 {
 	m_dwQuality = QUALITY_LOW;
-	GetMenu()->GetSubMenu(0)->GetSubMenu(3)->
+	GetMenu()->GetSubMenu(1)->GetSubMenu(3)->
 		CheckMenuRadioItem(
 		ID_QUALITY_LOW, 
 		ID_QUALITY_HIGH, 
@@ -955,7 +976,7 @@ void CRemoteDesktopWnd::OnQualityLow()
 		MF_BYCOMMAND);
 
 
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartCapture(m_CurrentMonitor, m_dwMaxpFps, m_dwQuality);
 	
 }
 
@@ -963,13 +984,76 @@ void CRemoteDesktopWnd::OnQualityLow()
 void CRemoteDesktopWnd::OnQualityHigh()
 {
 	m_dwQuality = QUALITY_HIGH;
-	GetMenu()->GetSubMenu(0)->GetSubMenu(3)->
+	GetMenu()->GetSubMenu(1)->GetSubMenu(3)->
 		CheckMenuRadioItem(
 		ID_QUALITY_LOW, 
 		ID_QUALITY_HIGH,
 		ID_QUALITY_HIGH,
 		MF_BYCOMMAND);
 
-	m_pHandler->StartRDP(m_dwMaxpFps, m_dwQuality);
+	m_pHandler->StartCapture(m_CurrentMonitor,m_dwMaxpFps, m_dwQuality);
 	
+}
+
+LRESULT CRemoteDesktopWnd::OnMonitorsInfo(WPARAM wParam, LPARAM lParam)
+{
+	RECT * lpMonitors = (RECT*)wParam;
+	int    n = lParam;
+	CMenu *pSubMenu = m_Menu.GetSubMenu(0);
+
+	m_nMonitors = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		if (i > MAX_MONITOR_ID){
+			break;
+		}
+
+		CString text;
+		text.Format(TEXT("%d. %d x %d"), i + 1,
+			lpMonitors->right,
+			lpMonitors->bottom
+			);
+
+		pSubMenu->AppendMenu(MF_STRING, FIRST_MONITOR_ID + i, text);
+
+		++lpMonitors;
+		m_nMonitors++;
+	}
+
+	if (m_nMonitors){
+		PostMessage(WM_COMMAND, FIRST_MONITOR_ID);
+	}
+	return 0;
+}
+
+
+void CRemoteDesktopWnd::SwitchMonitor(UINT nID)
+{
+	int monitor = nID - FIRST_MONITOR_ID;
+
+	if (monitor != m_CurrentMonitor)
+	{
+		CMenu * pSubMenu = m_Menu.GetSubMenu(0);
+		int n = pSubMenu->GetMenuItemCount();
+
+		for (int i = 0; i < m_nMonitors; i++)
+		{
+			if (i != monitor)
+				pSubMenu->CheckMenuItem(FIRST_MONITOR_ID + i, MF_UNCHECKED | MF_BYCOMMAND);
+			else
+				pSubMenu->CheckMenuItem(FIRST_MONITOR_ID + i, MF_CHECKED | MF_BYCOMMAND);
+		}
+
+		m_pHandler->StartCapture(monitor, m_dwMaxpFps, m_dwQuality);
+		m_CurrentMonitor = monitor;
+	}
+	return;
+}
+
+void CRemoteDesktopWnd::OnUpdateFrameMenu(HMENU hMenuAlt)
+{
+	// TODO:  在此添加专用代码和/或调用基类
+
+	CFrameWnd::OnUpdateFrameMenu(hMenuAlt);
 }

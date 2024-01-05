@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\EventHandler.h" />
+    <ClInclude Include="..\..\common\filedownloader_common.h" />
     <ClInclude Include="..\..\common\IOCPSocket.h" />
     <ClInclude Include="..\..\common\list.h" />
     <ClInclude Include="..\..\common\spinlock.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="..\..\common\dbg.cpp" />
     <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
+    <ClCompile Include="..\..\common\kernel_common.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\UDPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />

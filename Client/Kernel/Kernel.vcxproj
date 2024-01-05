@@ -101,18 +101,21 @@
     <ClCompile Include="..\..\common\dbg.cpp" />
     <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
+    <ClCompile Include="..\..\common\kernel_common.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Kernel.cpp" />
-    <ClCompile Include="loader.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\kernel_common.h" />
     <ClInclude Include="..\Common\utils.h" />
     <ClInclude Include="App.h" />
-    <ClInclude Include="loader.h" />
+    <ClInclude Include="Kernel.h" />
+    <ClInclude Include="Module.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

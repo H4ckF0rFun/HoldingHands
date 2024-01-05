@@ -72,7 +72,6 @@
 #define IDC_PROGRESS                    1024
 #define IDC_IPADDRESS1                  1024
 #define IDC_IPADDRESS2                  1025
-#define IDC_TAB1                        1026
 #define ID_MAIN                         32771
 #define ID_MAIN_STARTSERVER             32772
 #define ID_MAIN_SETTINGS                32773
@@ -172,13 +171,17 @@
 #define ID_MAIN_PARENTPROCESS           32868
 #define ID_PROCESS                      32869
 #define ID_PROCESS_PARENT               32870
+#define ID_OPERATION_REMOTEDESKTOP32871 32871
+#define ID_REMOTEDESKTOP_GDI            32872
+#define ID_REMOTEDESKTOP_DXGICAPTURE    32873
+#define ID_REMOTEDESKTOP_DXGI           32874
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        351
-#define _APS_NEXT_COMMAND_VALUE         32871
+#define _APS_NEXT_COMMAND_VALUE         32875
 #define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

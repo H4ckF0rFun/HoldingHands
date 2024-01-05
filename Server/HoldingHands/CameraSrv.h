@@ -1,33 +1,17 @@
 #pragma once
 #include "EventHandler.h"
+#include "camera_common.h"
 #include "resource.h"
-#include<string>
+#include <string>
 
 using std::string;
 
 extern"C"
 {
-#include <libavcodec\avcodec.h>
-#include <libavutil\avutil.h>
-#include <libyuv.h>
+	#include <libavcodec\avcodec.h>
+	#include <libavutil\avutil.h>
+	#include <libyuv.h>
 }
-
-
-#define CAMERA			('C'|('A'<<8)|('M'<<16)|('E')<<24)
-#define CAMERA_DEVICELIST			(0xabc1)
-#define CAMERA_START				(0xabc2)
-#define CAMERA_VIDEOSIZE			(0xabc3)
-
-#define CAMERA_STOP					(0xabc4)
-#define CAMERA_STOP_OK				(0xabdd)
-
-
-#define CAMERA_GETFRAME				(0xabc5)
-#define CAMERA_FRAME				(0xabc6)
-#define CAMERA_SCREENSHOT			(0xabc7)
-
-
-#define CAMERA_ERROR				(0x0000)
 
 //Notify Message
 #define WM_CAMERA_DEVICELIST	(WM_USER + 352)

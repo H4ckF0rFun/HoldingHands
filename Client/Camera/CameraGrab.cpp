@@ -432,6 +432,8 @@ int CCameraGrab::GrabberInit(const string&device_name, DWORD dwWidth, DWORD dwHe
 	//设置输出视频格式.,SamplerGrabber的输出格式.
 	mt.majortype = MEDIATYPE_Video;
 	mt.subtype = MEDIASUBTYPE_ARGB32;
+	//mt.subtype = MEDIASUBTYPE_420O;
+	
 	//
 	m_pSamplerGrabber->SetMediaType(&mt);
 	m_pSamplerGrabber->SetOneShot(FALSE);
@@ -530,7 +532,7 @@ int CCameraGrab::GrabberInit(const string&device_name, DWORD dwWidth, DWORD dwHe
 	x264_picture_init(m_pPicIn);
 	x264_picture_alloc(m_pPicIn, X264_CSP_I420, m_dwWidth, m_dwHeight);
 
-	x264_param_default_preset(&param, "veryfast", "zerolatency");
+	x264_param_default_preset(&param, "ultrafast", "zerolatency");
 
 	param.i_width = m_dwWidth;
 	param.i_height = m_dwHeight;

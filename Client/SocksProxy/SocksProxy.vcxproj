@@ -96,7 +96,7 @@
     <ClCompile Include="SocksProxyUDP.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\common\SocksProxyCommon.h" />
+    <ClInclude Include="..\..\common\socks_proxy_common.h" />
     <ClInclude Include="SocksProxy.h" />
     <ClInclude Include="SocksProxyTcp.h" />
     <ClInclude Include="SocksProxyUDP.h" />

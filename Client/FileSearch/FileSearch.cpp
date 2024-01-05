@@ -1,29 +1,36 @@
-#include "FileMgrSearch.h"
+#include "FileSearch.h"
 #include "utils.h"
+#pragma comment(lib,"Shlwapi.lib")
 
-CFileMgrSearch::CFileMgrSearch(CClient*pClient) :
+CFileSearch::CFileSearch(CClient*pClient, Module *    owner) :
 CEventHandler(pClient, FILEMGR_SEARCH)
 {
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
-CFileMgrSearch::~CFileMgrSearch()
+
+CFileSearch::~CFileSearch()
 {
+	if (m_owner)
+		put_module(m_owner);
 }
 
 
-void CFileMgrSearch::OnClose()
+void CFileSearch::OnClose()
 {
 	OnStop();
 }
 
-void CFileMgrSearch::OnOpen()
+void CFileSearch::OnOpen()
 {
 
 }
 
 
-void CFileMgrSearch::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
+void CFileSearch::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
 {
 	switch (e)
 	{
@@ -48,7 +55,7 @@ void OnFoundFile(WCHAR* path, WIN32_FIND_DATAW* pfd, LPVOID Param)
 		WCHAR szFileName[2];
 	};
 	//找到一个就发送一个.
-	CFileMgrSearch*pMgrSearch = (CFileMgrSearch*)Param;
+	CFileSearch*pMgrSearch = (CFileSearch*)Param;
 	UINT32   dwLen = sizeof(UINT32) + sizeof(TCHAR)* (lstrlen(path) + 1 + lstrlen(pfd->cFileName) + 1);
 	FindFile*pFindFile = (FindFile*)malloc(dwLen);
 
@@ -64,11 +71,11 @@ void OnFoundFile(WCHAR* path, WIN32_FIND_DATAW* pfd, LPVOID Param)
 }
 void OnSearchOver(LPVOID Param)
 {
-	CFileMgrSearch*pMgrSearch = (CFileMgrSearch*)Param;
+	CFileSearch*pMgrSearch = (CFileSearch*)Param;
 	pMgrSearch->Send(FILE_MGR_SEARCH_OVER, 0, 0);
 }
 
-void CFileMgrSearch::OnSearch(TCHAR * SearchArg)
+void CFileSearch::OnSearch(TCHAR * SearchArg)
 {
 	TCHAR*szStartLocation = SearchArg;
 	TCHAR*szFileName = StrStr(SearchArg, TEXT("\n"));
@@ -80,7 +87,7 @@ void CFileMgrSearch::OnSearch(TCHAR * SearchArg)
 	
 	m_searcher.Search(szFileName, szStartLocation, 0, OnFoundFile, OnSearchOver, this);
 }
-void CFileMgrSearch::OnStop()
+void CFileSearch::OnStop()
 {
 	m_searcher.StopSearching();
 }

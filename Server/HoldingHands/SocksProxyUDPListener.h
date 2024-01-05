@@ -1,6 +1,6 @@
 #pragma once
 #include "UDPSocket.h"
-#include "SocksProxyCommon.h"
+#include "socks_proxy_common.h"
 
 class CSocksProxySrv;
 

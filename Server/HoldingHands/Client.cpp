@@ -27,8 +27,8 @@
 
 #define BUF_SIZE 0x1000
 
-//max buffer is 2MB
-#define MAX_BUF  0x200000
+//max buffer is 32MB
+#define MAX_BUF  0x2000000
 
 
 CClient::CClient(SOCKET hSock):

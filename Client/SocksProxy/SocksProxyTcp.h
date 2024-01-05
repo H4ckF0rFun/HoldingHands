@@ -1,6 +1,6 @@
 #pragma once
 #include "TCPSocket.h"
-#include "SocksProxyCommon.h"
+#include "socks_proxy_common.h"
 
 class CSocksProxy;
 

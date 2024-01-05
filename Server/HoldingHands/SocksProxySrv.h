@@ -1,17 +1,6 @@
 #pragma once
 #include "EventHandler.h"
-#include "SocksProxyCommon.h"
-
-#define SOCKS_PROXY			(('S') | (('K') << 8) | (('P') << 16) | (('X') << 24))
-
-
-
-#define SOCK_PROXY_ADD_CLIENT			(0xaa01)
-#define SOCK_PROXY_REQUEST				(0xaa02)
-#define SOCK_PROXY_REQUEST_RESULT		(0xaa04)
-#define SOCK_PROXY_DATA					(0xaa03)
-#define SOCK_PROXY_CLOSE				(0xaa05)
-
+#include "socks_proxy_common.h"
 
 
 //notify 

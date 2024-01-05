@@ -14,7 +14,7 @@ HIMAGELIST CProcessManager::hImageList_SmallIcon = NULL;
 
 spinlock_t CProcessManager::m_mutex = 0;
 
-CProcessManager::CProcessManager(CClient * pClient):
+CProcessManager::CProcessManager(CClient * pClient, Module * owner) :
 CEventHandler(pClient, PROCESS_MANAGER)
 {
 	m_hEvent = NULL;
@@ -34,6 +34,10 @@ CEventHandler(pClient, PROCESS_MANAGER)
 	}
 
 	__spin_unlock(CProcessManager::m_mutex);
+
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
@@ -41,6 +45,9 @@ CProcessManager::~CProcessManager()
 {
 	CloseHandle(m_hEvent);
 	m_hEvent = NULL;
+
+	if (m_owner)
+		put_module(m_owner);
 }
 
 

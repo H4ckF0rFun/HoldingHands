@@ -42,7 +42,10 @@
     <ClCompile Include="..\..\common\utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="loader.cpp">
+    <ClCompile Include="Module.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\kernel_common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +56,13 @@
     <ClInclude Include="App.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="loader.h">
+    <ClInclude Include="Module.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Kernel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\kernel_common.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

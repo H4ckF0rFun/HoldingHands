@@ -146,7 +146,8 @@ BOOL CFileDownloadDlg::OnInitDialog()
 	m_pHandler->GetPeerAddress(szIP);
 	// TODO:  在此添加额外的初始化
 	CString Title;
-	Title.Format(TEXT("[%s] Download...."), CString(szIP));
+	CString szWIP = CString(szIP);
+	Title.Format(TEXT("[%s] Download...."), szWIP);
 	SetWindowText(Title);
 	//
 	m_Progress.SetRange(0, 100);

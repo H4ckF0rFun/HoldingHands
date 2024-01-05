@@ -1,11 +1,11 @@
 #include "FileManager.h"
-#include "FileDownloader.h"
-#include "FileMgrSearch.h"
-#include "FileTrans.h" 
 #include <process.h>
+#include "file_transfer_common.h"
 
-CFileManager::CFileManager(CClient*pClient) :
-CEventHandler(pClient, FILE_MANAGER)
+CFileManager::CFileManager(CClient*pClient, 
+	Module * owner,
+	typeRun run, LPVOID kernel) :
+	CEventHandler(pClient, FILE_MANAGER)
 {
 	//init buffer.
 	m_pCurDir = (TCHAR*)calloc(0x10000, sizeof(TCHAR));
@@ -13,6 +13,14 @@ CEventHandler(pClient, FILE_MANAGER)
 	m_FileList = (TCHAR*)calloc(0x10000, sizeof(TCHAR));
 
 	m_bMove = FALSE;
+
+	//
+	m_kernel = kernel;
+	m_run_module = run;
+
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
@@ -33,119 +41,11 @@ CFileManager::~CFileManager()
 		free(m_FileList);
 		m_FileList = NULL;
 	}
+
+	if (m_owner)
+		put_module(m_owner);
 }
 
-static void BeginFileTrans(CIOCP *Iocp, char* szServerAddr, unsigned short uPort, LPVOID ArgList[])
-{
-	//参数有问题,注意还没使用就直接释放了.
-	CClient * client = new CClient;
-	UINT32 Duty      = (UINT32)ArgList[0];
-	TCHAR * SrcDir   = (TCHAR*)ArgList[1];
-	TCHAR * DestDir  = (TCHAR*)ArgList[2];
-	TCHAR * FileList = (TCHAR*)ArgList[3];
-
-	CFileTrans * ft = new CFileTrans(client, Duty, SrcDir, DestDir, FileList);
-
-	if (!client->Create())
-	{
-		dbg_log("client->Create() failed");
-		goto __failed__;
-	}
-
-	if (!client->Bind(0))
-	{
-		dbg_log("client->Bind() failed");
-		goto __failed__;
-	}
-
-	if (!Iocp->AssociateSock(client))
-	{
-		dbg_log("iocp->AssociateSock(client) failed");
-		goto __failed__;
-	}
-
-	if (!client->Connect(szServerAddr, uPort, NULL, NULL))
-	{
-		dbg_log("client->Connect() failed");
-		goto __failed__;
-	}
-
-__failed__:
-	client->Put();
-	return;
-}
-
-static  void BeginDownload(CIOCP *Iocp, char* szServerAddr, unsigned short uPort, LPVOID ArgList[])
-{
-	CClient * client = new CClient;
-	UINT32 flags     = (UINT32)ArgList[0];
-	TCHAR * url      = (TCHAR*)ArgList[1];
-	TCHAR * savePath = (TCHAR*)ArgList[2];
-
-	CFileDownloader * fd = new CFileDownloader(client, flags,savePath,url);
-
-	if (!client->Create())
-	{
-		dbg_log("client->Create() failed");
-		goto __failed__;
-	}
-
-	if (!client->Bind(0))
-	{
-		dbg_log("client->Bind() failed");
-		goto __failed__;
-	}
-
-	if (!Iocp->AssociateSock(client))
-	{
-		dbg_log("iocp->AssociateSock(client) failed");
-		goto __failed__;
-	}
-
-	if (!client->Connect(szServerAddr, uPort, NULL, NULL))
-	{
-		dbg_log("client->Connect() failed");
-		goto __failed__;
-	}
-
-__failed__:
-	client->Put();
-	return;
-}
-
-static void BeginSearch(CIOCP *Iocp, char* szServerAddr, unsigned short uPort, LPVOID ArgList[])
-{
-	CClient * client = new CClient;
-	CFileMgrSearch * fms = new CFileMgrSearch(client);
-
-	if (!client->Create())
-	{
-		dbg_log("client->Create() failed");
-		goto __failed__;
-	}
-
-	if (!client->Bind(0))
-	{
-		dbg_log("client->Bind() failed");
-		goto __failed__;
-	}
-
-	if (!Iocp->AssociateSock(client))
-	{
-		dbg_log("iocp->AssociateSock(client) failed");
-		goto __failed__;
-	}
-
-	if (!client->Connect(szServerAddr, uPort, NULL, NULL))
-	{
-		dbg_log("client->Connect() failed");
-		goto __failed__;
-	}
-
-__failed__:
-	client->Put();
-	return;
-}
 
 void CFileManager::OnClose()
 {
@@ -825,67 +725,100 @@ void CFileManager::OnPaste(TCHAR *FileName)
 	}
 }
 
-void CFileManager::OnUploadFromDisk(TCHAR *FileList)
+static void file_downloader_param_release(Params * Params)
 {
-	SOCKADDR_IN addr = { 0 };
-	int addrlen = sizeof(addr);
-	LPVOID ArgList[4] = { 0 };
-	TCHAR * SrcDir = FileList;
-
-	FileList += (lstrlen(FileList) + 1);
-
-	ArgList[0] = (LPVOID)MNFT_DUTY_RECEIVER;
-	ArgList[1] = (LPVOID)SrcDir;
-	ArgList[2] = (LPVOID)m_pCurDir;
-	ArgList[3] = (LPVOID)FileList;
-
-	m_pClient->GetPeerName((SOCKADDR*)&addr, &addrlen);
-	BeginFileTrans(m_pClient->m_Iocp, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), ArgList);
-}
-
-void CFileManager::OnDownload(TCHAR *FileList)
-{
-	SOCKADDR_IN addr = { 0 };
-	int addrlen = sizeof(addr);
-	LPVOID ArgList[4] = { 0 };
-	TCHAR * DestDir = FileList;
-
-	FileList += (lstrlen(FileList) + 1);
-
-	ArgList[0] = (LPVOID)MNFT_DUTY_SENDER;
-	ArgList[1] = (LPVOID)m_pCurDir;					//源目录.
-	ArgList[2] = (LPVOID)DestDir;					//保存路径
-	ArgList[3] = (LPVOID)FileList;					//文件列表
-
-	m_pClient->GetPeerName((SOCKADDR*)&addr, &addrlen);
-	BeginFileTrans(m_pClient->m_Iocp, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), ArgList);
-
-}
-
-
-void CFileManager::OnSearch()
-{
-	SOCKADDR_IN addr = { 0 };
-	int addrlen = sizeof(addr);
-	m_pClient->GetPeerName((SOCKADDR*)&addr, &addrlen);
-	BeginSearch(m_pClient->m_Iocp, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), NULL);
+	LPVOID * ArgList = (LPVOID*)(Params + 1);
+	free(ArgList[1]);
+	free(ArgList[2]);
+	free(Params);
 }
 
 
 void CFileManager::OnUploadFromUrl(TCHAR *lpszUrl)
 {
-	SOCKADDR_IN addr = { 0 };
-	int addrlen = sizeof(addr);
-	/*
-	UINT32 flags    = (UINT32)ArgList[0];
-	char * url      = (char*)ArgList[1];
-	char * savePath = (char*)ArgList[2]
-	*/
-	LPVOID ArgList[3];
-	ArgList[0] = NULL;
-	ArgList[1] = lpszUrl;
-	ArgList[2] = m_pCurDir;
+	Params * lpParams = (Params*)malloc(sizeof(Params) + sizeof(LPVOID) * 3);
+	LPVOID* ArgList = (LPVOID*)(lpParams + 1);
 
-	m_pClient->GetPeerName((SOCKADDR*)&addr, &addrlen);
-	BeginDownload(m_pClient->m_Iocp, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port),ArgList);
+	lpParams->num = 2;
+	lpParams->release = file_downloader_param_release;
+
+	ArgList[0] = 0;
+	ArgList[1] = malloc(sizeof(TCHAR) * (lstrlen(lpszUrl) + 1));
+	lstrcpy((TCHAR*)ArgList[1], lpszUrl);
+
+	ArgList[2] = malloc(sizeof(TCHAR) * (lstrlen(m_pCurDir) + 1));
+	lstrcpy((TCHAR*)ArgList[2], m_pCurDir);
+
+	m_run_module(m_kernel, TEXT("filedownloader"), TEXT("ModuleEntry"), lpParams);
 }
+
+
+
+static void file_transfer_param_release(Params * Params)
+{
+	LPVOID * ArgList = (LPVOID*)(Params + 1);
+	free(ArgList[1]);
+	free(ArgList[2]);
+	free(ArgList[3]);
+
+	free(Params);
+}
+
+
+void CFileManager::OnUploadFromDisk(TCHAR *FileList)
+{
+	TCHAR * SrcDir = FileList;
+	FileList += (lstrlen(FileList) + 1);
+
+	Params * lpParams = (Params*)malloc(sizeof(Params) + sizeof(LPVOID) * 4);
+	LPVOID* ArgList = (LPVOID*)(lpParams + 1);
+
+	lpParams->num = 3;
+	lpParams->release = file_downloader_param_release;
+	
+	ArgList[0] = (LPVOID)MNFT_DUTY_RECEIVER;
+	ArgList[1] = malloc(sizeof(TCHAR) * (lstrlen(SrcDir) + 1));
+	lstrcpy((TCHAR*)ArgList[1], SrcDir);
+
+	ArgList[2] = malloc(sizeof(TCHAR) * (lstrlen(m_pCurDir) + 1));
+	lstrcpy((TCHAR*)ArgList[2], m_pCurDir);
+
+	ArgList[3] = malloc(sizeof(TCHAR) * (lstrlen(FileList) + 1));
+	lstrcpy((TCHAR*)ArgList[3], FileList);
+
+	m_run_module(m_kernel, TEXT("filetransfer"), TEXT("ModuleEntry"), lpParams);
+}
+
+
+void CFileManager::OnDownload(TCHAR *FileList)
+{
+	TCHAR * DestDir = FileList;
+	FileList += (lstrlen(FileList) + 1);
+	
+	Params * lpParams = (Params*) malloc(sizeof(Params) + sizeof(LPVOID) * 4);
+	LPVOID* ArgList = (LPVOID*)(lpParams + 1);
+
+	lpParams->num = 3;
+	lpParams->release = file_downloader_param_release;
+
+
+	ArgList[0] = (LPVOID)MNFT_DUTY_SENDER;
+	ArgList[1] = malloc(sizeof(TCHAR) * (lstrlen(m_pCurDir) + 1));
+	lstrcpy((TCHAR*)ArgList[1], m_pCurDir);
+
+	ArgList[2] = malloc(sizeof(TCHAR) * (lstrlen(DestDir) + 1));
+	lstrcpy((TCHAR*)ArgList[2], DestDir);
+
+	ArgList[3] = malloc(sizeof(TCHAR) * (lstrlen(FileList) + 1));
+	lstrcpy((TCHAR*)ArgList[3], FileList);
+
+	m_run_module(m_kernel, TEXT("filetransfer"), TEXT("ModuleEntry"), lpParams);
+}
+
+
+void CFileManager::OnSearch()
+{
+	m_run_module(m_kernel, TEXT("filesearch"), TEXT("ModuleEntry"), NULL);
+}
+
+

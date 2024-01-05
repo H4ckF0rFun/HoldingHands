@@ -93,8 +93,12 @@
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
-    <ClCompile Include="..\FileManager\FileDownloader.cpp" />
+    <ClCompile Include="FileDownloader.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\filedownloader_common.h" />
+    <ClInclude Include="FileDownloader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

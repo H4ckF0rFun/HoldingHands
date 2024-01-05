@@ -44,7 +44,7 @@ private:
 	spinlock_t			   m_spinlock;
 	//
 
-	volatile ULONGLONG     m_ullTraffic[2];
+	volatile ULONG     m_ullTraffic[2];
 
 	//
 	volatile unsigned long m_BusyCount;
@@ -177,7 +177,7 @@ public:
 	void RemoveSock(CIOCPSocket*lpSock);				//thread-safe.
 	BOOL Create();										//thread-safe.
 
-	void GetTraffic(ULONGLONG traffic[2])				//thread-safe.
+	void GetTraffic(ULONG traffic[2])				//thread-safe.
 	{
 		memcpy(traffic, (void*)m_ullTraffic, sizeof(m_ullTraffic));
 	}

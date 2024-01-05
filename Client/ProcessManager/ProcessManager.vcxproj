@@ -94,6 +94,7 @@
     <ClCompile Include="ProcessManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\process_manager_common.h" />
     <ClInclude Include="ProcessManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

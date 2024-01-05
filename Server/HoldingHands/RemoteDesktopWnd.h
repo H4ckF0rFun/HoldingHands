@@ -6,16 +6,12 @@ class CRemoteDesktopSrv;
 
 #define SCROLL_UINT		15
 
-#define CONTROL_MOUSE (0x1)
-#define CONTROL_KEYBOARD (0x2)
+#define CONTROL_MOUSE		(0x1)
+#define CONTROL_KEYBOARD	(0x2)
 
-#define DISPLAY_FULLSCREEN  0x1
-#define DISPLAY_STRETCH		0x2
-#define DISPLAY_TILE		0x4
-
-#define CAPTURE_MOUSE		0x1
-#define CAPTURE_TRANSPARENT 0x2
-
+#define DISPLAY_FULLSCREEN  0x4
+#define DISPLAY_STRETCH		0x8
+#define DISPLAY_TILE		0x10
 
 //Message...
 
@@ -41,11 +37,10 @@ public:
 	HDC		m_hDC;
 	POINT	m_OrgPt;			//¹ö¶¯ÌõÎ»ÖÃ.
 
-	DWORD	m_dwCaptureFlags;
 	HCURSOR m_LastCursor;
 
 	// CONTROL
-	BOOL m_ControlFlags;		//
+	DWORD   m_ControlFlags;		//
 
 	DWORD	m_dwMaxpFps;
 	DWORD	m_dwQuality;
@@ -60,6 +55,10 @@ public:
 	CRect	m_FullScreen;
 	CPoint	m_FullScreenDrawOrg;	//
 	BOOL	m_bFullScreenStretchMode;
+
+	//
+	int     m_nMonitors;
+	int     m_CurrentMonitor;
 
 	CRemoteDesktopWnd(CRemoteDesktopSrv*pHandler);
 	~CRemoteDesktopWnd();
@@ -78,12 +77,15 @@ public:
 	afx_msg void OnUpdateCaptureMouse(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateCaptureTransparentwindow(CCmdUI *pCmdUI);
 
+	void SwitchMonitor(UINT id);
 	LRESULT	OnDraw(WPARAM wParam, LPARAM lParam);
 	LRESULT OnError(WPARAM wParam, LPARAM lParam);
 	LRESULT OnDesktopSize(WPARAM wParam, LPARAM lParam);
 	LRESULT OnSetClipbdText(WPARAM wParam, LPARAM lParam);
-	LRESULT OnScreenShot(WPARAM wParam, LPARAM lParam);
+	//LRESULT OnScreenShot(WPARAM wParam, LPARAM lParam);
 	LRESULT OnGetDrawHwnd(WPARAM wParam, LPARAM lParam);
+	LRESULT OnGetScreenshotSavePath(WPARAM wParam, LPARAM lParamm);
+	LRESULT OnMonitorsInfo(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -107,5 +109,6 @@ public:
 	//afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnQualityLow();
 	afx_msg void OnQualityHigh();
+	virtual void OnUpdateFrameMenu(HMENU hMenuAlt);
 };
 

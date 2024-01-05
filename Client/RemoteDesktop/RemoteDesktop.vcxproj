@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -51,7 +51,7 @@
     <IncludePath>..\Common;$(IncludePath);..\..\Common</IncludePath>
     <LibraryPath>..\Common;$(LibraryPath)</LibraryPath>
     <SourcePath>..\Common;$(SourcePath)</SourcePath>
-    <TargetName>rd</TargetName>
+    <TargetName>rd_dxgi</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,7 +84,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>..\Modules\rd.dll</OutputFile>
+      <OutputFile>..\Modules\rd_dxgi.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -94,9 +94,15 @@
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
-    <ClCompile Include="DesktopGrab.cpp" />
+    <ClCompile Include="..\Common\X264Encoder.cpp" />
+    <ClCompile Include="DxgiCapture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RemoteDesktop.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\rd_common.h" />
+    <ClInclude Include="DxgiCapture.h" />
+    <ClInclude Include="RemoteDesktop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

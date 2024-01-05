@@ -50,5 +50,11 @@
     <ClInclude Include="AudioPlay.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\common\audio_common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

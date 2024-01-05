@@ -35,7 +35,6 @@ public:
 	afx_msg void OnOperationCmd();
 	afx_msg void OnOperationChatbox();
 	afx_msg void OnOperationFilemanager();
-	afx_msg void OnOperationRemotedesktop();
 	afx_msg void OnOperationCamera();
 	afx_msg void OnSessionRestart();
 	afx_msg void OnOperationMicrophone();
@@ -54,5 +53,7 @@ public:
 
 	static int CALLBACK CompareByString(LPARAM, LPARAM, LPARAM);
 
+	afx_msg void OnRemotedesktopDxgi();
+	afx_msg void OnRemotedesktopGdi();
 };
 

@@ -95,12 +95,12 @@
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
-    <ClCompile Include="FileDownloader.cpp" />
     <ClCompile Include="FileManager.cpp" />
-    <ClCompile Include="FileMgrSearch.cpp" />
-    <ClCompile Include="FileTrans.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SearchFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\file_manager_common.h" />
+    <ClInclude Include="FileManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

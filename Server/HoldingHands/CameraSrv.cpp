@@ -181,7 +181,14 @@ void CCameraSrv::CameraTerm()
 void CCameraSrv::OnVideoSize(int code, string&err, int width, int height){
 	if (code)
 	{
+#ifdef UNICODE
+		TCHAR Error[0x100] = { 0 };
+		MultiByteToWideChar(CP_ACP, 0, err.c_str(), err.length(), Error, 0x100 - 1);
+		Notify(WM_CAMERA_ERROR, (WPARAM)Error);
+#else
 		Notify(WM_CAMERA_ERROR, (WPARAM)err.c_str());
+#endif
+		
 		return;
 	}
 

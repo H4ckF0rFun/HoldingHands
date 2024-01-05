@@ -1,20 +1,10 @@
 #pragma once
 
 #include "EventHandler.h"
-#include "SocksProxyCommon.h"
-
-#define SOCKS_PROXY			(('S') | (('K') << 8) | (('P') << 16) | (('X') << 24))
-
+#include "socks_proxy_common.h"
+#include "module.h"
 
 #define WORK_THREAD_COUNT	8
-
-
-#define SOCK_PROXY_REQUEST					(0xaa02)
-
-
-#define SOCK_PROXY_REQUEST_RESULT		(0xaa04)
-#define SOCK_PROXY_DATA					(0xaa03)
-#define SOCK_PROXY_CLOSE				(0xaa05)
 
 
 class CIOCPSocket;
@@ -24,7 +14,7 @@ class CSocksProxy :
 {
 private:
 	CIOCPSocket *     m_Clients[MAX_CLIENT_COUNT];
-
+	Module      * m_owner;
 public:
 	void OnOpen();
 	void OnClose();
@@ -41,7 +31,7 @@ public:
 	virtual void OnEvent(UINT32 e, BYTE* lpData, UINT Size);
 
 	static void __stdcall work_thread(CSocksProxy*pThis);
-	CSocksProxy(CClient *pClient);
+	CSocksProxy(CClient *pClient,Module * owner);
 	~CSocksProxy();
 };
 

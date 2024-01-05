@@ -1,22 +1,8 @@
 #pragma once
 #include "EventHandler.h"
+#include "filedownloader_common.h"
 #include <WinInet.h>
-#define MINIDOWNLOAD	('M'|('N'<<8)|('D'<<16)|('D'<<24))
-
-
-
-#define MNDD_GET_FILE_INFO		(0xabc0)
-#define MNDD_FILE_INFO			(0xabd1)
-
-#define MNDD_DOWNLOAD_CONTINUE	(0xabd3)
-
-//成功,创建文件失败.;
-#define MNDD_DOWNLOAD_RESULT	(0xabd4)
-
-#define MNDD_DOWNLOAD_END		(0xabd6)
-
-
-#define FILEDOWNLOADER_FLAG_RUNAFTERDOWNLOAD (0x1)
+#include "module.h"
 
 class CFileDownloader :
 	public CEventHandler
@@ -28,6 +14,9 @@ class CFileDownloader :
 		3.Finished.
 	*/
 private:
+	Module  * m_owner;
+
+
 	HINTERNET	m_hInternet;
 	HINTERNET	m_hConnect;
 	HINTERNET	m_hRemoteFile;
@@ -58,8 +47,12 @@ public:
 	void OnClose();
 	void OnEvent(UINT32 e, BYTE* lpData, UINT Size);
 
-	CFileDownloader(CClient* pClient, UINT32 flags,
-		const TCHAR * saveDir, const TCHAR * url);
+	CFileDownloader(
+		CClient* pClient,
+		Module * owner,
+		UINT32 flags,
+		const TCHAR * saveDir,
+		const TCHAR * url);
 
 	void OnGetFileInfo();
 	void OnContinueDownload();

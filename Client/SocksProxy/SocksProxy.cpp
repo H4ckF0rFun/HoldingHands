@@ -8,15 +8,20 @@
 #include "SocksProxyUDP.h"
 #include "SocksProxyTcp.h"
 
-CSocksProxy::CSocksProxy(CClient *pClient):
+CSocksProxy::CSocksProxy(CClient *pClient, Module * owner) :
 CEventHandler(pClient,SOCKS_PROXY)
 {
 	memset(m_Clients, 0 , sizeof(m_Clients));
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
 
 CSocksProxy::~CSocksProxy()
 {
 	dbg_log("CSocksProxy::~CSocksProxy()");
+	if (m_owner)
+		put_module(m_owner);
 }
 
 void CSocksProxy::OnOpen()

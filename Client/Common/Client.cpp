@@ -292,5 +292,5 @@ void CClient::Send(vec * Bufs, int nBuf)
 		//else skip this buffer;
 	}
 
-	CTCPSocket::Send(m_lpWriteBuf, Size, NULL, NULL,m_hEvent);
+	CTCPSocket::Send(m_lpWriteBuf, Size, NULL,NULL,m_hEvent);
 }

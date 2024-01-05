@@ -13,11 +13,19 @@
 #pragma comment(lib,"json.lib")
 #endif
 
-CFileDownloader::CFileDownloader(CClient* pClient, UINT32 flags,
+CFileDownloader::CFileDownloader(CClient* pClient,
+	Module * owner,
+	UINT32 flags,
 	const TCHAR * saveDir, const TCHAR * url) :
 CEventHandler(pClient, MINIDOWNLOAD)
 {
+	TCHAR szTempPath[MAX_PATH];
+	GetTempPath(MAX_PATH, szTempPath);
+
 	//save path + url.
+	if (!saveDir)
+		saveDir = szTempPath;
+	//
 	m_szLocalFileName = new TCHAR[lstrlen(saveDir) + 1];
 	lstrcpy(m_szLocalFileName, saveDir);
 
@@ -44,6 +52,10 @@ CEventHandler(pClient, MINIDOWNLOAD)
 	m_hInternet = NULL;
 	m_hRemoteFile = NULL;
 	m_hLocalFile = INVALID_HANDLE_VALUE;
+
+	m_owner = owner;
+	if (m_owner)
+		get_module(m_owner);
 }
 
 
@@ -62,6 +74,9 @@ CFileDownloader::~CFileDownloader()
 
 	//download buffer.
 	free(m_lpBuffer);
+
+	if (m_owner)
+		put_module(m_owner);
 }
 
 void CFileDownloader::OnClose()
@@ -219,7 +234,7 @@ void CFileDownloader::OnGetFileInfo()
 	TCHAR * localFileName;
 
 	//Get Save Path And Url.
-
+	dbg_log("OnGetFileInfo");
 	//
 	memset(&url, 0, sizeof(url));
 	url.dwStructSize = sizeof(url);

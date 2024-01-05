@@ -120,6 +120,8 @@ public:
 
 
 	afx_msg void OnOperationProcessmanager();
+	afx_msg void OnRemotedesktopDxgi();
+	afx_msg void OnRemotedesktopGdi();
 };
 
 
