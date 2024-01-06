@@ -97,7 +97,7 @@ public:
 	void GetComment(TCHAR Comment[256]);
 	void GetInstallDate(TCHAR InstallDate[128]);
 	void GetLoginInfo(LoginInfo*pLoginInfo);
-
+	void GetGroup(TCHAR szGroup[256]);
 
 	/*********************************************************************/
 	/*					EventHandler									  */
@@ -105,7 +105,8 @@ public:
 	void OnReady();
 
 	void OnEditComment(TCHAR NewComment[256]);
-	
+	void OnEditGroup(TCHAR NewGroup[0x100]);
+
 	//session handler.
 	void OnPower_Reboot();
 	void OnPower_Shutdown();

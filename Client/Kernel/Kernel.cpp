@@ -82,9 +82,14 @@ void CKernel::OnEvent(UINT32 e, BYTE* lpData, UINT Size)
 	case KNEL_EDITCOMMENT:
 		OnEditComment((TCHAR*)lpData);
 		break;
+	case KNEL_EDIT_GROUP:
+		OnEditGroup((TCHAR*)lpData);
+		break;
+
 	case KNEL_EXIT:
 		OnExit();
 		break;
+
 	case KNEL_RESTART:
 		OnRestart();
 		break;
@@ -838,11 +843,40 @@ void CKernel::GetComment(TCHAR Comment[256])
 	return;
 }
 
+void CKernel::GetGroup(TCHAR szGroup[256])
+{
+	HKEY hKey = NULL;
+
+	szGroup[0] = 0;
+
+	//Open Key
+	if (ERROR_SUCCESS == RegCreateKey(
+		HKEY_CURRENT_USER,
+		TEXT("SOFTWARE\\HHClient"),
+		&hKey))
+	{
+		DWORD cbBuffer = 256;
+		DWORD Type = 0;
+		if (ERROR_SUCCESS == RegQueryValueEx(
+			hKey,
+			TEXT("Group"),
+			0,
+			&Type,
+			(LPBYTE)szGroup,
+			&cbBuffer))
+		{
+			//do nothing.....
+		}
+		RegCloseKey(hKey);
+	}
+	return;
+}
+
 void CKernel::GetLoginInfo(LoginInfo*pLoginInfo)
 {
-	char peer_ip[0x20];
+	char        peer_ip[0x20];
 	SOCKADDR_IN addr;
-	int addrlen = sizeof(addr);
+	int         addrlen = sizeof(addr);
 
 	memset(pLoginInfo, 0, sizeof(LoginInfo));
 	
@@ -856,6 +890,7 @@ void CKernel::GetLoginInfo(LoginInfo*pLoginInfo)
 	lstrcat(pLoginInfo->Disk_RAM, TEXT("/"));
 	GetRAM(pLoginInfo->Disk_RAM + lstrlen(pLoginInfo->Disk_RAM));
 	GetComment(pLoginInfo->Comment);
+	GetGroup(pLoginInfo->szGroup); 
 
 	m_pClient->GetPeerName((SOCKADDR*)&addr,&addrlen);
 	lstrcpyA(peer_ip, inet_ntoa(addr.sin_addr));
@@ -911,6 +946,42 @@ void CKernel::OnReady()
 	GetLoginInfo(&li);
 	Send(KNEL_LOGIN, (char*)&li, sizeof(li));
 }
+
+void CKernel::OnEditGroup(TCHAR NewGroup[256])
+{
+	HKEY hKey = NULL;
+	TCHAR error[0x100];
+	//Open Key
+	if (ERROR_SUCCESS == RegCreateKey(
+		HKEY_CURRENT_USER,
+		TEXT("SOFTWARE\\HHClient"),
+		&hKey))
+	{
+		DWORD dwError = RegSetValueEx(
+			hKey,
+			TEXT("Group"),
+			0,
+			REG_SZ,
+			(BYTE*)NewGroup,
+			sizeof(TCHAR)*(lstrlen(NewGroup) + 1));
+
+		if (ERROR_SUCCESS == dwError)
+		{
+			Send(KNEL_EDIT_GROUP_OK,
+				NewGroup,
+				sizeof(TCHAR)*(lstrlen(NewGroup) + 1));
+		}
+		else
+		{
+			wsprintf(error, TEXT("RegSetValueEx failed with error: %d"), dwError);
+			Send(KNEL_ERROR, error, sizeof(TCHAR) * (lstrlen(error) + 1));
+		}
+		RegCloseKey(hKey);
+		return;
+	}
+	return;
+}
+
 
 void CKernel::OnEditComment(TCHAR NewComment[256])
 {

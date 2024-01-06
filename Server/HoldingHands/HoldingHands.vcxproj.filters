@@ -33,12 +33,6 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ClientList.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="EditCommentDlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="UrlInputDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -183,6 +177,24 @@
     <ClInclude Include="..\..\common\filedownloader_common.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ClientDoc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientGroup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GetStrDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LogCtrl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HoldingHands.cpp">
@@ -192,12 +204,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MainFrm.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientList.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="EditCommentDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UrlInputDlg.cpp">
@@ -342,6 +348,24 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\common\kernel_common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientDoc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientGroup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GetStrDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LogCtrl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

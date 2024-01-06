@@ -256,7 +256,7 @@ void CCameraWnd::OnScreenShot()
 	FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
 
 	CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
-	CString value    = pMainWnd->Config().GetConfig(TEXT("cam"), TEXT("screenshot_save_path"));
+	CString value = CString(pMainWnd->Config().cfg()["cam"]["screenshot_save_path"].asCString());
 
 	CString SavePath;
 

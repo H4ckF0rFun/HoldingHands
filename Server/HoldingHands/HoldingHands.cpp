@@ -8,6 +8,8 @@
 #include "HoldingHands.h"
 #include "MainFrm.h"
 #include "utils.h"
+#include "ClientDoc.h"
+#include "ClientView.h"
 
 extern "C"
 {
@@ -161,22 +163,36 @@ BOOL CHoldingHandsApp::InitInstance()
 	SetConsoleTitleA("HoldingHands Debug Log");
 #endif
 
-	// 若要创建主窗口，此代码将创建新的框架窗口
-	// 对象，然后将其设置为应用程序的主窗口对象
-	CMainFrame* pFrame = new CMainFrame(m_Iocp);
-	if (!pFrame)
+	//// 若要创建主窗口，此代码将创建新的框架窗口
+	//// 对象，然后将其设置为应用程序的主窗口对象
+	//CMainFrame* pFrame = new CMainFrame(m_Iocp);
+	//if (!pFrame)
+	//	return FALSE;
+
+	CSingleDocTemplate * pDocTemplate = new CSingleDocTemplate(
+		IDR_MAINFRAME,
+		RUNTIME_CLASS(CClientDoc),
+		RUNTIME_CLASS(CMainFrame),       // 主 SDI 框架窗口
+		RUNTIME_CLASS(CClientView)
+		);
+
+	if (!pDocTemplate)
 		return FALSE;
 
-	m_pMainWnd = pFrame;
-	// 创建并加载框架及其资源
-	pFrame->LoadFrame(IDR_MAINFRAME,
-		WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,
-		NULL);
+	AddDocTemplate(pDocTemplate);
 
+	// 分析标准 shell 命令、DDE、打开文件操作的命令行
+	CCommandLineInfo cmdInfo;
+	ParseCommandLine(cmdInfo);
+
+	// 调度在命令行中指定的命令。  如果
+	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
+	if (!ProcessShellCommand(cmdInfo))
+		return FALSE;
 
 	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
-	pFrame->ShowWindow(SW_SHOW);
-	pFrame->UpdateWindow();
+	m_pMainWnd->ShowWindow(SW_SHOW);
+	m_pMainWnd->UpdateWindow();
 	return TRUE;
 }
 

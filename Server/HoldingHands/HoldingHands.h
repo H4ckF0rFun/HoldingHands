@@ -31,6 +31,8 @@ public:
 // й╣ож
 
 public:
+	CIOCP * GetIocp() { return m_Iocp;}
+
 	CShellManager*	m_pShellManager;
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()

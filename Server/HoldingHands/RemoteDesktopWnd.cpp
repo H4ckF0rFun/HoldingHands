@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "resource.h"
 #include "MainFrm.h"
+#include "json\json.h"
 
 #pragma comment(lib,"HHRDKbHook.lib")
 
@@ -851,13 +852,13 @@ void CRemoteDesktopWnd::OnOtherScreenshot()
 }
 
 
-
 LRESULT CRemoteDesktopWnd::OnGetScreenshotSavePath(WPARAM wParam, LPARAM lParamm)
 {
 	CString FileName;
 	CTime Time = CTime::GetTickCount();
 	CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
-	CString value = pMainWnd->Config().GetConfig(TEXT("remote_desktop"), TEXT("screenshot_save_path"));
+	CString value = CString(pMainWnd->Config().cfg()["remote_desktop"]["screenshot_save_path"].asCString());
+	
 	CString SavePath;
 
 	FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());

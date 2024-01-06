@@ -12,28 +12,31 @@ class CConfig
 {
 private:
 	Json::Value m_config;
-	
 
 public:
-	void DefaultConfig();
+
+	//void DefaultConfig();
 	BOOL LoadConfig(const CString & config_file_path);
 	VOID SaveConfig(const CString & config_file_path) const;
-	
-	CString     	GetConfig(const CString& key, const CString& subkey) const ;
-	void		    SetConfig(const CString& key, const CString& subkey, const CString& value);
 
-	CConfig()
-	{
-		DefaultConfig();
-	}
+	Json::Value & cfg()
+	{ 
+		return m_config;
+	};
 
 	CConfig(const CString & config_file_path)
 	{
 		if (!LoadConfig(config_file_path))
 		{
-			DefaultConfig();
+			AfxMessageBox(TEXT("Load Config failed!"), MB_OK | MB_ICONERROR);
+			exit(1);
 		}
 	}
+
+	CConfig::CConfig()
+	{
+	}
+
 	~CConfig();
 };
 

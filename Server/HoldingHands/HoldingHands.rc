@@ -136,7 +136,13 @@ BEGIN
                 MENUITEM "Shutdown",                    ID_POWER_SHUTDOWN
             END
         END
-        MENUITEM "EditComment",                 ID_OPERATION_EDITCOMMENT
+        MENUITEM "Edit Comment",                ID_OPERATION_EDITCOMMENT
+        MENUITEM "Modify Group",                ID_OPERATION_MODIFYGROUP
+    END
+    POPUP "View"
+    BEGIN
+        MENUITEM "Log View",                    ID_VIEW_LOGVIEW
+        MENUITEM "Status Bar",                  ID_VIEW_STATUSBAR
     END
     POPUP "About"
     BEGIN
@@ -259,6 +265,15 @@ BEGIN
     END
 END
 
+IDR_GROUP_MANAGER MENU
+BEGIN
+    POPUP "main"
+    BEGIN
+        MENUITEM "New group",                   ID_MAIN_ADDGROUP
+        MENUITEM "Remove current group",        ID_MAIN_REMOVECURRENTGROUP
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -278,9 +293,8 @@ BEGIN
     LTEXT           "Version: 2023.01.04",IDC_STATIC,47,29,114,8,SS_NOPREFIX
 END
 
-IDD_EDITCMT_DLG DIALOGEX 0, 0, 230, 33
+IDD_GETSTR_DLG DIALOGEX 0, 0, 230, 33
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "EditComment"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,166,7,57,19
@@ -465,6 +479,16 @@ BEGIN
     CONTROL         "",IDC_IPADDRESS2,"SysIPAddress32",WS_TABSTOP,90,67,129,14
 END
 
+IDD_DLG_NEW_GROUP DIALOGEX 0, 0, 199, 48
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New group"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,143,15,33,17
+    GROUPBOX        "",IDC_STATIC,7,3,185,37
+    EDITTEXT        IDC_EDIT1,14,16,117,16,ES_AUTOHSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -521,7 +545,7 @@ BEGIN
         BOTTOMMARGIN, 76
     END
 
-    IDD_EDITCMT_DLG, DIALOG
+    IDD_GETSTR_DLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 223
@@ -624,6 +648,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 91
     END
+
+    IDD_DLG_NEW_GROUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 192
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 41
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -683,7 +715,7 @@ IDR_FM_TOOLBAR          BITMAP                  "res\\toolbar1.bmp"
 STRINGTABLE
 BEGIN
     IDP_OLE_INIT_FAILED     "OLE 初始化失败。  请确保 OLE 库是正确的版本。"
-    ID_SERVER_STATU         "SvrStatu: Stopped"
+    ID_SERVER_STATU         "ServerStatus: Stopped"
     ID_HOST_COUNT           "Host: 0"
     ID_UPLOAD_SPEED         "Upload: 0 KB/S"
     ID_DOWNLOAD_SPEED       "Download: 0KB/s"

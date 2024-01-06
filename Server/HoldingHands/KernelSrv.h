@@ -9,8 +9,8 @@
 #define WM_KERNEL_LOGIN					(WM_USER + 401)
 #define WM_KERNEL_LOGOUT				(WM_USER + 402)
 
-#define WM_CLIENT_BLOCK					(WM_USER + 403)
-#define WM_CLIENT_EDITCOMMENT			(WM_USER + 404)
+#define WM_KERNEL_EDITGROUP				(WM_USER + 403)
+#define WM_KERNEL_EDITCOMMENT			(WM_USER + 404)
 
 #define WM_KERNEL_ERROR					(WM_USER + 405)
 #define WM_KERNEL_UPDATE_UPLODA_STATU	(WM_USER + 406)
@@ -23,6 +23,7 @@ class CKernelSrv :
 {
 
 private:
+	char m_szPublicIP[0x100];
 
 	//module transport.
 	TCHAR	m_szModulePath[MAX_PATH];
@@ -32,12 +33,13 @@ private:
 	BYTE *  m_lpBuffer;
 
 	BOOL    m_bLogin;
-private:
 
-	 
+	LoginInfo m_LoginInfo;
+
+private:
+ 
 	void OnClose() ;	
 	void OnOpen();		
-
 
 	void OnEvent(UINT32 e, BYTE *lpData, UINT32 Size);;
 
@@ -52,8 +54,11 @@ public:
 	CString GetLocation();
 	CString GetPublicIP();
 
+	LoginInfo* GetLoginInfo(){ return &m_LoginInfo; };
 
 	void EditComment(TCHAR *Comment);
+	void EditGroup(TCHAR * szGroup);
+
 	void Power_Reboot();
 	void Power_Shutdown();
 	void Restart();

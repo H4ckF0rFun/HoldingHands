@@ -17,6 +17,7 @@
 #define IDR_MAINFRAME                   128
 #define IDR_HoldingHandsTYPE            130
 #define IDD_EDITCMT_DLG                 310
+#define IDD_GETSTR_DLG                  310
 #define IDD_FILETRANS                   311
 #define IDD_URL_INPUT                   312
 #define IDD_MNDD_DLG                    313
@@ -48,6 +49,8 @@
 #define IDR_SOCKS_PROXY_MENU            348
 #define IDD_SOCKS_ADDR                  349
 #define IDR_PROCESS_MANAGER             350
+#define IDR_GROUP_MANAGER               351
+#define IDD_DLG_NEW_GROUP               352
 #define IDC_EDIT1                       1000
 #define IDC_TRANS_PROGRESS              1001
 #define IDC_EDIT3                       1001
@@ -175,13 +178,18 @@
 #define ID_REMOTEDESKTOP_GDI            32872
 #define ID_REMOTEDESKTOP_DXGICAPTURE    32873
 #define ID_REMOTEDESKTOP_DXGI           32874
+#define ID_MAIN_ADDGROUP                32875
+#define ID_MAIN_REMOVECURRENTGROUP      32876
+#define ID_OPERATION_MODIFYGROUP        32877
+#define ID_VIEW_LOGVIEW                 32878
+#define ID_VIEW_STATUSBAR               32879
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        351
-#define _APS_NEXT_COMMAND_VALUE         32875
+#define _APS_NEXT_RESOURCE_VALUE        353
+#define _APS_NEXT_COMMAND_VALUE         32880
 #define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

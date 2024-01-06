@@ -26,7 +26,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Static</UseOfMfc>
@@ -131,12 +131,14 @@
     <ClInclude Include="ChatInputName.h" />
     <ClInclude Include="ChatSrv.h" />
     <ClInclude Include="Client.h" />
-    <ClInclude Include="ClientList.h" />
+    <ClInclude Include="ClientDoc.h" />
+    <ClInclude Include="ClientGroup.h" />
+    <ClInclude Include="ClientView.h" />
     <ClInclude Include="CmdEdit.h" />
     <ClInclude Include="CmdSrv.h" />
     <ClInclude Include="CmdWnd.h" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="EditCommentDlg.h" />
+    <ClInclude Include="GetStrDlg.h" />
     <ClInclude Include="FileManagerDlg.h" />
     <ClInclude Include="FileManagerSrv.h" />
     <ClInclude Include="FileMgrSearchDlg.h" />
@@ -146,11 +148,13 @@
     <ClInclude Include="KernelSrv.h" />
     <ClInclude Include="KeybdLogDlg.h" />
     <ClInclude Include="KeybdLogSrv.h" />
+    <ClInclude Include="LogCtrl.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="FileDownloadDlg.h" />
     <ClInclude Include="FileDownloadSrv.h" />
     <ClInclude Include="FileTransDlg.h" />
     <ClInclude Include="FileTransSrv.h" />
+    <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="ProcessManagerSrv.h" />
     <ClInclude Include="ProcessManagerWnd.h" />
     <ClInclude Include="RemoteDesktopSrv.h" />
@@ -188,12 +192,14 @@
     <ClCompile Include="ChatInputName.cpp" />
     <ClCompile Include="ChatSrv.cpp" />
     <ClCompile Include="Client.cpp" />
-    <ClCompile Include="ClientList.cpp" />
+    <ClCompile Include="ClientDoc.cpp" />
+    <ClCompile Include="ClientGroup.cpp" />
+    <ClCompile Include="ClientView.cpp" />
     <ClCompile Include="CmdEdit.cpp" />
     <ClCompile Include="CmdSrv.cpp" />
     <ClCompile Include="CmdWnd.cpp" />
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="EditCommentDlg.cpp" />
+    <ClCompile Include="GetStrDlg.cpp" />
     <ClCompile Include="FileManagerDlg.cpp" />
     <ClCompile Include="FileManagerSrv.cpp" />
     <ClCompile Include="FileMgrSearchDlg.cpp" />
@@ -203,11 +209,13 @@
     <ClCompile Include="KernelSrv.cpp" />
     <ClCompile Include="KeybdLogDlg.cpp" />
     <ClCompile Include="KeybdLogSrv.cpp" />
+    <ClCompile Include="LogCtrl.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="FileDownloadDlg.cpp" />
     <ClCompile Include="FileDownloadSrv.cpp" />
     <ClCompile Include="FileTransDlg.cpp" />
     <ClCompile Include="FileTransSrv.cpp" />
+    <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="ProcessManagerSrv.cpp" />
     <ClCompile Include="ProcessManagerWnd.cpp" />
     <ClCompile Include="RemoteDesktopSrv.cpp" />
