@@ -913,35 +913,37 @@ BOOL CRemoteDesktopWnd::PreTranslateMessage(MSG* pMsg)
 
 		if (m_DisplayMode & DISPLAY_STRETCH)
 		{
-			RECT rect;
+			CRect rect;
 			GetClientRect(&rect);
-			dwX = (DWORD)(dwX * 65535.0 / rect.right);
-			dwY = (DWORD)(dwY * 65535.0 / rect.bottom);
+			dwX = dwX * 1.0 * m_dwDeskWidth / rect.Width();
+			dwY = dwY * 1.0 * m_dwDeskHeight / rect.Height();
 		}
 		else if (m_DisplayMode & DISPLAY_TILE)
 		{
-			dwX += (DWORD)(m_OrgPt.x);
-			dwY += (DWORD)(m_OrgPt.y);
-			dwX = (DWORD)(dwX * 65535.0 / m_dwDeskWidth);
-			dwY = (DWORD)(dwY * 65535.0 / m_dwDeskHeight);
+			dwX += m_OrgPt.x;
+			dwY += m_OrgPt.y;
 		}
-		else if (m_DisplayMode & DISPLAY_FULLSCREEN){
+		else if (m_DisplayMode & DISPLAY_FULLSCREEN)
+		{
 			//
-			if (m_bFullScreenStretchMode){
-				RECT rect;
+			if (m_bFullScreenStretchMode)
+			{
+				CRect rect;
 				GetClientRect(&rect);
-				dwX = (DWORD)(dwX * 65535.0 / rect.right);
-				dwY = (DWORD)(dwY * 65535.0 / rect.bottom);
+				dwX = dwX * 1.0 * m_dwDeskWidth / rect.Width();
+				dwY = dwY * 1.0 * m_dwDeskHeight / rect.Height();
 			}
-			else {
-				//
+			else
+			{
+				//全屏,但是平铺.
 				if (dwX < m_FullScreenDrawOrg.x || dwX >(m_FullScreenDrawOrg.x + m_dwDeskWidth) ||
-					dwY < m_FullScreenDrawOrg.y || dwY >(m_FullScreenDrawOrg.y + m_dwDeskHeight)){
+					dwY < m_FullScreenDrawOrg.y || dwY >(m_FullScreenDrawOrg.y + m_dwDeskHeight))
+				{
 					return FALSE;
 				}
 				//
-				dwX = (DWORD)((dwX - m_FullScreenDrawOrg.x) * 65535.0 / m_dwDeskWidth);
-				dwY = (DWORD)((dwY - m_FullScreenDrawOrg.y) * 65535.0 / m_dwDeskHeight);
+				dwX = dwX - m_FullScreenDrawOrg.x;
+				dwY = dwY - m_FullScreenDrawOrg.y;
 			}
 		}
 

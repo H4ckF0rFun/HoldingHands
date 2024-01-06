@@ -596,6 +596,22 @@ void CRemoteDesktop::OnNextFrame()
 
 void CRemoteDesktop::OnControl(CtrlParam*pParam)
 {
+	int x, y;
+	RECT rect = { 0 };
+
+	// 获取虚拟屏幕的宽度和高度
+	int virtualScreenWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+	int virtualScreenHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+	//为什么有问题???????
+	m_gdiCapture.GetCurrentMonitorRect(&rect);
+
+	x = LOWORD(pParam->Param.dwCoor) + rect.left;
+	y = HIWORD(pParam->Param.dwCoor) + rect.top;
+
+	x = x * 1.0 / virtualScreenWidth * 65535;
+	y = y * 1.0 / virtualScreenHeight * 65535;
+
 	switch (pParam->dwType)
 	{
 	case WM_KEYDOWN:
@@ -607,80 +623,80 @@ void CRemoteDesktop::OnControl(CtrlParam*pParam)
 		//鼠标移动
 	case WM_MOUSEMOVE:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, 
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor), 
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
+			0,
 			0);
 		break;
 		//左键操作
 	case WM_LBUTTONDOWN:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN, 
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor),
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
+			0,
 			0);
 		break;
 	case WM_LBUTTONUP:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP, 
-			LOWORD(pParam->Param.dwCoor),
-			HIWORD(pParam->Param.dwCoor),
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
+			0,
 			0);
 		break;
 	case WM_LBUTTONDBLCLK:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN|MOUSEEVENTF_LEFTUP,
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor),
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
+			0,
 			0);
 		Sleep(100);
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor),
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
 			0,
 			0);
 		break;
 		//右键操作
 	case WM_RBUTTONDOWN:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN, 
-			LOWORD(pParam->Param.dwCoor),
-			HIWORD(pParam->Param.dwCoor),
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
 			0,
 			0);
 		break;
 	case WM_RBUTTONUP:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTUP, 
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor),
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTUP | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
 			0,
 			0);
 		break;
 	case WM_RBUTTONDBLCLK:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN|MOUSEEVENTF_RIGHTUP, 
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor),
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
 			0,
 			0);
 		Sleep(100);
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP,
-			LOWORD(pParam->Param.dwCoor), 
-			HIWORD(pParam->Param.dwCoor), 
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP | MOUSEEVENTF_VIRTUALDESK,
+			x,
+			y,
+			0,
 			0);
 		break;
 		//中键操作
 	case WM_MBUTTONDOWN:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEDOWN,
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_VIRTUALDESK,
 			0,
 			0,
 			0,
@@ -688,33 +704,33 @@ void CRemoteDesktop::OnControl(CtrlParam*pParam)
 		break;
 	case WM_MBUTTONUP:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEUP,
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEUP | MOUSEEVENTF_VIRTUALDESK,
 			0,
-			0, 
+			0,
+			0,
 			0);
 		break;
 	case WM_MBUTTONDBLCLK:
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEDOWN|MOUSEEVENTF_MIDDLEUP, 
-			0, 
-			0, 
-			0, 
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP | MOUSEEVENTF_VIRTUALDESK,
+			0,
+			0,
+			0,
 			0);
 		Sleep(100);
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEDOWN|MOUSEEVENTF_MIDDLEUP,
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP | MOUSEEVENTF_VIRTUALDESK,
 			0,
 			0,
-			0, 
+			0,
 			0);
 		break;
 		//
 	case WM_MOUSEWHEEL:		//mouse wheel
 		mouse_event(
-			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_WHEEL,
+			MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_WHEEL | MOUSEEVENTF_VIRTUALDESK,
 			0,
-			0, 
+			0,
 			pParam->dwExtraData,
 			0);
 		break;
