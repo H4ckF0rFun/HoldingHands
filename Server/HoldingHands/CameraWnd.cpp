@@ -238,59 +238,26 @@ void CCameraWnd::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CCameraWnd::OnScreenShot()
 {
-	DWORD dwBmpSize;
-	LPVOID Buffer = NULL;
-
-	if (m_dwHeight == 0 || m_dwWidth == 0 || m_pHandler == NULL)
-		return;
-
-	Buffer = m_pHandler->GetBmpFile(&dwBmpSize);
-
-	if (!Buffer)
-	{
-		return;
-	}
-
-	CString FileName;
-	CTime Time = CTime::GetTickCount();
-	FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
-
 	CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
-	CString value = CString(pMainWnd->Config().cfg()["cam"]["screenshot_save_path"].asCString());
+	CString      SavePath = CString(pMainWnd->Config().cfg()["cam"]["screenshot_save_path"].asCString());
+	CString      FileName;
+	CString      OutputFile;
 
-	CString SavePath;
+	FileName.Format(TEXT("\\%s.bmp"), CTime::GetTickCount().Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
 
-	SavePath += value;
-	SavePath += FileName;
+	OutputFile.Format(TEXT("%s\\%s"), SavePath, FileName);
 
-	if (SavePath[1] != ':')
+	if (OutputFile[1] != ':')
 	{
 		CString csCurrentDir;
 		csCurrentDir.Preallocate(MAX_PATH);
-		GetCurrentDirectory(MAX_PATH, csCurrentDir.GetBuffer());
-		SavePath = csCurrentDir + "\\" + SavePath;
+		GetProcessDirectory(csCurrentDir.GetBuffer());
+		OutputFile = csCurrentDir + "\\" + OutputFile;
 	}
 
-	MakesureDirExist(SavePath, TRUE);
-	HANDLE hFile = CreateFile(SavePath, GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	CString err;
-	
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		err.Format(TEXT("CreateFile failed with error: %d"), GetLastError());
-	}
+	MakesureDirExist(OutputFile.GetBuffer(), TRUE);
 
-	if (hFile != INVALID_HANDLE_VALUE)
-	{
-		DWORD dwWrite = 0;
-		WriteFile(hFile, Buffer, dwBmpSize, &dwWrite, NULL);
-		CloseHandle(hFile);
-
-		err.Format(TEXT("Image has been save to %s"), SavePath);
-	}
-
-	delete[] Buffer;
-	MessageBox(err, TEXT("Tips"), MB_OK | MB_ICONINFORMATION);
+	m_pHandler->ScreenShot(OutputFile.GetBuffer());
 }
 
 LRESULT CCameraWnd::OnVideoSize(WPARAM Width, LPARAM Height){

@@ -101,7 +101,6 @@ BEGIN_MESSAGE_MAP(CRemoteDesktopWnd, CFrameWnd)
 	ON_COMMAND(ID_QUALITY_LOW, &CRemoteDesktopWnd::OnQualityLow)
 	ON_COMMAND(ID_QUALITY_HIGH, &CRemoteDesktopWnd::OnQualityHigh)
 	ON_MESSAGE(WM_REMOTE_DESKTOP_MONITORS,OnMonitorsInfo)
-	ON_MESSAGE(WM_REMOTE_DESKTOP_GET_SCREENSHOT_SAVE_PATH,OnGetScreenshotSavePath)
 	ON_COMMAND_RANGE(FIRST_MONITOR_ID, MAX_MONITOR_ID, SwitchMonitor)
 	//ON_MESSAGE(WM_REMOTE_DESKTOP_SCREENSHOT, OnScreenShot)
 	ON_WM_SYSCOMMAND()
@@ -812,71 +811,30 @@ void CRemoteDesktopWnd::OnDisplayFullscreen()
 }
 
 
-//LRESULT CRemoteDesktopWnd::OnScreenShot(WPARAM wParam,LPARAM lParam)
-//{
-//	//char * Buffer = (char*)wParam;
-//	//DWORD  dwSize = lParam;
-//
-//	//if (Buffer == NULL)
-//	//{
-//	//	return 0;
-//	//}
-//
-//	//CString FileName;
-//	//CTime Time = CTime::GetTickCount();
-//	//FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
-//
-//	//CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
-//	//CString value    = pMainWnd->Config().GetConfig(TEXT("remote_desktop"), TEXT("screenshot_save_path"));
-//	//CString SavePath;
-//
-//	//SavePath += value;
-//	//SavePath += FileName;
-//
-//	//if (SavePath[1] != ':')
-//	//{
-//	//	CString csCurrentDir;
-//	//	csCurrentDir.Preallocate(MAX_PATH);
-//	//	GetCurrentDirectory(MAX_PATH, csCurrentDir.GetBuffer());
-//	//	SavePath = csCurrentDir + "\\" + SavePath;
-//	//}
-//
-//	//MakesureDirExist(SavePath, TRUE);
-//
-//	return 0;
-//}
-
 void CRemoteDesktopWnd::OnOtherScreenshot()
 {
-	m_pHandler->ScreenShot();
-}
-
-
-LRESULT CRemoteDesktopWnd::OnGetScreenshotSavePath(WPARAM wParam, LPARAM lParamm)
-{
-	CString FileName;
-	CTime Time = CTime::GetTickCount();
+	CString      FileName;
 	CMainFrame * pMainWnd = (CMainFrame*)AfxGetMainWnd();
-	CString value = CString(pMainWnd->Config().cfg()["remote_desktop"]["screenshot_save_path"].asCString());
-	
-	CString SavePath;
+	CString      SavePath = CString(pMainWnd->Config().cfg()["remote_desktop"]["screenshot_save_path"].asCString());
 
-	FileName.Format(TEXT("\\%s.bmp"), Time.Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
+	CString OutputFile;
 
-	SavePath += value;
-	SavePath += FileName;
+	FileName.Format(TEXT("\\%s.bmp"), CTime::GetTickCount().Format("%Y-%m-%d_%H_%M_%S").GetBuffer());
 
-	if (SavePath[1] != ':')
+	OutputFile += SavePath;
+	OutputFile += FileName;
+
+	if (OutputFile[1] != ':')
 	{
 		CString csCurrentDir;
 		csCurrentDir.Preallocate(MAX_PATH);
-		GetCurrentDirectory(MAX_PATH, csCurrentDir.GetBuffer());
-		SavePath = csCurrentDir + "\\" + SavePath;
+		GetProcessDirectory(csCurrentDir.GetBuffer());
+		OutputFile = csCurrentDir + "\\" + OutputFile;
 	}
 
-	MakesureDirExist(SavePath, TRUE);
-	lstrcpy((TCHAR*)wParam, SavePath);
-	return 0;
+	MakesureDirExist(OutputFile, TRUE);
+
+	m_pHandler->ScreenShot(OutputFile.GetBuffer());
 }
 
 

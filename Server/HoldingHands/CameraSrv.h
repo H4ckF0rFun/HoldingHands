@@ -34,9 +34,7 @@ private:
 	HBITMAP				m_hBmp;
 	BITMAP				m_Bmp;
 	HDC					m_hMemDC;
-	void*				m_Buffer;
-
-	HANDLE				m_hMutex;
+	LPVOID				m_lpBits;
 
 	int		CameraInit(int width, int height);
 	void	CameraTerm();
@@ -56,7 +54,7 @@ public:
 	void OnError(char*szError);
 
 
-	char * GetBmpFile(DWORD * lpDataSize);
+	void ScreenShot(TCHAR * SavePath);
 
 	CCameraSrv(CClient*pClient);
 	~CCameraSrv();

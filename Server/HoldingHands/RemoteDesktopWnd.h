@@ -84,7 +84,7 @@ public:
 	LRESULT OnSetClipbdText(WPARAM wParam, LPARAM lParam);
 	//LRESULT OnScreenShot(WPARAM wParam, LPARAM lParam);
 	LRESULT OnGetDrawHwnd(WPARAM wParam, LPARAM lParam);
-	LRESULT OnGetScreenshotSavePath(WPARAM wParam, LPARAM lParamm);
+	
 	LRESULT OnMonitorsInfo(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSize(UINT nType, int cx, int cy);

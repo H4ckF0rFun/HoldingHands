@@ -9,24 +9,24 @@ CCameraSrv::CCameraSrv(CClient*pClient) :
 	m_pCodecContext(NULL),
 	m_hBmp(NULL),
 	m_hMemDC(NULL),
-	m_Buffer(NULL)
+	m_lpBits(NULL)
 {
 	memset(&m_Bmp, 0, sizeof(m_Bmp));
 	memset(&m_AVPacket, 0, sizeof(m_AVPacket));
 	memset(&m_AVFrame, 0, sizeof(m_AVFrame));
 
-	m_hMutex = CreateEvent(0, FALSE, TRUE, NULL);
+	//m_hMutex = CreateEvent(0, FALSE, TRUE, NULL);
 }
 
 
 CCameraSrv::~CCameraSrv()
 {
-	if (m_hMutex){
-		CloseHandle(m_hMutex);
-		m_hMutex = NULL;
-	}
+	//if (m_hMutex){
+	//	CloseHandle(m_hMutex);
+	//	m_hMutex = NULL;
+	//}
 
-	//
+	////
 	dbg_log("CCameraSrv::~CCameraSrv()");
 }
 
@@ -129,7 +129,7 @@ int CCameraSrv::CameraInit(int width, int height)
 	bmi.bmiHeader.biCompression = BI_RGB;
 
 	//创建DIBSection
-	m_hBmp = CreateDIBSection(m_hMemDC, &bmi, DIB_RGB_COLORS, &m_Buffer, 0, 0);
+	m_hBmp = CreateDIBSection(m_hMemDC, &bmi, DIB_RGB_COLORS, &m_lpBits, 0, 0);
 	if (m_hBmp == NULL || !SelectObject(m_hMemDC, m_hBmp))
 		goto Failed;
 	//
@@ -217,13 +217,12 @@ void CCameraSrv::OnFrame(char*buffer,DWORD dwLen)
 		{
 			//成功.
 			//I420 ---> ARGB.
-			WaitForSingleObject(m_hMutex, INFINITE);
 
 			libyuv::I420ToARGB(
 				m_AVFrame.data[0], m_AVFrame.linesize[0], 
 				m_AVFrame.data[1], m_AVFrame.linesize[1],
 				m_AVFrame.data[2], m_AVFrame.linesize[2],
-				(uint8_t*)m_Buffer, 
+				(uint8_t*)m_lpBits,
 				m_Bmp.bmWidthBytes, 
 				m_Bmp.bmWidth,
 				m_Bmp.bmHeight);
@@ -233,7 +232,7 @@ void CCameraSrv::OnFrame(char*buffer,DWORD dwLen)
 			//Param2 : BmpInfo.
 
 			Notify(WM_CAMERA_FRAME, (WPARAM)m_hMemDC, (LPARAM)&m_Bmp);
-			SetEvent(m_hMutex);
+			//SetEvent(m_hMutex);
 			return;
 		}
 	}
@@ -241,62 +240,85 @@ void CCameraSrv::OnFrame(char*buffer,DWORD dwLen)
 	return;
 }
 
-char * CCameraSrv::GetBmpFile(DWORD * lpDataSize)
+
+void CCameraSrv::ScreenShot(TCHAR * szFileName)
 {
-	DWORD dwBitsSize = 0, dwBufferSize = 0;
+	//截图.
+	DWORD dwBitsSize = 0;
+	DWORD dwBufferSize = 0;
 	BITMAPINFOHEADER bi = { 0 };
 	BITMAPFILEHEADER bmfHeader = { 0 };
-	char * lpBuffer = NULL;
-	int Result = 0;
+	TCHAR			 szError[0x100] = { 0 };
+	DWORD			 dwWriteBytes = 0;
 
 	if (!m_Bmp.bmHeight || !m_Bmp.bmWidth)
 	{
-		return NULL;
+		return;
 	}
 
 	bi.biSize = sizeof(BITMAPINFOHEADER);
 	bi.biWidth = m_Bmp.bmWidth;
 	bi.biHeight = m_Bmp.bmHeight;
 	bi.biPlanes = 1;
-	bi.biBitCount = 24;
+	bi.biBitCount = m_Bmp.bmBitsPixel;
 	bi.biCompression = BI_RGB;
 
-	dwBitsSize = ((m_Bmp.bmWidth * bi.biBitCount + 31) / 32) * 4 * m_Bmp.bmHeight;
-		
+	dwBitsSize = m_Bmp.bmWidthBytes * m_Bmp.bmHeight;
+
 	dwBufferSize += sizeof(BITMAPFILEHEADER);
 	dwBufferSize += sizeof(BITMAPINFOHEADER);
 	dwBufferSize += dwBitsSize;
-
-	lpBuffer = new char[dwBufferSize];
 
 	bmfHeader.bfType = 0x4D42;
 	bmfHeader.bfOffBits = (DWORD)sizeof(BITMAPFILEHEADER) + (DWORD)sizeof(BITMAPINFOHEADER);
 	bmfHeader.bfSize = dwBufferSize;
 
-	memcpy(lpBuffer, &bmfHeader, sizeof(bmfHeader));
-	memcpy(lpBuffer + sizeof(bmfHeader), &bi, sizeof(bi));
 
-	WaitForSingleObject(m_hMutex, INFINITE);		//lock
-	//get bits 
-	Result = GetDIBits(
-		m_hMemDC, 
-		m_hBmp,
-		0,
-		m_Bmp.bmHeight, 
-		lpBuffer + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER), 
-		(BITMAPINFO*)&bi,
-		DIB_RGB_COLORS);
+	HANDLE hFile = CreateFile(
+		szFileName,
+		GENERIC_WRITE,
+		NULL,
+		NULL,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
 
-	SetEvent(m_hMutex);			//unlock
 
-	if (Result != m_Bmp.bmHeight)
+	if (hFile == INVALID_HANDLE_VALUE)
 	{
-		delete[] lpBuffer;
-		return NULL;
+		wsprintf(szError, TEXT("CreateFile failed with error: %d"), GetLastError());
+		Notify(WM_CAMERA_ERROR, (WPARAM)szError, 0);
+		return;
 	}
 
-	*lpDataSize = dwBufferSize;
-	return lpBuffer;
+	if (!WriteFile(hFile, &bmfHeader, sizeof(bmfHeader), &dwWriteBytes, NULL))
+	{
+		wsprintf(szError, TEXT("Write bmp file header failed with error: %d"), GetLastError());
+		Notify(WM_CAMERA_ERROR, (WPARAM)szError, 0);
+		CloseHandle(hFile);
+		return;
+	}
+
+	if (!WriteFile(hFile, &bi, sizeof(bi), &dwWriteBytes, NULL))
+	{
+		wsprintf(szError, TEXT("Write bmp info header failed with error: %d"), GetLastError());
+		Notify(WM_CAMERA_ERROR, (WPARAM)szError, 0);
+		CloseHandle(hFile);
+		return;
+	}
+
+	if (!WriteFile(hFile, m_lpBits, dwBitsSize, &dwWriteBytes, NULL))
+	{
+		wsprintf(szError, TEXT("Write bits failed with error: %d"), GetLastError());
+		Notify(WM_CAMERA_ERROR, (WPARAM)szError, 0);
+		CloseHandle(hFile);
+		return;
+	}
+
+	wsprintf(szError, TEXT("File has been save to %s"), szFileName);
+	MessageBox(NULL, szError, TEXT("Tips"), MB_OK | MB_ICONINFORMATION);
+
+	CloseHandle(hFile);
 }
 
 void CCameraSrv::OnError(char*szError)

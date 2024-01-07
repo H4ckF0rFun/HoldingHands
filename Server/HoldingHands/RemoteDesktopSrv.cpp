@@ -148,24 +148,16 @@ void CRemoteDesktopSrv::NextFrame()
 	Send(REMOTEDESKTOP_NEXT_FRAME,NULL, 0);
 }
 
-void CRemoteDesktopSrv::ScreenShot()
+void CRemoteDesktopSrv::ScreenShot(CONST TCHAR * szFileName)
 {
 	//截图.
 	DWORD dwBitsSize    = 0;
 	DWORD dwBufferSize  = 0;
 	BITMAPINFOHEADER bi = { 0 };
 	BITMAPFILEHEADER bmfHeader = { 0 };
-	TCHAR            szFileName[0x100] = { 0 };
+
 	TCHAR			 szError[0x100] = { 0 };
 	DWORD			 dwWriteBytes = 0;
-
-	//获取文件保存路径
-	Notify(WM_REMOTE_DESKTOP_GET_SCREENSHOT_SAVE_PATH, (WPARAM)szFileName, 0);
-
-	if (szFileName[0] == 0)
-	{
-		return;
-	}
 
 	if (!m_Bmp.bmHeight || !m_Bmp.bmWidth)
 	{
@@ -236,12 +228,6 @@ void CRemoteDesktopSrv::ScreenShot()
 	
 	CloseHandle(hFile);
 }
-
-//void CRemoteDesktopSrv::OnBmpFile(BYTE * lpData, DWORD dwSize)
-//{
-//	Notify(WM_REMOTE_DESKTOP_SCREENSHOT, (WPARAM)lpData, dwSize);
-//}
-
 
 void CRemoteDesktopSrv::OnDeskSize(char*DeskSize)
 {

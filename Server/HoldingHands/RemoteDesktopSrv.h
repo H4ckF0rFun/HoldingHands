@@ -17,7 +17,6 @@ extern "C"
 #define WM_REMOTE_DESKTOP_SET_CLIPBOARD_TEXT	(WM_USER + 72)
 #define WM_REMOTE_DESKTOP_SCREENSHOT			(WM_USER + 73)
 #define WM_REMOTE_DESKTOP_GET_DRAW_WND			(WM_USER + 74)
-#define WM_REMOTE_DESKTOP_GET_SCREENSHOT_SAVE_PATH		(WM_USER + 75)
 #define WM_REMOTE_DESKTOP_MONITORS				(WM_USER + 76)
 //
 
@@ -67,7 +66,7 @@ private:
 
 public:
 	void StartCapture(int id, DWORD dwMaxFps, DWORD dwQuality);
-	void ScreenShot();
+	void ScreenShot(CONST TCHAR * szFileName);
 	void Control(CtrlParam*pParam);
 	void SetClipboardText(TCHAR *szText);
 	void SetFlag(DWORD dwFlag);
