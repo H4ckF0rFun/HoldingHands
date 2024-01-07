@@ -64,7 +64,8 @@ int CCmdWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	MoveWindow(&rect);
 	ShowWindow(SW_SHOW);
-	UpdateWindow();
+	
+	CenterWindow();
 
 	//Set Notify Window...
 	m_pHandler->SetNotifyWindow(GetSafeHwnd());

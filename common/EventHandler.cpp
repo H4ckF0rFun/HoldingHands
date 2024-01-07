@@ -52,7 +52,7 @@ void CEventHandler::Send(UINT32 e, vec * Bufs, int nBuf)
 	tempBufs[0].lpData = (BYTE*)&e;
 	tempBufs[0].Size = sizeof(e);
 
-	memcpy(&tempBufs[1], Bufs, sizeof(vec) * nBuf);
+	RtlCopyMemory(&tempBufs[1], Bufs, sizeof(vec) * nBuf);
 	
 	//send data.
 	m_pClient->Send(tempBufs, nBuf + 1);

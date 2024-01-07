@@ -12,7 +12,6 @@ private:
 	int m_LastSortColum;
 
 	TCHAR m_GroupName[0x40];
-
 public:
 	CClientGroup(CONST TCHAR * GroupName);
 	~CClientGroup();
@@ -67,5 +66,6 @@ public:
 	afx_msg void OnRemotedesktopGdi();
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	afx_msg void OnOperationModifygroup();
+
 };
 

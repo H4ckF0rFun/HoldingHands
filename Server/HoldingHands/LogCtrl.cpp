@@ -13,6 +13,7 @@ CLogCtrl::~CLogCtrl()
 BEGIN_MESSAGE_MAP(CLogCtrl, CMFCListCtrl)
 	ON_WM_CREATE()
 	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CLogCtrl::OnLvnColumnclick)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -29,12 +30,13 @@ int CLogCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	dwExStyle = GetExStyle()
 		| LVS_EX_FULLROWSELECT
-		| LVS_EX_AUTOCHECKSELECT;
+		| LVS_EX_AUTOCHECKSELECT
+		| LVS_EX_HEADERDRAGDROP;
 
 	SetExtendedStyle(dwExStyle);
 
 	InsertColumn(0, TEXT("Date"), LVCFMT_LEFT, 250);
-	InsertColumn(1, TEXT("Event"), LVCFMT_LEFT, 600);		//OK
+	InsertColumn(1, TEXT("Event"), LVCFMT_LEFT,800);		//OK
 
 	return 0;
 }
@@ -50,8 +52,6 @@ void CLogCtrl::OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult)
 void CLogCtrl::Log(CONST TCHAR * logMsg)
 {
 	int id = GetItemCount();
-
-	CTime time = CTime::GetCurrentTime(); 
-	InsertItem(id, time.Format("[%Y-%m-%d %H:%M:%S]"));
+	InsertItem(id, CTime::GetCurrentTime().Format("[%Y-%m-%d %H:%M:%S]"));
 	SetItemText(id, 1, logMsg);
 }

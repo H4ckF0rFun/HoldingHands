@@ -93,7 +93,7 @@ static UINT indicators[] =
 {
 	ID_SERVER_STATU,
 	ID_HOST_COUNT,
-	ID_HOST_SELECTED,
+	//ID_HOST_SELECTED,
 	ID_UPLOAD_SPEED,
 	ID_DOWNLOAD_SPEED,
 	ID_CUR_DATE
@@ -197,10 +197,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators) / sizeof(UINT));
 	m_wndStatusBar.SetPaneInfo(0, ID_SERVER_STATU, SBPS_STRETCH, 100);
 	m_wndStatusBar.SetPaneInfo(1, ID_HOST_COUNT, SBPS_NORMAL, 110);
-	m_wndStatusBar.SetPaneInfo(2, ID_HOST_SELECTED, SBPS_NORMAL, 110);
-	m_wndStatusBar.SetPaneInfo(3, ID_UPLOAD_SPEED, SBPS_NORMAL, 180);
-	m_wndStatusBar.SetPaneInfo(4, ID_DOWNLOAD_SPEED, SBPS_NORMAL, 180);
-	m_wndStatusBar.SetPaneInfo(5, ID_CUR_DATE, SBPS_NORMAL, 160);
+	//m_wndStatusBar.SetPaneInfo(2, ID_HOST_SELECTED, SBPS_NORMAL, 110);
+	m_wndStatusBar.SetPaneInfo(2, ID_UPLOAD_SPEED, SBPS_NORMAL, 180);
+	m_wndStatusBar.SetPaneInfo(3, ID_DOWNLOAD_SPEED, SBPS_NORMAL, 180);
+	m_wndStatusBar.SetPaneInfo(4, ID_CUR_DATE, SBPS_NORMAL, 160);
 
 	EnableDocking(CBRS_ALIGN_ANY);
 
@@ -305,7 +305,7 @@ void CMainFrame::OnUpdateStatuBar()
 	TCHAR szReadSpeed[128], szWriteSpeed[128];
 
 	PaneText = time.Format("[%Y-%m-%d %H:%M:%S]");
-	m_wndStatusBar.SetPaneText(5, PaneText);
+	m_wndStatusBar.SetPaneText(4, PaneText);
 	//更新上传,下载速度.
 
 	m_Iocp->GetTraffic(traffic);
@@ -322,10 +322,11 @@ void CMainFrame::OnUpdateStatuBar()
 	GetStorageSizeString(tmp[1], szWriteSpeed);
 
 	PaneText.Format(TEXT("Upload: %s/S"), szWriteSpeed);
-	m_wndStatusBar.SetPaneText(3, PaneText);
+	m_wndStatusBar.SetPaneText(2, PaneText);
 
 	PaneText.Format(TEXT("Download: %s/s"), szReadSpeed);
-	m_wndStatusBar.SetPaneText(4, PaneText);
+	m_wndStatusBar.SetPaneText(3, PaneText);
+
 }
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)

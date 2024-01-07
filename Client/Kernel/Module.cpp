@@ -77,11 +77,11 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 
 		*pProc++ = 0;
 		
-		if ((hModule = GetModuleHandleA(pModule)) == NULL)
-		{
-			hModule = LoadLibraryA(pModule);
-		}
+		hModule = GetModuleHandleA(pModule);
 		
+		//不要load,load 会增加引用计数.
+		//
+
 		if (hModule == NULL)
 		{
 			return 0;
@@ -108,7 +108,7 @@ int CopySections(Module * module,const BYTE * data)
 	//展开section,空间已经分配好了,只需要把相应位置的数据copy即可
 	for (int i = 0; i < NumOfSections; i++,section++)
 	{
-		dbg_log("Section : %p ", section->VirtualAddress);
+		//dbg_log("Section : %p ", section->VirtualAddress);
 		if (section->SizeOfRawData == 0) 
 		{
 			DWORD section_size = module->NtHeaders->OptionalHeader.SectionAlignment;

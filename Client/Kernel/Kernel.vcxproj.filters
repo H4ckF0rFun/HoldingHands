@@ -18,12 +18,6 @@
     <ClCompile Include="Kernel.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\common\IOCP.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -48,12 +42,12 @@
     <ClCompile Include="..\..\common\kernel_common.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\utils.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="App.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Module.h">

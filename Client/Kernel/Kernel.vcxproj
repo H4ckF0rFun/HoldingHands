@@ -23,7 +23,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -52,7 +52,7 @@
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <TargetExt>.dll</TargetExt>
+    <TargetExt>.lib</TargetExt>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);..\Common;E:\MyProjects\HoldingHands\Client\Common\SDK\Lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -105,15 +105,13 @@
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
-    <ClCompile Include="App.cpp" />
     <ClCompile Include="Kernel.cpp" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="Module.cpp" />
-    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\kernel_common.h" />
     <ClInclude Include="..\Common\utils.h" />
-    <ClInclude Include="App.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="Module.h" />
   </ItemGroup>

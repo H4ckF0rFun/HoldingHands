@@ -296,6 +296,7 @@ void CClientView::OnMainAddgroup()
 	}
 
 	GroupName = dlg.m_str;
+
 	if (!(newGroup = CreateGroup(GroupName)))
 	{
 		CString err;
@@ -306,9 +307,10 @@ void CClientView::OnMainAddgroup()
 	}
 
 	//remove client from default to new group if exist eligible client.
+	m_DefaultGroup->LockWindowUpdate();
+	newGroup->LockWindowUpdate();
+
 	n = m_DefaultGroup->GetItemCount();
-	m_DefaultGroup->SetRedraw(FALSE);
-	newGroup->SetRedraw(FALSE);
 
 	for (; i < n;)
 	{
@@ -328,8 +330,8 @@ void CClientView::OnMainAddgroup()
 		}
 	}
 
-	m_DefaultGroup->SetRedraw(TRUE);
-	newGroup->SetRedraw(TRUE);
+	m_DefaultGroup->UnlockWindowUpdate();
+	newGroup->UnlockWindowUpdate();
 
 	n = m_tabGroups.GetTabsNum();
 
@@ -434,7 +436,7 @@ LRESULT CClientView::OnClientLogin(WPARAM wParam, LPARAM lParam)
 	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
 	CString msg;
 
-	msg.Format(TEXT("Client login from [ %s ]."), kernel->GetPublicIP());
+	msg.Format(TEXT("Client login from [ %s ]"), kernel->GetPublicIP());
 	pMainFrame->GetLogCtrl()->Log(msg);
 	
 	CString host;
@@ -471,7 +473,7 @@ LRESULT CClientView::OnClientLogout(WPARAM wParam, LPARAM lParam)
 	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd();
 	CString msg;
 
-	msg.Format(TEXT("Client from [ %s ] logout."), kernel->GetPublicIP());
+	msg.Format(TEXT("Client from [ %s ] logout"), kernel->GetPublicIP());
 	pMainFrame->GetLogCtrl()->Log(msg);
 
 	kernel->Close();

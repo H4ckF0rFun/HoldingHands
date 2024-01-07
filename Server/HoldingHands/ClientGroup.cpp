@@ -51,6 +51,7 @@ BEGIN_MESSAGE_MAP(CClientGroup, CMFCListCtrl)
 	ON_COMMAND(ID_REMOTEDESKTOP_GDI, &CClientGroup::OnRemotedesktopGdi)
 	ON_WM_CONTEXTMENU()
 	ON_COMMAND(ID_OPERATION_MODIFYGROUP, &CClientGroup::OnOperationModifygroup)
+
 END_MESSAGE_MAP()
 
 
@@ -67,7 +68,8 @@ int CClientGroup::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//LVS_SINGLESEL 取消单行限制
 	DWORD dwExStyle = GetExStyle();
 	ModifyStyle(LVS_SINGLESEL, 0);
-	dwExStyle |= LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_AUTOCHECKSELECT | LVS_EX_CHECKBOXES;
+	dwExStyle |= LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_AUTOCHECKSELECT | LVS_EX_CHECKBOXES ;
+
 	SetExtendedStyle(dwExStyle);
 	//左对齐
 	InsertColumn(0, TEXT("IP"), LVCFMT_LEFT, 120);
@@ -83,7 +85,9 @@ int CClientGroup::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	InsertColumn(10, TEXT("Location"), LVCFMT_LEFT, 100);			//OK
 
 	InsertColumn(11, TEXT("Comment"), LVCFMT_LEFT, 150);			//---
-	InsertColumn(12, TEXT(""), LVCFMT_LEFT, 350);					//---
+	InsertColumn(12, TEXT(""), LVCFMT_FILL,100);					//---
+	
+
 	return 0;
 }
 
