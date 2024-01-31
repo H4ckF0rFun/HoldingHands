@@ -11,11 +11,10 @@ class CSocksProxyWnd :
 {
 	
 public:
-	BOOL			 m_DestroyAfterDisconnect;
 	CSocksProxySrv * m_pHandler;
 	BOOL			 m_IsRunning;
 
-	CListCtrl		m_Connections;
+	CListCtrl	 m_Connections;
 
 	char			m_ListenAddress[0x100];
 	UINT			m_ListenPort;

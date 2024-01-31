@@ -8,8 +8,7 @@
 #include "dbg.h"
 
 CSocksProxyWnd::CSocksProxyWnd(CSocksProxySrv*pHandler) :
-m_pHandler(pHandler),
-m_DestroyAfterDisconnect(FALSE)
+m_pHandler(pHandler)
 {
 	m_IsRunning = FALSE;
 	m_pHandler->Get();

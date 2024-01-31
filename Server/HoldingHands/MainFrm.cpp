@@ -565,13 +565,15 @@ LRESULT CMainFrame::OnClientLogin(WPARAM wParam, LPARAM module)
 	return 0;
 }
 
-void CMainFrame::OnMainBuild(){
+void CMainFrame::OnMainBuild()
+{
 	CBuildDlg dlg;
 	dlg.DoModal();
 }
 
 
-void CMainFrame::OnMainSettings(){
+void CMainFrame::OnMainSettings()
+{
 	CSettingDlg dlg(m_config, this);
 	dlg.DoModal();
 }
