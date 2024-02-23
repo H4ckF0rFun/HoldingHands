@@ -36,13 +36,6 @@ private:
 	
 	///////
 	UINT     m_State;
-	
-	//pkt_head m_read_pkt_head;
-
-	////received data length until now.
-	//BYTE*    m_lpData;
-	//UINT     m_BufSize;
-	//UINT     m_DataLength;
 
 
 	//recv Buffer;
@@ -72,8 +65,8 @@ public:
 	}
 
 	void Run();
-	void Send(BYTE *lpData, UINT32 Size,BOOL Block = TRUE);
-	void Send(vec * Bufs, int nBuf, BOOL Block = TRUE);
+	void Send(BYTE *lpData, UINT32 Size);
+	void Send(vec * Bufs, int nBuf);
 
 	void OnRecvCompletePacket(BYTE * lpData, UINT32 Size);
 

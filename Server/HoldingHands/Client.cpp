@@ -322,7 +322,7 @@ void CClient::Run()
 	Recv(m_w_ptr, m_end_ptr - m_w_ptr,  NULL);
 }
 
-void CClient::Send(BYTE *lpData, UINT32 Size, BOOL Block)
+void CClient::Send(BYTE *lpData, UINT32 Size)
 {
 	pkt_head * pkt;
 	//wait last send request release the write buffer.
@@ -344,7 +344,7 @@ void CClient::Send(BYTE *lpData, UINT32 Size, BOOL Block)
 	CTCPSocket::Send(m_lpWriteBuf, Size, NULL,NULL, m_hEvent);
 }
 
-void CClient::Send(vec * Bufs, int nBuf, BOOL Block)
+void CClient::Send(vec * Bufs, int nBuf)
 {
 	UINT32 Size = 0;
 	UINT32 copy = 0;
