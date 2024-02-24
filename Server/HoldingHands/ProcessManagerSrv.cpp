@@ -70,38 +70,65 @@ void CProcessManagerSrv::OnRemoveProcess(DWORD dwPid)
 
 void CProcessManagerSrv::OnAppendIcon(BYTE * lpIconData,DWORD dwSize)
 {
-	HICON hIcon				= 0;
-	ICONINFO * lpIconInfo   = (ICONINFO*)lpIconData;
-	
-	BITMAP	 * lpMaskBitmap = (BITMAP*)(lpIconInfo + 1);
-	BYTE	 * lpMaskBits   = (BYTE*)(lpMaskBitmap + 1);
+	HICON    hIcon		 = 0;
+	ICONINFO icon_info   = { 0 };
+	BITMAP	 MaskBitmap  = { 0 };
+	BITMAP   ColorBitmap = { 0 };
 
-	BITMAP	 * lpColorBitmap = NULL;
+
+	BYTE	 * lpMaskBits    = NULL;
 	BYTE	 * lpColorBits   = NULL;
 	//
+
+	PROCESS_ICONINFO * processIconInfo = (PROCESS_ICONINFO*)lpIconData;
+	PROCESS_BITMAP   * MaskBmp = (PROCESS_BITMAP*)(processIconInfo + 1); 
+	PROCESS_BITMAP	 * ColorBmp = NULL;
+
+	lpMaskBits = (LPBYTE)(MaskBmp + 1);
+
 	if (dwSize == 0)
 	{
 		Close();
 		return;
 	}
 
-	if (lpIconInfo->hbmColor)
+	if (processIconInfo->bHasBMColor)
 	{
-		lpColorBitmap = (BITMAP*)(lpMaskBits + lpMaskBitmap->bmHeight * lpMaskBitmap->bmWidthBytes);
-		lpColorBits   = (BYTE*)(lpColorBitmap + 1);
+		ColorBmp	= (PROCESS_BITMAP*)(lpMaskBits + MaskBmp->bmHeight * MaskBmp->bmWidthBytes);
+		lpColorBits = (BYTE*)(ColorBmp + 1);
 	}
 	
-	lpMaskBitmap->bmBits = lpMaskBits;
-	if (lpColorBitmap)
-		lpColorBitmap->bmBits = lpColorBits;
+	icon_info.fIcon = processIconInfo->fIcon;
+	icon_info.xHotspot = processIconInfo->xHotspot;
+	icon_info.yHotspot = processIconInfo->yHotspot;
 
-	lpIconInfo->hbmMask = CreateBitmapIndirect(lpMaskBitmap);
+	MaskBitmap.bmType = MaskBmp->bmType;
+	MaskBitmap.bmHeight = MaskBmp->bmHeight;
+	MaskBitmap.bmWidth = MaskBmp->bmWidth;
+	MaskBitmap.bmWidthBytes = MaskBmp->bmWidthBytes;
+	MaskBitmap.bmPlanes = MaskBmp->bmPlanes;
+	MaskBitmap.bmBitsPixel = MaskBmp->bmBitsPixel;
+	MaskBitmap.bmBits = lpMaskBits;
 
-	if (lpColorBitmap)
-		lpIconInfo->hbmColor = CreateBitmapIndirect(lpColorBitmap);
+	if (lpColorBits)
+	{
+		ColorBitmap.bmType = ColorBmp->bmType;
+		ColorBitmap.bmHeight = ColorBmp->bmHeight;
+		ColorBitmap.bmWidth = ColorBmp->bmWidth;
+		ColorBitmap.bmWidthBytes = ColorBmp->bmWidthBytes;
+		ColorBitmap.bmPlanes = ColorBmp->bmPlanes;
+		ColorBitmap.bmBitsPixel = ColorBmp->bmBitsPixel;
+		ColorBitmap.bmBits = lpColorBits;
+
+	}
+
+	icon_info.hbmMask = CreateBitmapIndirect(&MaskBitmap);
+
+	if (ColorBmp)
+		icon_info.hbmColor = CreateBitmapIndirect(&ColorBitmap);
 
 	//
-	hIcon = CreateIconIndirect(lpIconInfo); 
+	hIcon = CreateIconIndirect(&icon_info);
 
 	if (hIcon)
 		Notify(WM_PROCESS_MANAGER_APPEND_ICON, (WPARAM)hIcon);
@@ -109,11 +136,11 @@ void CProcessManagerSrv::OnAppendIcon(BYTE * lpIconData,DWORD dwSize)
 		Close();
 
 	//clean...
-	if (lpIconInfo->hbmMask)
-		DeleteObject(lpIconInfo->hbmMask);
+	if (icon_info.hbmMask)
+		DeleteObject(icon_info.hbmMask);
 
-	if (lpIconInfo->hbmColor)
-		DeleteObject(lpIconInfo->hbmColor);
+	if (icon_info.hbmColor)
+		DeleteObject(icon_info.hbmColor);
 
 	if (hIcon)
 		DestroyIcon(hIcon);

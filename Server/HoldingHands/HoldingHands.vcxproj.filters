@@ -314,9 +314,6 @@
     <ClCompile Include="..\..\common\dbg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\common\EventHandler.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -366,6 +363,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="LogCtrl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EventHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

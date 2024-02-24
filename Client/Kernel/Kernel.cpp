@@ -6,6 +6,7 @@
 #include <WinInet.h>
 #include <STDIO.H>
 #include <process.h>
+#include <client.h>
 #include "utils.h"
 #include  <shlobj.h>
 #include "dbg.h"

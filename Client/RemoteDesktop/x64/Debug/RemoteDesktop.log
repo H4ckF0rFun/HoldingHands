@@ -1,9 +1,27 @@
-﻿生成启动时间为 2024/2/24 16:10:33。
-     1>项目“E:\MyProjects\HoldingHands3.0\Client\RemoteDesktop\RemoteDesktop.vcxproj”在节点 7 上(Build 个目标)。
-     1>Link:
+﻿生成启动时间为 2024/2/24 17:50:18。
+     1>项目“E:\MyProjects\HoldingHands3.0\Client\RemoteDesktop\RemoteDesktop.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt ..\Common\X264Encoder.cpp RemoteDesktop.cpp main.cpp
+         X264Encoder.cpp
+         正在生成代码...
+         正在跳过...(未检测到相关更改)
+         main.cpp
+         RemoteDesktop.cpp
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\RemoteDesktop.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\RemoteDesktop.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\RemoteDesktop.lib" /MACHINE:X64 x64\Debug\dbg.obj
+         x64\Debug\IOCP.obj
+         x64\Debug\TCPSocket.obj
+         x64\Debug\utils.obj
+         x64\Debug\Client.obj
+         x64\Debug\EventHandler.obj
+         x64\Debug\X264Encoder.obj
+         x64\Debug\DxgiCapture.obj
+         x64\Debug\main.obj
+         x64\Debug\RemoteDesktop.obj
+            正在创建库 E:\MyProjects\HoldingHands3.0\Client\x64\Debug\RemoteDesktop.lib 和对象 E:\MyProjects\HoldingHands3.0\Client\x64\Debug\RemoteDesktop.exp
          RemoteDesktop.vcxproj -> E:\MyProjects\HoldingHands3.0\Client\x64\Debug\RemoteDesktop.exe
      1>已完成生成项目“E:\MyProjects\HoldingHands3.0\Client\RemoteDesktop\RemoteDesktop.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.05
+已用时间 00:00:00.57

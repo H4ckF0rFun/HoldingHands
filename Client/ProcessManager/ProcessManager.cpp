@@ -208,6 +208,8 @@ int CProcessManager::GetExeIconIndex(const TCHAR* ExeFileName)
 	return si.iIcon;
 }
 
+
+
 DWORD CProcessManager::GetIconDataByIndex(int dwIconIndex, BYTE ** lppData)
 {
 	static BYTE IconData[0x2000];			//0x200µÄ×ã¹»ÁË..
@@ -215,6 +217,7 @@ DWORD CProcessManager::GetIconDataByIndex(int dwIconIndex, BYTE ** lppData)
 	ICONINFO	icon_info  = { 0 };
 	BITMAP		bmp;
 	BYTE *		lpIconData = IconData;
+
 
 	hIcon = ImageList_GetIcon(hImageList_SmallIcon, dwIconIndex, 0);
 
@@ -224,13 +227,23 @@ DWORD CProcessManager::GetIconDataByIndex(int dwIconIndex, BYTE ** lppData)
 	GetIconInfo(hIcon, &icon_info);
 
 	//Write Icon Info
-	memcpy(lpIconData, &icon_info, sizeof(icon_info));
-	lpIconData += sizeof(icon_info);
+	((PROCESS_ICONINFO*)lpIconData)->fIcon = icon_info.fIcon;
+	((PROCESS_ICONINFO*)lpIconData)->xHotspot = icon_info.xHotspot;
+	((PROCESS_ICONINFO*)lpIconData)->yHotspot = icon_info.yHotspot;
+	((PROCESS_ICONINFO*)lpIconData)->bHasBMColor = icon_info.hbmColor != NULL;
+	((PROCESS_ICONINFO*)lpIconData)->bHasBMMask = icon_info.hbmMask != NULL;
+	
+	lpIconData += sizeof(PROCESS_ICONINFO);
 
 	//ÏÈÐ´Mask Data
 	GetObject(icon_info.hbmMask, sizeof(BITMAP), &bmp);
-	memcpy(lpIconData, &bmp, sizeof(bmp));
-	lpIconData += sizeof(BITMAP);
+	((PROCESS_BITMAP*)lpIconData)->bmType = bmp.bmType;
+	((PROCESS_BITMAP*)lpIconData)->bmWidth = bmp.bmWidth;
+	((PROCESS_BITMAP*)lpIconData)->bmHeight = bmp.bmHeight;
+	((PROCESS_BITMAP*)lpIconData)->bmWidthBytes = bmp.bmWidthBytes;
+	((PROCESS_BITMAP*)lpIconData)->bmPlanes = bmp.bmPlanes;
+	((PROCESS_BITMAP*)lpIconData)->bmBitsPixel = bmp.bmBitsPixel;
+	lpIconData += sizeof(PROCESS_BITMAP);
 
 	//Ð´bits
 	GetBitmapBits(icon_info.hbmMask, bmp.bmWidthBytes * bmp.bmHeight, lpIconData);
@@ -239,10 +252,15 @@ DWORD CProcessManager::GetIconDataByIndex(int dwIconIndex, BYTE ** lppData)
 	//if exist hbmColor
 	if (icon_info.hbmColor)
 	{
-		//Ð´ Color Data.
+		//Ð´ Color bitmap.
 		GetObject(icon_info.hbmColor, sizeof(BITMAP), &bmp);
-		memcpy(lpIconData, &bmp, sizeof(bmp));
-		lpIconData += sizeof(BITMAP);
+		((PROCESS_BITMAP*)lpIconData)->bmType = bmp.bmType;
+		((PROCESS_BITMAP*)lpIconData)->bmWidth = bmp.bmWidth;
+		((PROCESS_BITMAP*)lpIconData)->bmHeight = bmp.bmHeight;
+		((PROCESS_BITMAP*)lpIconData)->bmWidthBytes = bmp.bmWidthBytes;
+		((PROCESS_BITMAP*)lpIconData)->bmPlanes = bmp.bmPlanes;
+		((PROCESS_BITMAP*)lpIconData)->bmBitsPixel = bmp.bmBitsPixel;
+		lpIconData += sizeof(PROCESS_BITMAP);
 
 		//Ð´bits
 		GetBitmapBits(icon_info.hbmColor, bmp.bmWidthBytes * bmp.bmHeight, lpIconData);

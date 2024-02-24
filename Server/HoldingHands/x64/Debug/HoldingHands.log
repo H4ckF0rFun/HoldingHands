@@ -1,9 +1,12 @@
-﻿生成启动时间为 2024/2/24 15:27:11。
+﻿生成启动时间为 2024/2/24 19:05:11。
      1>项目“E:\MyProjects\HoldingHands3.0\Server\HoldingHands\HoldingHands.vcxproj”在节点 2 上(Build 个目标)。
-     1>Link:
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /Od /D WIN32 /D _WINDOWS /D _DEBUG /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /D _HOLDINGHANDS_ /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"x64\Debug\HoldingHands.pch" /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt HoldingHands.cpp
+         HoldingHands.cpp
+     1>e:\myprojects\holdinghands3.0\common\x86_64\include\libavutil\rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+       Link:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Server\x64\Debug\HoldingHands.exe" /INCREMENTAL /NOLOGO /NODEFAULTLIB:libcmt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Server\x64\Debug\HoldingHands.pdb" /SUBSYSTEM:WINDOWS,"5.02" /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE:NO /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Server\x64\Debug\HoldingHands.lib" /MACHINE:X64 x64\Debug\HoldingHands.res
          x64\Debug\dbg.obj
-         x64\Debug\EventHandler.obj
          x64\Debug\IOCP.obj
          x64\Debug\kernel_common.obj
          x64\Debug\TCPSocket.obj
@@ -27,6 +30,7 @@
          x64\Debug\CmdSrv.obj
          x64\Debug\CmdWnd.obj
          x64\Debug\Config.obj
+         x64\Debug\EventHandler.obj
          x64\Debug\GetStrDlg.obj
          x64\Debug\FileManagerDlg.obj
          x64\Debug\FileManagerSrv.obj
@@ -64,4 +68,4 @@
 
 生成成功。
 
-已用时间 00:00:01.90
+已用时间 00:00:00.77

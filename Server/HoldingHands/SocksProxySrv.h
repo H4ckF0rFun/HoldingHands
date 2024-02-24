@@ -2,6 +2,7 @@
 #include "EventHandler.h"
 #include "socks_proxy_common.h"
 
+#include "spinlock.h"
 
 //notify 
 #define WM_SOCKS_PROXY_ERROR	(WM_USER + 122)

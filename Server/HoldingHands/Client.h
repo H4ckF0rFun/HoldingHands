@@ -1,28 +1,10 @@
 #pragma once
 #include "TCPSocket.h"
-#include <stdint.h>
-
-#define STATE_PKT_HEAD 0
-#define STATE_PKT_BODY 1
-
+#include <client_common.h>
 
 //you should setNotifyWindow wen you get WM_CLIENT_LOGIN,
 #define WM_CLIENT_LOGIN (WM_USER + 102)
 
-class CEventHandler;
-
-struct pkt_head
-{
-	uint32_t magic;
-	uint32_t size;
-	uint32_t flags;
-};
-
-struct vec
-{
-	const void *lpData;
-	UINT32 Size;
-};
 
 class CClient :
 	public CTCPSocket

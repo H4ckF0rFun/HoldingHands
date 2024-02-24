@@ -1,9 +1,69 @@
-﻿生成启动时间为 2024/2/24 15:25:09。
+﻿生成启动时间为 2024/2/24 18:15:04。
      1>项目“E:\MyProjects\HoldingHands3.0\Server\HoldingHands\HoldingHands.vcxproj”在节点 2 上(Build 个目标)。
-     1>Link:
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /D _HOLDINGHANDS_ /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\HoldingHands.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\common\kernel_common.cpp AudioDlg.cpp AudioSrv.cpp CameraSrv.cpp CameraWnd.cpp ChatDlg.cpp ChatSrv.cpp Client.cpp ClientGroup.cpp ClientView.cpp CmdEdit.cpp CmdSrv.cpp CmdWnd.cpp EventHandler.cpp FileManagerDlg.cpp FileManagerSrv.cpp FileMgrSearchDlg.cpp FileMgrSearchSrv.cpp HoldingHands.cpp KernelSrv.cpp KeybdLogDlg.cpp KeybdLogSrv.cpp MainFrm.cpp FileDownloadDlg.cpp FileDownloadSrv.cpp FileTransDlg.cpp FileTransSrv.cpp ProcessManagerSrv.cpp ProcessManagerWnd.cpp RemoteDesktopSrv.cpp RemoteDesktopWnd.cpp Server.cpp SocksProxyTcp.cpp SocksProxyListener.cpp SocksProxySrv.cpp SocksProxyUDPListener.cpp SocksProxyWnd.cpp
+         SocksProxyWnd.cpp
+         SocksProxyUDPListener.cpp
+         SocksProxySrv.cpp
+         SocksProxyListener.cpp
+         SocksProxyTcp.cpp
+         Server.cpp
+         RemoteDesktopWnd.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(357): warning C4018: “<”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(358): warning C4018: “<”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(475): warning C4018: “>”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(479): warning C4018: “>”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(481): warning C4018: “>”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(881): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(882): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(896): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(897): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(902): warning C4018: “<”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(903): warning C4018: “<”: 有符号/无符号不匹配
+         RemoteDesktopSrv.cpp
+         ProcessManagerWnd.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\processmanagerwnd.cpp(105): warning C4244: “return”: 从“float”转换到“int”，可能丢失数据
+         ProcessManagerSrv.cpp
+         FileTransSrv.cpp
+         FileTransDlg.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\filetransdlg.cpp(223): warning C4244: “参数”: 从“ULONGLONG”转换到“int”，可能丢失数据
+         FileDownloadSrv.cpp
+         FileDownloadDlg.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\filedownloaddlg.cpp(103): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
+         MainFrm.cpp
+         KeybdLogSrv.cpp
+         KeybdLogDlg.cpp
+         KernelSrv.cpp
+         HoldingHands.cpp
+         FileMgrSearchSrv.cpp
+         正在生成代码...
+         正在编译...
+         FileMgrSearchDlg.cpp
+         FileManagerSrv.cpp
+         FileManagerDlg.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\filemanagerdlg.cpp(472): warning C4244: “=”: 从“DWORD_PTR”转换到“TCHAR”，可能丢失数据
+         EventHandler.cpp
+         CmdWnd.cpp
+         CmdSrv.cpp
+         CmdEdit.cpp
+         ClientView.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\clientview.cpp(161): warning C4018: “<”: 有符号/无符号不匹配
+         ClientGroup.cpp
+         Client.cpp
+     1>e:\myprojects\holdinghands3.0\server\holdinghands\client.cpp(173): warning C4018: “>=”: 有符号/无符号不匹配
+         ChatSrv.cpp
+         ChatDlg.cpp
+         CameraWnd.cpp
+         CameraSrv.cpp
+         AudioSrv.cpp
+         AudioDlg.cpp
+         kernel_common.cpp
+     1>e:\myprojects\holdinghands3.0\common\kernel_common.cpp(118): warning C4018: “<”: 有符号/无符号不匹配
+     1>e:\myprojects\holdinghands3.0\common\kernel_common.cpp(204): warning C4018: “<”: 有符号/无符号不匹配
+         正在生成代码...
+       Link:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Server\Debug\HoldingHands.exe" /INCREMENTAL /NOLOGO /NODEFAULTLIB:libcmt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Server\Debug\HoldingHands.pdb" /SUBSYSTEM:WINDOWS,"5.01" /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE:NO /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Server\Debug\HoldingHands.lib" /MACHINE:X86 Debug\HoldingHands.res
          Debug\dbg.obj
-         Debug\EventHandler.obj
          Debug\IOCP.obj
          Debug\kernel_common.obj
          Debug\TCPSocket.obj
@@ -27,6 +87,7 @@
          Debug\CmdSrv.obj
          Debug\CmdWnd.obj
          Debug\Config.obj
+         Debug\EventHandler.obj
          Debug\GetStrDlg.obj
          Debug\FileManagerDlg.obj
          Debug\FileManagerSrv.obj
@@ -67,4 +128,4 @@
 
 生成成功。
 
-已用时间 00:00:01.86
+已用时间 00:00:06.08

@@ -1,9 +1,54 @@
-﻿生成启动时间为 2024/2/24 16:10:47。
-     1>项目“E:\MyProjects\HoldingHands3.0\Client\Camera\Camera.vcxproj”在节点 6 上(Build 个目标)。
-     1>Link:
+﻿生成启动时间为 2024/2/24 17:06:31。
+     1>项目“E:\MyProjects\HoldingHands3.0\Client\Camera\Camera.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\common\dbg.cpp ..\..\common\IOCP.cpp ..\..\common\TCPSocket.cpp ..\..\common\utils.cpp ..\Common\Client.cpp ..\Common\EventHandler.cpp Camera.cpp main.cpp
+         EventHandler.cpp
+     1>e:\myprojects\holdinghands3.0\common\iocpsocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+     1>e:\myprojects\holdinghands3.0\client\common\eventhandler.cpp(27): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1868) : 参见“inet_ntoa”的声明
+         Client.cpp
+     1>e:\myprojects\holdinghands3.0\common\iocpsocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+     1>e:\myprojects\holdinghands3.0\client\common\client.cpp(149): warning C4018: “>=”: 有符号/无符号不匹配
+         utils.cpp
+     1>e:\myprojects\holdinghands3.0\common\utils.cpp(37): warning C4244: “=”: 从“TCHAR”转换到“char”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\common\utils.cpp(64): warning C4244: “初始化”: 从“const LONGLONG”转换到“double”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\common\utils.cpp(75): warning C4244: “初始化”: 从“double”转换到“UINT32”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\common\utils.cpp(80): warning C4244: “=”: 从“double”转换到“UINT32”，可能丢失数据
+     1>e:\myprojects\holdinghands3.0\common\utils.cpp(220): warning C4244: “return”: 从“UINT32”转换到“float”，可能丢失数据
+         TCPSocket.cpp
+     1>e:\myprojects\holdinghands3.0\common\iocpsocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+     1>e:\myprojects\holdinghands3.0\common\tcpsocket.cpp(55): warning C4146: 一元负运算符应用于无符号类型，结果仍为无符号类型
+     1>e:\myprojects\holdinghands3.0\common\tcpsocket.cpp(80): warning C4146: 一元负运算符应用于无符号类型，结果仍为无符号类型
+     1>e:\myprojects\holdinghands3.0\common\tcpsocket.cpp(391): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(2238) : 参见“gethostbyname”的声明
+         IOCP.cpp
+     1>e:\myprojects\holdinghands3.0\common\iocpsocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+         dbg.cpp
+         正在生成代码...
+         正在编译...
+         main.cpp
+     1>e:\myprojects\holdinghands3.0\common\iocpsocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+         Camera.cpp
+         正在生成代码...
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Client\Debug\Camera.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Client\Debug\Camera.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Client\Debug\Camera.lib" /MACHINE:X86 Debug\dbg.obj
+         Debug\IOCP.obj
+         Debug\TCPSocket.obj
+         Debug\utils.obj
+         Debug\Client.obj
+         Debug\EventHandler.obj
+         Debug\Camera.obj
+         Debug\CameraGrab.obj
+         Debug\main.obj
+         Debug\MySampleGrabberCB.obj
          Camera.vcxproj -> E:\MyProjects\HoldingHands3.0\Client\Debug\Camera.exe
      1>已完成生成项目“E:\MyProjects\HoldingHands3.0\Client\Camera\Camera.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.06
+已用时间 00:00:03.15

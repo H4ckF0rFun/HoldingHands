@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Client.h"
+#include "client_common.h"
+
+class CClient;
 
 class CEventHandler
 {
@@ -33,25 +35,11 @@ public:
 		return m_ID;
 	}
 
-	UINT GetPeerAddress(char* szIP)
-	{
-		SOCKADDR_IN addr = { 0 };
-		int namelen = sizeof(addr);
-		UINT Port = 0;
-
-		*szIP = 0;
-
-		if (m_pClient->GetPeerName((SOCKADDR*)&addr, &namelen))
-		{
-			Port = ntohs(addr.sin_port);
-			lstrcpyA(szIP, inet_ntoa(addr.sin_addr));
-		}
-		return Port;
-	}
-
 	void	SetNotifyWindow(HWND hWnd = NULL)
 	{
 		m_hNotifyWindow = hWnd;
 	}
+
+	UINT GetPeerAddress(char* szIP);
 };
 

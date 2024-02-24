@@ -1,9 +1,56 @@
-﻿生成启动时间为 2024/2/24 16:10:34。
-     1>项目“E:\MyProjects\HoldingHands3.0\Client\SocksProxy\SocksProxy.vcxproj”在节点 11 上(Build 个目标)。
-     1>Link:
+﻿生成启动时间为 2024/2/24 17:12:44。
+     1>项目“E:\MyProjects\HoldingHands3.0\Client\SocksProxy\SocksProxy.vcxproj”在节点 10 上(Build 个目标)。
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt ..\..\common\dbg.cpp ..\..\common\IOCP.cpp ..\..\common\TCPSocket.cpp ..\..\common\UDPSocket.cpp ..\Common\Client.cpp ..\Common\EventHandler.cpp main.cpp SocksProxy.cpp SocksProxyTcp.cpp SocksProxyUDP.cpp
+         SocksProxy.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1850) : 参见“inet_addr”的声明
+     1>SocksProxy.cpp(140): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(2238) : 参见“gethostbyname”的声明
+         EventHandler.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1850) : 参见“inet_addr”的声明
+     1>..\Common\EventHandler.cpp(27): warning C4996: 'inet_ntoa': Use inet_ntop() or InetNtop() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1868) : 参见“inet_ntoa”的声明
+         正在生成代码...
+         正在编译...
+         SocksProxyUDP.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1850) : 参见“inet_addr”的声明
+     1>SocksProxyUDP.cpp(33): warning C4101: “atyp”: 未引用的局部变量
+     1>SocksProxyUDP.cpp(104): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(2238) : 参见“gethostbyname”的声明
+         SocksProxyTcp.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1850) : 参见“inet_addr”的声明
+         main.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+         Client.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1850) : 参见“inet_addr”的声明
+     1>..\Common\Client.cpp(174): warning C4244: “参数”: 从“__int64”转换到“UINT32”，可能丢失数据
+     1>..\Common\Client.cpp(219): warning C4244: “参数”: 从“__int64”转换到“UINT32”，可能丢失数据
+         正在生成代码...
+         正在跳过...(未检测到相关更改)
+         UDPSocket.cpp
+         TCPSocket.cpp
+         IOCP.cpp
+         dbg.cpp
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\SocksProxy.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\SocksProxy.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE:NO /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\SocksProxy.lib" /MACHINE:X64 x64\Debug\dbg.obj
+         x64\Debug\IOCP.obj
+         x64\Debug\TCPSocket.obj
+         x64\Debug\UDPSocket.obj
+         x64\Debug\Client.obj
+         x64\Debug\EventHandler.obj
+         x64\Debug\main.obj
+         x64\Debug\SocksProxy.obj
+         x64\Debug\SocksProxyTcp.obj
+         x64\Debug\SocksProxyUDP.obj
          SocksProxy.vcxproj -> E:\MyProjects\HoldingHands3.0\Client\x64\Debug\SocksProxy.exe
      1>已完成生成项目“E:\MyProjects\HoldingHands3.0\Client\SocksProxy\SocksProxy.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.04
+已用时间 00:00:03.21

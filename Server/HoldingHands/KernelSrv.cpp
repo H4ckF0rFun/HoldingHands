@@ -483,7 +483,7 @@ void CKernelSrv::OnGetModuleInfo(const TCHAR*ModuleName){
 		Notify(WM_KERNEL_GET_MODULE_PATH, (WPARAM)this, (LPARAM)m_szModulePath);
 	}
 
-	wsprintf(FileName,TEXT( "%s\\%s.dll"), m_szModulePath, ModuleName);
+	wsprintf(FileName,TEXT( "%s\\%d\\%s.dll"), m_szModulePath,m_LoginInfo.PE_bit ,ModuleName);
 	
 	dbg_log("OnGetModuleInfo: %s\n", FileName);
 

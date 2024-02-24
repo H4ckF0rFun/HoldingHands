@@ -1,9 +1,21 @@
-﻿生成启动时间为 2024/2/24 16:10:47。
-     1>项目“E:\MyProjects\HoldingHands3.0\Client\Chat\Chat.vcxproj”在节点 3 上(Build 个目标)。
-     1>Link:
+﻿生成启动时间为 2024/2/24 17:07:59。
+     1>项目“E:\MyProjects\HoldingHands3.0\Client\Chat\Chat.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Chat.cpp
+         Chat.cpp
+     1>e:\myprojects\holdinghands3.0\common\iocpsocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850) : 参见“inet_addr”的声明
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Client\Debug\Chat.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Client\Debug\Chat.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Client\Debug\Chat.lib" /MACHINE:X86 Debug\dbg.obj
+         Debug\IOCP.obj
+         Debug\TCPSocket.obj
+         Debug\Client.obj
+         Debug\EventHandler.obj
+         Debug\Chat.obj
+         Debug\main.obj
          Chat.vcxproj -> E:\MyProjects\HoldingHands3.0\Client\Debug\Chat.exe
      1>已完成生成项目“E:\MyProjects\HoldingHands3.0\Client\Chat\Chat.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.03
+已用时间 00:00:00.65

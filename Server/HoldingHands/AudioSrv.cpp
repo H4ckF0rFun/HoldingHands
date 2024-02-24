@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "AudioSrv.h"
+#include "dbg.h"
 #pragma comment(lib,"Winmm.lib")
 
 

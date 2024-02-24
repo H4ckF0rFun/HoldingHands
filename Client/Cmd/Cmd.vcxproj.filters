@@ -33,10 +33,10 @@
     <ClCompile Include="..\..\common\dbg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\common\EventHandler.cpp">
+    <ClCompile Include="..\..\common\utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\common\utils.cpp">
+    <ClCompile Include="..\Common\EventHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

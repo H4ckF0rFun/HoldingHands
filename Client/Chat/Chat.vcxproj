@@ -160,10 +160,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\dbg.cpp" />
-    <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
+    <ClCompile Include="..\Common\EventHandler.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

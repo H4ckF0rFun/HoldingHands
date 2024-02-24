@@ -138,6 +138,7 @@ int CX264Encoder::encode(
 		return -2;
 	}
 
+
 	encode_size = x264_encoder_encode(
 		m_pCodec,
 		&pNal,

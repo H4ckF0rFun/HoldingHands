@@ -156,11 +156,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\dbg.cpp" />
-    <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\UDPSocket.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
+    <ClCompile Include="..\Common\EventHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SocksProxy.cpp" />
     <ClCompile Include="SocksProxyTcp.cpp" />

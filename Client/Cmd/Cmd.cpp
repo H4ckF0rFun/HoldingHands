@@ -1,6 +1,7 @@
 #include "Cmd.h"
 #include <iostream>
-
+#include <client.h>
+#include <dbg.h>
 using std::iostream;
 
 CCmd::CCmd(CClient *pClient, Module * owner) :

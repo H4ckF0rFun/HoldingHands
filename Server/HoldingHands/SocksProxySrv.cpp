@@ -5,6 +5,8 @@
 #include "utils.h"
 #include "dbg.h"
 #include <limits.h>
+#include "dbg.h"
+#include "Client.h"
 
 CSocksProxySrv::CSocksProxySrv(CClient*pClient) :
 CEventHandler(pClient, SOCKS_PROXY)

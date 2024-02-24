@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\common\dbg.cpp" />
-    <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
@@ -11,6 +10,7 @@
     <ClCompile Include="RemoteDesktop.cpp" />
     <ClCompile Include="GdiCapture.cpp" />
     <ClCompile Include="..\Common\X264Encoder.cpp" />
+    <ClCompile Include="..\Common\EventHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\rd_common.h" />

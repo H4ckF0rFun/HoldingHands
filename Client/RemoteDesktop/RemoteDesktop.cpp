@@ -140,7 +140,7 @@ void CRemoteDesktop::OnClose()
 
 LRESULT CALLBACK CRemoteDesktop::WndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	MyData*		 pMyData = (MyData*)GetWindowLongPtr(hWnd, (-21));
+	MyData*		 pMyData = (MyData*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	CREATESTRUCT*pCreateStruct  = NULL;
 	HWND		 hRemovedWnd    = NULL;
 	HWND		 hAfterWnd		= NULL;
@@ -151,8 +151,9 @@ LRESULT CALLBACK CRemoteDesktop::WndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARA
 	case WM_CREATE:
 		pCreateStruct = (CREATESTRUCT*)lParam;
 		//ÉèÖÃUserData,
-		SetWindowLong(hWnd, (-21), (LONG)pCreateStruct->lpCreateParams);
-		pMyData = (MyData*)GetWindowLongPtr(hWnd, (-21));
+		
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreateStruct->lpCreateParams);
+		pMyData = (MyData*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		pMyData->m_hNextViewer = SetClipboardViewer(hWnd);
 		break;
 	case WM_CLOSE:
@@ -414,7 +415,7 @@ void __stdcall CRemoteDesktop::TimerCallback(PVOID lpParam, BOOLEAN TimerOrWaitF
 
 	//Skip this frame.
 	if (InterlockedExchange(&pThis->m_TimerMutex, 1)){
-		dbg_log("skip frame");
+		//dbg_log("skip frame");
 		return;
 	}
 
@@ -423,9 +424,10 @@ void __stdcall CRemoteDesktop::TimerCallback(PVOID lpParam, BOOLEAN TimerOrWaitF
 		return;
 	}
 
+
 	//get desktop frame.
 	err = pThis->m_dxgiCapture.GetDesktopFrame(&lpRGB, &stride, &size);
-
+	
 	if (err){
 		wsprintf(szError, TEXT("GetDesktopFrame failed with error : %d"), err);
 		pThis->Send(
@@ -438,7 +440,10 @@ void __stdcall CRemoteDesktop::TimerCallback(PVOID lpParam, BOOLEAN TimerOrWaitF
 	//encode.
 	pThis->m_dxgiCapture.GetCurrentMonitorSize(&width, &height);
 
+
 	err = pThis->m_encoder.encode(lpRGB, 32, stride, width, height, &encoded_data, &encoded_size,-1);
+	
+
 	if (err){
 		wsprintf(szError, TEXT("encode failed with error : %d"), err);
 		pThis->Send(

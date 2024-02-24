@@ -180,7 +180,7 @@ BOOL CHoldingHandsApp::InitInstance()
 		return FALSE;
 	}
 	
-	m_Iocp = new CIOCP(0,worker_thread_init,worker_thread_fini,NULL);
+	m_Iocp = new CIOCP(6,worker_thread_init,worker_thread_fini,NULL);
 
 	if (!m_Iocp->Create())
 	{

@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath);..\..\Common;..\..\Common\x86\include;..\..\Client\Common</IncludePath>
+    <IncludePath>$(IncludePath);..\..\Common;..\..\Common\x86\include;</IncludePath>
     <LibraryPath>$(LibraryPath);..\..\Common\x86\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -82,12 +82,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);..\..\Common;..\..\Common\x86\include;..\..\Client\Common</IncludePath>
+    <IncludePath>$(IncludePath);..\..\Common;..\..\Common\x86\include;</IncludePath>
     <LibraryPath>$(LibraryPath);..\..\Common\x86\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);..\..\Common;..\..\Common\x86_64\include;..\..\Client\Common</IncludePath>
+    <IncludePath>$(IncludePath);..\..\Common;..\..\Common\x86_64\include;</IncludePath>
     <LibraryPath>$(LibraryPath);..\..\Common\x86_64\lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -272,7 +272,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\dbg.cpp" />
-    <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
     <ClCompile Include="..\..\common\kernel_common.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
@@ -296,6 +295,7 @@
     <ClCompile Include="CmdSrv.cpp" />
     <ClCompile Include="CmdWnd.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="GetStrDlg.cpp" />
     <ClCompile Include="FileManagerDlg.cpp" />
     <ClCompile Include="FileManagerSrv.cpp" />

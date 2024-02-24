@@ -2,6 +2,7 @@
 #include "CameraSrv.h"
 #include "json\json.h"
 #include "utils.h"
+#include "dbg.h"
 
 CCameraSrv::CCameraSrv(CClient*pClient) :
 	CEventHandler(pClient,CAMERA),

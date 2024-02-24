@@ -151,8 +151,8 @@ LRESULT CALLBACK CRemoteDesktop::WndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARA
 	case WM_CREATE:
 		pCreateStruct = (CREATESTRUCT*)lParam;
 		//ÉèÖÃUserData,
-		SetWindowLong(hWnd, (-21), (LONG)pCreateStruct->lpCreateParams);
-		pMyData = (MyData*)GetWindowLongPtr(hWnd, (-21));
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreateStruct->lpCreateParams);
+		pMyData = (MyData*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		pMyData->m_hNextViewer = SetClipboardViewer(hWnd);
 		break;
 	case WM_CLOSE:
@@ -430,7 +430,16 @@ void __stdcall CRemoteDesktop::TimerCallback(PVOID lpParam, BOOLEAN TimerOrWaitF
 		flag |= CAPTUREBLT;
 	}
 
+	LARGE_INTEGER liFreq;
+	LARGE_INTEGER liStart, liEnd;
+
+	QueryPerformanceFrequency(&liFreq);
+
+	QueryPerformanceCounter(&liStart);
 	err = pThis->m_gdiCapture.GetDesktopFrame(&lpRGB, &stride, &size,flag);
+	QueryPerformanceCounter(&liEnd);
+
+	printf("elapse: %lf\n", (liEnd.QuadPart - liStart.QuadPart) * 1.0 / liFreq.QuadPart); 
 
 	if (err){
 		wsprintf(szError, TEXT("GetDesktopFrame failed with error : %d"), err);

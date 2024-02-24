@@ -1,7 +1,7 @@
 #include "Chat.h"
 #include "IOCP.h"
 #include "utils.h"
-
+#include <client.h>
 
 extern "C" __declspec(dllexport)
 int  ModuleEntry(

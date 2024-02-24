@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <assert.h>
 #include <winioctl.h>
+#include <dbg.h>
+#include <client.h>
 
 #include "SocksProxyUDP.h"
 #include "SocksProxyTcp.h"

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "CmdSrv.h"
+#include "dbg.h"
+#include "Client.h"
 
 CCmdSrv::CCmdSrv(CClient*pClient) :
 CEventHandler(pClient,CMD)

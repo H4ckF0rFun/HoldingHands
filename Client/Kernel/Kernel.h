@@ -3,7 +3,7 @@
 
 #include "kernel_common.h"
 #include "Module.h"
-
+#include "IOCP.h"
 /*************************************************************************/
 
 #define MAX_MODULE_COUNT 32

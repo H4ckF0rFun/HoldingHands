@@ -70,7 +70,7 @@ int main(){
 	iocp->Create();
 
 	//
-	ModuleEntry(iocp,NULL, "192.168.237.1", 10086, NULL);
+	ModuleEntry(iocp,NULL, "127.0.0.1", 10086, NULL);
 
 	Sleep(INFINITE);
 }

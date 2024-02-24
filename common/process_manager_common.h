@@ -39,7 +39,24 @@ typedef struct tagProcessInfo
 	LARGE_INTEGER liLastTime;			//上一次开始计时的时间.
 }ProcessInfo;
 
+typedef struct _PROCESS_ICONINFO {
+	BOOL    fIcon;
+	DWORD   xHotspot;
+	DWORD   yHotspot;
+	BOOL	bHasBMMask;
+	BOOL    bHasBMColor;
+} PROCESS_ICONINFO;
 
+
+typedef struct _PROCESS_BITMAP
+{
+	LONG        bmType;
+	LONG        bmWidth;
+	LONG        bmHeight;
+	LONG        bmWidthBytes;
+	WORD        bmPlanes;
+	WORD        bmBitsPixel;
+} PROCESS_BITMAP;
 
 #define MODIFY_UPDATE_NAME				0x1
 #define MODIFY_UPDATE_PATH				0x2

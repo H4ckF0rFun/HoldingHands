@@ -4,6 +4,7 @@
 
 #include "KeybdLogger.h"
 #include "unzip.h"
+#include <dbg.h>
 
 #include <STDIO.H>
 

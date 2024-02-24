@@ -183,12 +183,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\dbg.cpp" />
-    <ClCompile Include="..\..\common\EventHandler.cpp" />
     <ClCompile Include="..\..\common\IOCP.cpp" />
     <ClCompile Include="..\..\common\kernel_common.cpp" />
     <ClCompile Include="..\..\common\TCPSocket.cpp" />
     <ClCompile Include="..\..\common\utils.cpp" />
     <ClCompile Include="..\Common\Client.cpp" />
+    <ClCompile Include="..\Common\EventHandler.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Module.cpp" />

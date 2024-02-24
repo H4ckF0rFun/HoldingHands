@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ChatSrv.h"
+#include "dbg.h"
 
 CChatSrv::CChatSrv(CClient*pClient) :
 CEventHandler(pClient,CHAT)

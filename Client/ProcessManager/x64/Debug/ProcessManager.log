@@ -1,9 +1,36 @@
-﻿生成启动时间为 2024/2/24 16:10:33。
+﻿生成启动时间为 2024/2/24 18:39:05。
      1>项目“E:\MyProjects\HoldingHands3.0\Client\ProcessManager\ProcessManager.vcxproj”在节点 2 上(Build 个目标)。
-     1>Link:
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS- /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt ProcessManager.cpp main.cpp
+         ProcessManager.cpp
+     1>ProcessManager.cpp(200): warning C4018: “<”: 有符号/无符号不匹配
+     1>ProcessManager.cpp(285): warning C4244: “return”: 从“__int64”转换到“DWORD”，可能丢失数据
+     1>ProcessManager.cpp(399): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>ProcessManager.cpp(507): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
+     1>ProcessManager.cpp(518): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
+     1>ProcessManager.cpp(537): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+     1>ProcessManager.cpp(559): warning C4267: “初始化”: 从“size_t”转换到“DWORD”，可能丢失数据
+     1>ProcessManager.cpp(565): warning C4267: “=”: 从“size_t”转换到“DWORD”，可能丢失数据
+     1>ProcessManager.cpp(568): warning C4244: “=”: 从“float”转换到“DWORD”，可能丢失数据
+     1>ProcessManager.cpp(669): warning C4018: “<”: 有符号/无符号不匹配
+         正在生成代码...
+         正在编译...
+         main.cpp
+     1>e:\myprojects\holdinghands3.0\common\IOCPSocket.h(179): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\WinSock2.h(1850) : 参见“inet_addr”的声明
+         正在生成代码...
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\ProcessManager.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\ProcessManager.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Client\x64\Debug\ProcessManager.lib" /MACHINE:X64 x64\Debug\dbg.obj
+         x64\Debug\IOCP.obj
+         x64\Debug\TCPSocket.obj
+         x64\Debug\utils.obj
+         x64\Debug\Client.obj
+         x64\Debug\EventHandler.obj
+         x64\Debug\main.obj
+         x64\Debug\ProcessManager.obj
          ProcessManager.vcxproj -> E:\MyProjects\HoldingHands3.0\Client\x64\Debug\ProcessManager.exe
      1>已完成生成项目“E:\MyProjects\HoldingHands3.0\Client\ProcessManager\ProcessManager.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.04
+已用时间 00:00:01.12

@@ -4,6 +4,8 @@
 #include <json\json.h>
 #include <string>
 #include <Shlwapi.h>
+#include <dbg.h>
+
 
 #pragma comment(lib,"wininet.lib")
 

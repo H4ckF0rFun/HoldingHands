@@ -1,4 +1,7 @@
 #include "Chat.h"
+#include <client.h>
+#include <dbg.h>
+
 #define IDD_CHAT_DLG                    101
 #define ID_MSGLIST                      1000
 #define ID_INPUT                        1001
@@ -36,13 +39,13 @@ LRESULT CALLBACK CChat::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	HWND hMsgList;
 	LPCREATESTRUCTW pCreateStruct = NULL;
 	//不能用static 变量(开启多个对话框的时候会乱套)
-	CChat*pChat = (CChat*)GetWindowLong(hWnd, (-21));
+	CChat*pChat = (CChat*)GetWindowLong(hWnd, GWLP_USERDATA);
 
 	switch (uMsg)
 	{
 	case WM_CREATE:
 		pCreateStruct = (LPCREATESTRUCTW) lParam;
-		SetWindowLong(hWnd, (-21), (LONG)pCreateStruct->lpCreateParams);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreateStruct->lpCreateParams);
 		break;
 
 	case WM_CLOSE:		//ignore close msg;
