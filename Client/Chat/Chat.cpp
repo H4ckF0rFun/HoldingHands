@@ -36,13 +36,13 @@ LRESULT CALLBACK CChat::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	HWND hMsgList;
 	LPCREATESTRUCTW pCreateStruct = NULL;
 	//不能用static 变量(开启多个对话框的时候会乱套)
-	CChat*pChat = (CChat*)GetWindowLong(hWnd,GWL_USERDATA);
+	CChat*pChat = (CChat*)GetWindowLong(hWnd, (-21));
 
 	switch (uMsg)
 	{
 	case WM_CREATE:
 		pCreateStruct = (LPCREATESTRUCTW) lParam;
-		SetWindowLong(hWnd,GWL_USERDATA,(LONG)pCreateStruct->lpCreateParams);
+		SetWindowLong(hWnd, (-21), (LONG)pCreateStruct->lpCreateParams);
 		break;
 
 	case WM_CLOSE:		//ignore close msg;

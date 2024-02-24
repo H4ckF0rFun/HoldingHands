@@ -10,6 +10,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RemoteDesktop.cpp" />
     <ClCompile Include="GdiCapture.cpp" />
+    <ClCompile Include="..\Common\X264Encoder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\rd_common.h" />

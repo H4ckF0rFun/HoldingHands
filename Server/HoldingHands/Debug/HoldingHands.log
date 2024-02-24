@@ -1,104 +1,6 @@
-﻿生成启动时间为 2024/2/23 20:05:18。
+﻿生成启动时间为 2024/2/24 15:25:09。
      1>项目“E:\MyProjects\HoldingHands3.0\Server\HoldingHands\HoldingHands.vcxproj”在节点 2 上(Build 个目标)。
-     1>ClCompile:
-         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /D _HOLDINGHANDS_ /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Debug\HoldingHands.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
-         stdafx.cpp
-         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /D _HOLDINGHANDS_ /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\HoldingHands.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\common\EventHandler.cpp ..\..\common\IOCP.cpp ..\..\common\TCPSocket.cpp ..\..\common\UDPSocket.cpp ..\..\common\dbg.cpp ..\..\common\kernel_common.cpp ..\..\common\utils.cpp AudioDlg.cpp AudioGrab.cpp AudioPlay.cpp AudioSrv.cpp BuildDlg.cpp CameraSrv.cpp CameraWnd.cpp ChatDlg.cpp ChatInputName.cpp ChatSrv.cpp Client.cpp ClientDoc.cpp ClientGroup.cpp ClientView.cpp CmdEdit.cpp CmdSrv.cpp CmdWnd.cpp Config.cpp FileDownloadDlg.cpp FileDownloadSrv.cpp FileManagerDlg.cpp FileManagerSrv.cpp FileMgrSearchDlg.cpp FileMgrSearchSrv.cpp FileSelectDlg.cpp FileTransDlg.cpp FileTransSrv.cpp GetStrDlg.cpp HoldingHands.cpp KernelSrv.cpp KeybdLogDlg.cpp KeybdLogSrv.cpp LogCtrl.cpp MainFrm.cpp OutputWnd.cpp ProcessManagerSrv.cpp ProcessManagerWnd.cpp RemoteDesktopSrv.cpp RemoteDesktopWnd.cpp RingBuffer.cpp Server.cpp SettingDlg.cpp SocksProxyAddrDlg.cpp SocksProxyListener.cpp SocksProxySrv.cpp SocksProxyTcp.cpp SocksProxyUDPListener.cpp SocksProxyWnd.cpp UrlInputDlg.cpp
-         UrlInputDlg.cpp
-         SocksProxyWnd.cpp
-         SocksProxyUDPListener.cpp
-         SocksProxyTcp.cpp
-         SocksProxySrv.cpp
-         SocksProxyListener.cpp
-         SocksProxyAddrDlg.cpp
-         SettingDlg.cpp
-         Server.cpp
-         RingBuffer.cpp
-         RemoteDesktopWnd.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(352): warning C4018: “<”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(353): warning C4018: “<”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(470): warning C4018: “>”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(474): warning C4018: “>”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(476): warning C4018: “>”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(876): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(877): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(891): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(892): warning C4244: “=”: 从“double”转换到“DWORD”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(897): warning C4018: “<”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\remotedesktopwnd.cpp(898): warning C4018: “<”: 有符号/无符号不匹配
-         RemoteDesktopSrv.cpp
-         ProcessManagerWnd.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\processmanagerwnd.cpp(105): warning C4244: “return”: 从“float”转换到“int”，可能丢失数据
-         ProcessManagerSrv.cpp
-         OutputWnd.cpp
-         MainFrm.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\mainfrm.cpp(407): warning C4102: “failed”: 未引用的标签
-         LogCtrl.cpp
-         KeybdLogSrv.cpp
-         KeybdLogDlg.cpp
-         KernelSrv.cpp
-         正在生成代码...
-         正在编译...
-         HoldingHands.cpp
-         GetStrDlg.cpp
-         FileTransSrv.cpp
-         FileTransDlg.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\filetransdlg.cpp(223): warning C4244: “参数”: 从“ULONGLONG”转换到“int”，可能丢失数据
-         FileSelectDlg.cpp
-         FileMgrSearchSrv.cpp
-         FileMgrSearchDlg.cpp
-         FileManagerSrv.cpp
-         FileManagerDlg.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\filemanagerdlg.cpp(472): warning C4244: “=”: 从“DWORD_PTR”转换到“TCHAR”，可能丢失数据
-         FileDownloadSrv.cpp
-         FileDownloadDlg.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\filedownloaddlg.cpp(103): warning C4244: “参数”: 从“__int64”转换到“int”，可能丢失数据
-         Config.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\config.cpp(20): warning C4244: “参数”: 从“ULONGLONG”转换到“INT_PTR”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\config.cpp(21): warning C4244: “参数”: 从“ULONGLONG”转换到“UINT”，可能丢失数据
-         CmdWnd.cpp
-         CmdSrv.cpp
-         CmdEdit.cpp
-         ClientView.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\clientview.cpp(161): warning C4018: “<”: 有符号/无符号不匹配
-         ClientGroup.cpp
-         ClientDoc.cpp
-         Client.cpp
-     1>e:\myprojects\holdinghands3.0\server\holdinghands\client.cpp(173): warning C4018: “>=”: 有符号/无符号不匹配
-         ChatSrv.cpp
-         正在生成代码...
-         正在编译...
-         ChatInputName.cpp
-         ChatDlg.cpp
-         CameraWnd.cpp
-         CameraSrv.cpp
-         BuildDlg.cpp
-         AudioSrv.cpp
-         AudioPlay.cpp
-         AudioGrab.cpp
-         AudioDlg.cpp
-         utils.cpp
-     1>e:\myprojects\holdinghands3.0\common\utils.cpp(37): warning C4244: “=”: 从“TCHAR”转换到“char”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\common\utils.cpp(64): warning C4244: “初始化”: 从“const LONGLONG”转换到“double”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\common\utils.cpp(75): warning C4244: “初始化”: 从“double”转换到“UINT32”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\common\utils.cpp(80): warning C4244: “=”: 从“double”转换到“UINT32”，可能丢失数据
-     1>e:\myprojects\holdinghands3.0\common\utils.cpp(220): warning C4244: “return”: 从“UINT32”转换到“float”，可能丢失数据
-         kernel_common.cpp
-     1>e:\myprojects\holdinghands3.0\common\kernel_common.cpp(118): warning C4018: “<”: 有符号/无符号不匹配
-     1>e:\myprojects\holdinghands3.0\common\kernel_common.cpp(204): warning C4018: “<”: 有符号/无符号不匹配
-         dbg.cpp
-         UDPSocket.cpp
-     1>e:\myprojects\holdinghands3.0\common\udpsocket.cpp(48): warning C4146: 一元负运算符应用于无符号类型，结果仍为无符号类型
-     1>e:\myprojects\holdinghands3.0\common\udpsocket.cpp(91): warning C4146: 一元负运算符应用于无符号类型，结果仍为无符号类型
-         TCPSocket.cpp
-     1>e:\myprojects\holdinghands3.0\common\tcpsocket.cpp(55): warning C4146: 一元负运算符应用于无符号类型，结果仍为无符号类型
-     1>e:\myprojects\holdinghands3.0\common\tcpsocket.cpp(80): warning C4146: 一元负运算符应用于无符号类型，结果仍为无符号类型
-         IOCP.cpp
-         EventHandler.cpp
-         正在生成代码...
-       ResourceCompile:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\bin\rc.exe /D _DEBUG /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /l"0x0804" /IDebug\ /nologo /fo"Debug\HoldingHands.res" HoldingHands.rc 
-       Link:
+     1>Link:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MyProjects\HoldingHands3.0\Server\Debug\HoldingHands.exe" /INCREMENTAL /NOLOGO /NODEFAULTLIB:libcmt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\MyProjects\HoldingHands3.0\Server\Debug\HoldingHands.pdb" /SUBSYSTEM:WINDOWS,"5.01" /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE:NO /NXCOMPAT /IMPLIB:"E:\MyProjects\HoldingHands3.0\Server\Debug\HoldingHands.lib" /MACHINE:X86 Debug\HoldingHands.res
          Debug\dbg.obj
          Debug\EventHandler.obj
@@ -165,4 +67,4 @@
 
 生成成功。
 
-已用时间 00:00:09.88
+已用时间 00:00:01.86

@@ -46,6 +46,7 @@ typedef struct LoginInfo
 	DWORD dwPing;
 	TCHAR Comment[256];
 	TCHAR szGroup[256];
+	DWORD PE_bit;
 }LoginInfo;
 
 /*

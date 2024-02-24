@@ -7,13 +7,18 @@
 #include "MainFrm.h"
 #include "json\json.h"
 
-#pragma comment(lib,"HHRDKbHook.lib")
+#ifdef _WIN64
+#pragma comment(lib,"..\\x64\\Release\\HHRDKbHook.lib")
+
+#else 
+#pragma comment(lib,"..\\Release\\HHRDKbHook.lib")
+#endif
 
 DWORD			dwWndCount = 0;			//窗口计数
 HHOOK			hKbHook = NULL;
 
-extern"C"__declspec(dllimport)	HWND	hTopWindow;						//顶层窗口
-extern"C"__declspec(dllimport) LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);	//钩子函数
+__declspec(dllimport) HWND	hTopWindow;						//顶层窗口
+__declspec(dllimport) LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);	//钩子函数
 
 #define FIRST_MONITOR_ID 0x40
 #define MAX_MONITOR_ID (FIRST_MONITOR_ID + 0x10)

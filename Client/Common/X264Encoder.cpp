@@ -1,7 +1,7 @@
 #include "X264Encoder.h"
 #include <string.h>
 
-#pragma comment(lib,"yuv.lib")
+#pragma comment(lib,"libyuv.lib")
 #pragma comment(lib,"libx264.lib")
 
 CX264Encoder::CX264Encoder()

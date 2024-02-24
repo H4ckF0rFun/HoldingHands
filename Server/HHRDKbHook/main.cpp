@@ -14,9 +14,9 @@ BOOL WINAPI DllMain(
 
 #pragma data_seg("Shared")     
 
-extern "C" __declspec(dllexport) HWND	hTopWindow = NULL;		//HoldingHands RemoteDesktop 当前顶层窗口
+ __declspec(dllexport) HWND	hTopWindow = NULL;		//HoldingHands RemoteDesktop 当前顶层窗口
 #pragma data_seg()
-extern "C" __declspec(dllexport) LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+ __declspec(dllexport) LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK LowLevelKeyboardProc(
 	int nCode,     // hook code

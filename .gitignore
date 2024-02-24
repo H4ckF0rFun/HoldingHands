@@ -1,5 +1,6 @@
 *.obj
 Release
+Debug
 *.sdf
 *.pdb
 *.exp

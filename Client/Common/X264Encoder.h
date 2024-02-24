@@ -1,8 +1,8 @@
 #pragma once
 
 extern "C"{
-	#include "libyuv.h"
-	#include "x264.h"
+	#include <libyuv\libyuv.h>
+	#include <x264\x264.h>
 }
 
 class CX264Encoder

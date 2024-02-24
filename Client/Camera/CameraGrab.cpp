@@ -1,11 +1,11 @@
 #include "CameraGrab.h"
 #include <stdint.h>
-#include "x264.h"
+#include <x264\x264.h>
 #include "utils.h"
 #include "dbg.h"
 
 #pragma comment(lib, "Strmiids.lib")
-#pragma comment(lib, "yuv.lib")
+#pragma comment(lib, "libyuv.lib")
 #pragma comment(lib,"libx264.lib")
 
 CCameraGrab::CCameraGrab()

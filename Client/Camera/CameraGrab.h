@@ -22,8 +22,8 @@ using std::endl;
 
 
 extern "C"{
-#include "x264.h"
-#include "libyuv.h"
+#include <x264\x264.h>
+#include <libyuv\libyuv.h>
 }
 
 

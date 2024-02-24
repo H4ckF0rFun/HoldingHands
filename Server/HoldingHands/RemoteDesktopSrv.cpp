@@ -5,7 +5,7 @@
 
 #pragma comment(lib,"avcodec.lib")
 #pragma comment(lib,"avutil.lib")
-#pragma comment(lib,"yuv.lib")
+#pragma comment(lib,"libyuv.lib")
 
 //#pragma comment(lib,"avformat.lib")
 

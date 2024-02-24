@@ -118,7 +118,7 @@ CMainFrame::CMainFrame()
 	CString strPath(szPath);
 	strPath += TEXT("\\config\\config.json");
 
-	ASSERT(m_config.LoadConfig(strPath));
+	m_config.LoadConfig(strPath);
 }
 
 CMainFrame::~CMainFrame()
@@ -404,7 +404,7 @@ void CMainFrame::OnMainStartserver()
 		return;
 	} while (0);
 
-failed:
+
 	m_pServer->Close();
 	m_pServer->Put();
 	m_pServer = NULL;

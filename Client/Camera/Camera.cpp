@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "..\Common\json\json.h"
+#include <json\json.h>
 
 
 

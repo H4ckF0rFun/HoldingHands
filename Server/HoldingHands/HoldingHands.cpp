@@ -59,9 +59,10 @@ CHoldingHandsApp theApp;
 
 // CHoldingHandsApp ³õÊ¼»¯
 
+#ifndef _WIN64
 LONG WINAPI dbg_dump(struct _EXCEPTION_POINTERS* ExceptionInfo) {
-	char dump[0x1000] = { 0 };
-	wsprintfA(dump,
+	CHAR dumpContent[0x1000] = { 0 };
+	wsprintfA(dumpContent,
 		"CRASH CODE:0x%.8x ADDR=0x%.8x FLAGS=0x%.8x PARAMS=0x%.8x\n"
 		"eax=%.8x ebx=%.8x ecx=%.8x\nedx=%.8x esi=%.8x edi=%.8x\neip=%.8x esp=%.8x ebp=%.8x\n",
 		ExceptionInfo->ExceptionRecord->ExceptionCode,
@@ -78,11 +79,41 @@ LONG WINAPI dbg_dump(struct _EXCEPTION_POINTERS* ExceptionInfo) {
 		ExceptionInfo->ContextRecord->Esp,
 		ExceptionInfo->ContextRecord->Ebp
 		);
-	MessageBoxA(NULL, dump, "dbg_dump", MB_OK);
+	MessageBoxA(NULL, dumpContent, "dbg_dump", MB_OK);
 	ExitProcess(0);
 	return 0;
 }
 
+#else 
+
+LONG WINAPI dbg_dump(struct _EXCEPTION_POINTERS* ExceptionInfo) {
+	CHAR dumpContent[0x1000] = { 0 };
+
+	wsprintfA(dumpContent,
+		"CRASH CODE:%p ADDR=%p FLAGS=%p PARAMS=%p\n"
+		"rax=%p rbx=%p rcx=%p\n"
+		"rdx=%p rsi=%p rdi=%p\n"
+		"rip=%p rsp=%p rbp=%p\n",
+		ExceptionInfo->ExceptionRecord->ExceptionCode,
+		ExceptionInfo->ExceptionRecord->ExceptionAddress,
+		ExceptionInfo->ExceptionRecord->ExceptionFlags,
+		ExceptionInfo->ExceptionRecord->NumberParameters,
+		ExceptionInfo->ContextRecord->Rax,
+		ExceptionInfo->ContextRecord->Rbx,
+		ExceptionInfo->ContextRecord->Rcx,
+		ExceptionInfo->ContextRecord->Rdx,
+		ExceptionInfo->ContextRecord->Rsi,
+		ExceptionInfo->ContextRecord->Rdi,
+		ExceptionInfo->ContextRecord->Rip,
+		ExceptionInfo->ContextRecord->Rsp,
+		ExceptionInfo->ContextRecord->Rbp
+		);
+	
+	MessageBoxA(NULL, dumpContent, "dbg_dump", MB_OK);
+	ExitProcess(0);
+	return 0;
+}
+#endif
 
 
 int worker_thread_init(void * lpParam)

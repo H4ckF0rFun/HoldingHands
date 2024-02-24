@@ -270,10 +270,6 @@ void CSearchFile::Push(WCHAR*pDir)
 {
 	do 
 	{
-		_asm
-		{
-			pause
-		}
 	} while (InterlockedExchange(&m_StackLock,1));
 
 	++m_StackSize;
@@ -291,9 +287,6 @@ LPWSTR CSearchFile::Pop()
 	//lock 
 	do 
 	{
-		_asm{
-			pause
-		}
 	} while (InterlockedExchange(&m_StackLock,1));
 
 	--m_StackSize;

@@ -2,17 +2,18 @@
 #define _SPIN_LOCK
 #include<Windows.h>
 
+#define RW_LOCK_BIAS		 0x01000000
+
+#define _rw_spinlock_init(x)   do{ *x = RW_LOCK_BIAS; } while(0);
+
+#ifndef _WIN64
 #define __spin_lock_initialize(lock) InterlockedExchange(&lock,0)
 #define __spin_lock(lock)  while (InterlockedExchange(&lock,1)){__asm{pause};};
 #define __spin_unlock(lock) InterlockedExchange(&lock,0)
 
 
-#define RW_LOCK_BIAS		 0x01000000
-
 typedef volatile unsigned long rw_spinlock_t;
 typedef volatile unsigned long spinlock_t;
-
-#define _rw_spinlock_init(x)   do{ *x = RW_LOCK_BIAS; } while(0);
 
 //copied from linux-2.6.11;
 
@@ -78,5 +79,51 @@ __declspec(naked) static int _write_unlock(rw_spinlock_t *rw_lock)
 		ret;
 	}
 }
+
+#else 
+#define __spin_lock_initialize(lock) InterlockedExchange64(&lock,0)
+#define __spin_lock(lock)  while (InterlockedExchange64(&lock,1)){};
+#define __spin_unlock(lock) InterlockedExchange64(&lock,0)
+
+
+typedef volatile LONG64 rw_spinlock_t;
+typedef volatile LONG64 spinlock_t;
+
+//copied from linux-2.6.11;
+static __inline void _read_lock(rw_spinlock_t * rw_lock)
+{
+	while (InterlockedDecrement64(rw_lock) < 0){
+		InterlockedIncrement64(rw_lock);
+		while (*rw_lock < 1);
+	}
+}
+
+static __inline void  _write_lock(rw_spinlock_t * rw_lock)
+{
+	while (InterlockedAdd64(rw_lock, -RW_LOCK_BIAS)){
+		InterlockedAdd64(rw_lock, RW_LOCK_BIAS);
+	}
+}
+
+__inline void  _read_unlock(rw_spinlock_t * rw_lock)
+{
+	InterlockedIncrement64(rw_lock);
+}
+
+
+__inline void _write_unlock(rw_spinlock_t * rw_lock)
+{
+	InterlockedAdd64(rw_lock, RW_LOCK_BIAS);
+}
+#endif
+
+
+
+
+
+
+
+
+
 
 #endif

@@ -12,8 +12,8 @@ typedef struct Module
 	PIMAGE_DOS_HEADER DosHeaders;
 	PIMAGE_NT_HEADERS NtHeaders;
 	DWORD			  ImageSize;
-	DWORD			  ImageBase;
-	DWORD             OriginalBase;
+	BYTE*			  ImageBase;
+	BYTE*             OriginalBase;
 	DllEntryProc	  Entry;
 	
 	HMODULE*		  Dependency;

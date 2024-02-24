@@ -2,9 +2,6 @@
 #include "dbg.h"
 #include <stdint.h>
 #include <stdio.h>
-#include"x264.h"
-
-
 #include <WinUser.h>
 
 #define THREAD_MSG_NEXT_FRAME	(WM_USER + 123)
@@ -143,7 +140,7 @@ void CRemoteDesktop::OnClose()
 
 LRESULT CALLBACK CRemoteDesktop::WndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	MyData*		 pMyData	    = (MyData*)GetWindowLongPtr(hWnd,GWL_USERDATA);
+	MyData*		 pMyData = (MyData*)GetWindowLongPtr(hWnd, (-21));
 	CREATESTRUCT*pCreateStruct  = NULL;
 	HWND		 hRemovedWnd    = NULL;
 	HWND		 hAfterWnd		= NULL;
@@ -154,8 +151,8 @@ LRESULT CALLBACK CRemoteDesktop::WndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARA
 	case WM_CREATE:
 		pCreateStruct = (CREATESTRUCT*)lParam;
 		//ÉèÖÃUserData,
-		SetWindowLong(hWnd,GWL_USERDATA,(LONG)pCreateStruct->lpCreateParams);
-		pMyData = (MyData*)GetWindowLongPtr(hWnd,GWL_USERDATA);
+		SetWindowLong(hWnd, (-21), (LONG)pCreateStruct->lpCreateParams);
+		pMyData = (MyData*)GetWindowLongPtr(hWnd, (-21));
 		pMyData->m_hNextViewer = SetClipboardViewer(hWnd);
 		break;
 	case WM_CLOSE:

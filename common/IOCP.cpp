@@ -46,7 +46,7 @@ CIOCP::CIOCP(UINT MaxThreadCount, typeInit init, typeFini fini,void *lpParam)
 	m_WorkingCount = 0;
 
 	//initialize spinlock.
-	InterlockedExchange(&m_spinlock, 0);
+	__spin_lock_initialize(m_spinlock);
 
 	list_init(&m_workers);
 

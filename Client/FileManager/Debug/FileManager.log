@@ -1,5 +1,10 @@
-﻿生成启动时间为 2024/1/7 18:38:31。
+﻿生成启动时间为 2024/2/24 16:10:47。
+     1>项目“E:\MyProjects\HoldingHands3.0\Client\FileManager\FileManager.vcxproj”在节点 8 上(Build 个目标)。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(364,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+     1>Link:
+         FileManager.vcxproj -> E:\MyProjects\HoldingHands3.0\Client\FileManager\..\Debug\FileMgr.exe
+     1>已完成生成项目“E:\MyProjects\HoldingHands3.0\Client\FileManager\FileManager.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00
+已用时间 00:00:00.04

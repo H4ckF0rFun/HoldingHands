@@ -18,17 +18,17 @@ static int ProtectionFlags[2][2][2] =
 LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 {
 	IMAGE_DOS_HEADER *pDosHeader = (IMAGE_DOS_HEADER*)(hModule);
-	IMAGE_NT_HEADERS *pNtHeaders = (IMAGE_NT_HEADERS*)(pDosHeader->e_lfanew + (DWORD)hModule);
+	IMAGE_NT_HEADERS *pNtHeaders = (IMAGE_NT_HEADERS*)(pDosHeader->e_lfanew + (LPBYTE)hModule);
 	IMAGE_DATA_DIRECTORY * DataDirectory = (IMAGE_DATA_DIRECTORY*)&pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
 
 	IMAGE_EXPORT_DIRECTORY*pExportDirectory = (IMAGE_EXPORT_DIRECTORY*)(
 		DataDirectory->VirtualAddress +
-		(DWORD)hModule);
+		(LPBYTE)hModule);
 
 	DWORD dwRavOfExportBegin = DataDirectory->VirtualAddress;
 	DWORD dwRvaOfExportEnd = dwRavOfExportBegin + DataDirectory->Size;
 
-	DWORD* FuncTable = (DWORD*)((DWORD)hModule + pExportDirectory->AddressOfFunctions);
+	DWORD* FuncTable = (DWORD*)((LPBYTE)hModule + pExportDirectory->AddressOfFunctions);
 	DWORD dwRvaOfFunc = 0;
 
 	//there is no export table;
@@ -52,12 +52,12 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 	else
 	{
 		//by name
-		DWORD * NameTable = (DWORD*)((DWORD)hModule + pExportDirectory->AddressOfNames);
-		WORD *	OrdTable  = (WORD*)((DWORD)hModule + pExportDirectory->AddressOfNameOrdinals);
+		DWORD * NameTable = (DWORD*)((LPBYTE)hModule + pExportDirectory->AddressOfNames);
+		WORD *	OrdTable = (WORD*)((LPBYTE)hModule + pExportDirectory->AddressOfNameOrdinals);
 
 		for (int i = 0; i < pExportDirectory->NumberOfNames; i++)
 		{
-			char*name = (char*)(NameTable[i] + (DWORD)hModule);
+			char*name = (char*)(NameTable[i] + (LPBYTE)hModule);
 			if (!lstrcmpiA(name, ProcName))
 			{
 				dwRvaOfFunc = FuncTable[OrdTable[i]];
@@ -72,7 +72,7 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 		char szBuffer[0x100];
 		char*pModule = szBuffer;
 		char*pProc   = pModule;
-		lstrcpynA(szBuffer, (char*)(dwRvaOfFunc + (DWORD)hModule), 0x100);
+		lstrcpynA(szBuffer, (char*)(dwRvaOfFunc + (LPBYTE)hModule), 0x100);
 		while (pProc[0] && pProc[0] != '.') pProc++;
 
 		*pProc++ = 0;
@@ -88,7 +88,7 @@ LPVOID __GetProcAddress(HMODULE hModule, const char*ProcName)
 		}
 		return __GetProcAddress(hModule, pProc);
 	}
-	return (void*)(dwRvaOfFunc + (DWORD)hModule);
+	return (void*)(dwRvaOfFunc + (LPBYTE)hModule);
 }
 
 int CopySections(Module * module,const BYTE * data)
@@ -96,7 +96,7 @@ int CopySections(Module * module,const BYTE * data)
 
 	IMAGE_SECTION_HEADER * section;
 	int NumOfSections    = module->NtHeaders->FileHeader.NumberOfSections;
-	DWORD ImageBase = module->ImageBase;
+	BYTE* ImageBase = module->ImageBase;
 
 	section = (IMAGE_SECTION_HEADER*)(
 		module->ImageBase +
@@ -147,9 +147,9 @@ int CopySections(Module * module,const BYTE * data)
 
 int Relocate(Module * module)
 {
-	DWORD     ImageBase = module->ImageBase;
-	DWORD     OriginalBase = module->OriginalBase;
-	DWORD     Delta;
+	BYTE*     ImageBase = module->ImageBase;
+	BYTE*     OriginalBase = module->OriginalBase;
+	LONG64    Delta;
 	PIMAGE_NT_HEADERS NtHeaders = module->NtHeaders;
 
 	IMAGE_BASE_RELOCATION * relocation = (IMAGE_BASE_RELOCATION*)(
@@ -169,7 +169,7 @@ int Relocate(Module * module)
 		return -1;
 	}
 
-	Delta = (DWORD)(ImageBase - OriginalBase);
+	Delta = ImageBase - OriginalBase;
 	
 	/*
 		md 网上的资料都是错的，根本没有结尾空的重定位项标记 结束.
@@ -182,7 +182,7 @@ int Relocate(Module * module)
 	while (relocation_size)
 	{
 		DWORD dwItems = (relocation->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / 2;
-		WORD * pAddrs = (WORD*)(sizeof(IMAGE_BASE_RELOCATION) + (DWORD)relocation);
+		WORD * pAddrs = (WORD*)(sizeof(IMAGE_BASE_RELOCATION) + (LPBYTE)relocation);
 
 		//dbg_log("relocation addr: %p ,va : %p , size: %d",
 		//	relocation,
@@ -193,15 +193,19 @@ int Relocate(Module * module)
 
 		for (int i = 0; i < dwItems; i++)
 		{
-			WORD dwType = (pAddrs[i] >> 12);
-			WORD dwOffset =  (pAddrs[i] & 0xfff);
-			DWORD*pRelocationAddr = (DWORD*)(ImageBase + relocation->VirtualAddress + dwOffset);
+			WORD   dwType = (pAddrs[i] >> 12);
+			WORD   dwOffset =  (pAddrs[i] & 0xfff);
+			LPBYTE* pRelocationAddr = (LPBYTE*)(ImageBase + relocation->VirtualAddress + dwOffset);
 			//
 			switch (dwType)
 			{
+				//0: 基址重定位被忽略。这种类型可以用来对其它块进行填充。
 			case IMAGE_REL_BASED_ABSOLUTE:		//block alignment
 				break;
 			case IMAGE_REL_BASED_HIGHLOW:
+				(*(UINT32*)pRelocationAddr) += Delta;
+				break;
+			case IMAGE_REL_BASED_DIR64:
 				*pRelocationAddr += Delta;
 				break;
 			default:
@@ -209,14 +213,14 @@ int Relocate(Module * module)
 			}
 		}
 		//Next Block
-		relocation = (IMAGE_BASE_RELOCATION*)(relocation->SizeOfBlock + (DWORD)relocation);
+		relocation = (IMAGE_BASE_RELOCATION*)(relocation->SizeOfBlock + (LPBYTE)relocation);
 	}
 	return 0;
 }
 
 int FixImport(Module * module)
 {
-	DWORD ImageBase = module->ImageBase;
+	LPBYTE ImageBase = module->ImageBase;
 	PIMAGE_NT_HEADERS NtHeaders = module->NtHeaders;
 	PIMAGE_DATA_DIRECTORY DataDir = NtHeaders->OptionalHeader.DataDirectory;
 	PIMAGE_IMPORT_DESCRIPTOR ImportDescriptor;
@@ -301,7 +305,7 @@ int FinalizeSections(Module* module)
 	BOOL				  executable;
 	BOOL				  readable;
 	BOOL				  writeable;
-	DWORD			      ImageBase = module->ImageBase;
+	LPBYTE			      ImageBase = module->ImageBase;
 	PIMAGE_NT_HEADERS     NtHeaders = module->NtHeaders;
 	PIMAGE_SECTION_HEADER section   = IMAGE_FIRST_SECTION(NtHeaders);
 	
@@ -330,6 +334,7 @@ int FinalizeSections(Module* module)
 		else
 			section_size = section[1].VirtualAddress - section->VirtualAddress;
 
+		//Is it correct ???
 		section->Misc.PhysicalAddress = (DWORD)(ImageBase + section->VirtualAddress);
 		
 		//protect.
@@ -367,9 +372,12 @@ Module*  __LoadModule(const BYTE* data)
 	module = AllocModule();
 	
 	module->ImageSize = pOldNtHeaders->OptionalHeader.SizeOfImage;
-	module->OriginalBase = pOldNtHeaders->OptionalHeader.ImageBase;
 
-	module->ImageBase = (DWORD)VirtualAlloc(
+	RtlCopyMemory(&module->OriginalBase,
+		&pOldNtHeaders->OptionalHeader.ImageBase,
+		sizeof(pOldNtHeaders->OptionalHeader.ImageBase));
+
+	module->ImageBase = (LPBYTE)VirtualAlloc(
 			(LPVOID)pOldNtHeaders->OptionalHeader.ImageBase,
 			module->ImageSize,
 			MEM_COMMIT | MEM_RESERVE,
@@ -378,7 +386,7 @@ Module*  __LoadModule(const BYTE* data)
 
 	if (module->ImageBase == NULL)
 	{
-		module->ImageBase = (DWORD)VirtualAlloc(
+		module->ImageBase = (LPBYTE)VirtualAlloc(
 			NULL, 
 			module->ImageSize,
 			MEM_COMMIT | MEM_RESERVE,
@@ -401,7 +409,10 @@ Module*  __LoadModule(const BYTE* data)
 	
 	//reset pNtHeaders
 	module->NtHeaders = (IMAGE_NT_HEADERS*)(module->ImageBase + dwNTHeaderOffset);
-	module->NtHeaders->OptionalHeader.ImageBase = module->ImageBase;
+
+	RtlCopyMemory(&module->NtHeaders->OptionalHeader.ImageBase,
+		&module->ImageBase,
+		sizeof(module->NtHeaders->OptionalHeader.ImageBase));
 
 	//Copy Sections.
 	if (CopySections(module, data))

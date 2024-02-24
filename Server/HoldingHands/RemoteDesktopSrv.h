@@ -3,7 +3,7 @@ extern "C"
 {
 #include <libavcodec\avcodec.h>
 #include <libavutil\avutil.h>
-#include <libyuv.h>
+#include <libyuv\libyuv.h>
 }
 
 #include "EventHandler.h"
