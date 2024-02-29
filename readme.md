@@ -22,7 +22,7 @@ This is free remote access trojan.
     - View victim's desktop
     - Clipboard data synchronization (only text)
     - Screenshot
-    - Gdi grab and x264 encode.
+    - Gdi grab and DXGI(fast) grab, x264 encode.
     - Record (Not implemented yet)
     - Support multiple minitors
 2. Camera:
@@ -57,6 +57,7 @@ This is free remote access trojan.
     - Kill processes
 10. Window Manager(Not implemented yet)
 11. Service Manager(Not implemented yet)
+
 
 
 ## 支持的功能:
@@ -125,3 +126,10 @@ This is free remote access trojan.
 
 1. 继承CEventHandler 实现主要的逻辑
 2. 设计Window 并且处理 handler 通知的消息,同时通过handler发起命令操作. 详细的步骤请参考已经开发好的模块
+
+## 打赏作者
+
+![Untitled](assets/wx.jpg)
+
+
+![Untitled](assets/zfb.jpg)
