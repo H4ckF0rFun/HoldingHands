@@ -9,3 +9,10 @@ ipch
 client_exe
 data
 *.db
+
+Bin\Modules\64\
+Bin\Sever_x86_64\
+common\x86_64\
+Client\x64\
+Server\x64\
+Server\HoldingHands\x64\

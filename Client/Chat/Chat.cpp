@@ -39,7 +39,7 @@ LRESULT CALLBACK CChat::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	HWND hMsgList;
 	LPCREATESTRUCTW pCreateStruct = NULL;
 	//不能用static 变量(开启多个对话框的时候会乱套)
-	CChat*pChat = (CChat*)GetWindowLong(hWnd, GWLP_USERDATA);
+	CChat*pChat = (CChat*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	switch (uMsg)
 	{
